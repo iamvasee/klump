@@ -173,8 +173,8 @@ export default function Sidebar() {
           {isCollapsed ? (
             <div className="w-10 h-10 flex items-center justify-center">
               <Image
-                src="/zuperchit_full.svg"
-                alt="Zuperchit"
+                src="/clyra_full.svg"
+                alt="Clyra"
                 width={24}
                 height={24}
                 className="w-6 h-6"
@@ -183,8 +183,8 @@ export default function Sidebar() {
           ) : (
             <div className="flex items-center">
               <Image
-                src="/zuperchit_main_logo.svg"
-                alt="Zuperchit Core Chit Fund"
+                src="/clyra_main_logo.svg"
+                alt="Clyra Core Entity Management"
                 width={180}
                 height={28}
                 className="h-7 w-auto"
@@ -200,10 +200,10 @@ export default function Sidebar() {
           <div className="flex items-center space-x-3">
             {/* MUI Marble Avatar */}
             <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
-              ABC
+              CLY
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-500 truncate">ABC Chit Fund Pvt Ltd</p>
+              <p className="text-xs font-medium text-gray-500 truncate">Clyra Pvt Ltd</p>
             </div>
           </div>
         </div>

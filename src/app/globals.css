@@ -279,8 +279,8 @@ body {
 }
 
 /* Ensure logos are white in dark mode */
-.dark img[alt*="Zuperchit"],
-.dark img[alt*="zuperchit"] {
+.dark img[alt*="Clyra"],
+.dark img[alt*="clyra"] {
   filter: brightness(0) invert(1);
 }
 

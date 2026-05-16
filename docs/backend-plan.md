@@ -1,4 +1,4 @@
-# EntityOS — Backend Plan (Deferred)
+# Clyra — Backend Plan (Deferred)
 
 > [!NOTE]
 > This file contains all backend-related specifications extracted from the main plan. These will be implemented **after** the frontend is complete.

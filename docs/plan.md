@@ -1,4 +1,4 @@
-# EntityOS — MVP Implementation Plan
+# Clyra — MVP Implementation Plan
 
 A multi-entity compliance intelligence platform for family offices, promoter groups, and CA/CS firms managing private companies, LLPs, partnerships, and trusts in India.
 

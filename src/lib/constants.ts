@@ -1,5 +1,5 @@
 // ============================================================
-// EntityOS — Constants & Enum Labels
+// Clyra — Constants & Enum Labels
 // ============================================================
 
 import { EntityType, EntityStatus, RelationshipRole, DocumentType, AccountType } from "./types";

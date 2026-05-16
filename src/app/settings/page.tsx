@@ -94,7 +94,7 @@ export default function SettingsPage() {
                       <Building2 className="w-5 h-5 mr-3 text-blue-600" />
                       Company Information
                     </h2>
-                    <p className="text-gray-600 mt-1">Manage your chit fund company details and legal information</p>
+                    <p className="text-gray-600 mt-1">Manage your entity management company details and legal information</p>
                   </div>
                   
                   <div className="p-8">
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                         <input
                           id="companyName"
                           type="text"
-                          defaultValue="Zuper Chit Funds Pvt Ltd"
+                          defaultValue="Clyra Pvt Ltd"
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           placeholder="Enter company name"
                         />
@@ -244,7 +244,7 @@ export default function SettingsPage() {
 
                   <div className="p-8">
                     <div className="space-y-8">
-                      {/* Chit Fund License */}
+                      {/* Entity Management License */}
                       <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
@@ -252,7 +252,7 @@ export default function SettingsPage() {
                               <CheckCircle className="w-6 h-6 text-green-600" />
                             </div>
                 <div>
-                              <h4 className="text-lg font-medium text-green-900">Chit Fund License</h4>
+                              <h4 className="text-lg font-medium text-green-900">Entity Management License</h4>
                               <p className="text-green-700 text-sm">License Number: CF/2020/12345</p>
                               <p className="text-green-600 text-xs">Valid until: Dec 31, 2025</p>
                             </div>
@@ -385,7 +385,7 @@ export default function SettingsPage() {
                               type="text"
                               defaultValue="INV"
                               className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
-                              placeholder="e.g., INV, CF, CHIT"
+                              placeholder="e.g., INV, CF, ENTITY"
                             />
                           </div>
                           <div className="space-y-2">
@@ -554,7 +554,7 @@ export default function SettingsPage() {
                             <input
                               id="officeEmail"
                               type="email"
-                              defaultValue="office@zuperchit.com"
+                              defaultValue="office@clyra.com"
                               className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                               placeholder="Office email address"
                             />
@@ -572,7 +572,7 @@ export default function SettingsPage() {
                             <input
                               id="website"
                               type="url"
-                              defaultValue="https://www.zuperchit.com"
+                              defaultValue="https://www.clyra.com"
                               className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                               placeholder="Company website"
                             />
@@ -802,7 +802,7 @@ export default function SettingsPage() {
                           <input
                             id="backupLocation"
                             type="text"
-                            defaultValue="/var/backups/zuperchit"
+                            defaultValue="/var/backups/clyra"
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             placeholder="Backup directory path"
                           />

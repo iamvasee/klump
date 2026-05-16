@@ -14,17 +14,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Zuperchit - Core Chit Fund Software",
-  description: "Manage your chit funds efficiently with our comprehensive dashboard",
+  title: "Clyra - Premium Entity & Compliance Management",
+  description: "Manage your entities and statutory compliance efficiently with our comprehensive dashboard",
   icons: {
     icon: [
       {
-        url: "/zuperchit_full.svg",
+        url: "/clyra_full.svg",
         type: "image/svg+xml",
       },
     ],
-    shortcut: "/zuperchit_full.svg",
-    apple: "/zuperchit_full.svg",
+    shortcut: "/clyra_full.svg",
+    apple: "/clyra_full.svg",
   },
 };
 

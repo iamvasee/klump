@@ -74,7 +74,7 @@ export default function Header() {
               </div>
               <div className="hidden md:block text-left">
                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">David Spade</p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">Chit Fund Admin</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">Entity Management Admin</p>
               </div>
               <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
             </button>
@@ -90,7 +90,7 @@ export default function Header() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">David Spade</p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400">david.spade@zuperchit.com</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">david.spade@clyra.com</p>
                     </div>
                   </div>
                 </div>
