@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import Image from 'next/image';
 import React from 'react';
 import { 
   Home, 
@@ -170,27 +169,16 @@ export default function Sidebar() {
         <div className={`flex items-center ${
           isCollapsed ? 'justify-center' : 'space-x-3'
         }`}>
-          {isCollapsed ? (
-            <div className="w-10 h-10 flex items-center justify-center">
-              <Image
-                src="/clyra_full.svg"
-                alt="Clyra"
-                width={24}
-                height={24}
-                className="w-6 h-6"
-              />
+          <div className="flex items-center space-x-2.5">
+            <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <span className="text-white font-bold text-xl tracking-tighter italic">C</span>
             </div>
-          ) : (
-            <div className="flex items-center">
-              <Image
-                src="/clyra_main_logo.svg"
-                alt="Clyra Core Entity Management"
-                width={180}
-                height={28}
-                className="h-7 w-auto"
-              />
-            </div>
-          )}
+            {!isCollapsed && (
+              <span className="text-xl font-bold tracking-tight text-gray-900">
+                Clyra<span className="text-blue-600">.</span>
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
