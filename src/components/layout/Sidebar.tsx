@@ -182,20 +182,7 @@ export default function Sidebar() {
         </div>
       </div>
 
-      {/* Company Name Section */}
-      {!isCollapsed && (
-        <div className="px-4 py-3 border-b border-gray-100">
-          <div className="flex items-center space-x-3">
-            {/* MUI Marble Avatar */}
-            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white text-xs font-semibold">
-              CLY
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-xs font-medium text-gray-500 truncate">Clyra Pvt Ltd</p>
-            </div>
-          </div>
-        </div>
-      )}
+
 
       {/* Navigation */}
       <nav className="flex-1 px-3 py-6 space-y-1">

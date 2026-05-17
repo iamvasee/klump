@@ -30,7 +30,9 @@ export type RelationshipRole =
   | "karta"
   | "proprietor"
   | "authorised_signatory"
-  | "beneficial_owner";
+  | "beneficial_owner"
+  | "auditor"
+  | "company_secretary";
 
 export type DocumentType =
   | "certificate_of_incorporation"
@@ -124,9 +126,12 @@ export interface BankAccount {
   id: string;
   entity_id: string;
   bank_name: string;
+  account_holder_name: string;
   branch?: string;
   account_number: string;
   ifsc_code: string;
+  iban?: string;
+  swift_code?: string;
   account_type: AccountType;
   is_primary: boolean;
   created_at: string;

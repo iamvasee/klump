@@ -32,6 +32,7 @@ import MainLayout from '@/components/layout/MainLayout';
 import { SecondaryButton, OutlineButton } from '@/components/ui/Button/index';
 import { db } from '@/lib/mockdb';
 import { Person, Entity, EntityPersonRelationship } from '@/lib/types';
+import Link from 'next/link';
 
 export default function PersonViewContent({ uid }: { uid: string }) {
   const [person, setPerson] = useState<Person | null>(null);

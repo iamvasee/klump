@@ -1,4 +1,4 @@
-import { Entity, Person, EntityPersonRelationship, Document, AuditLogEntry, UserProfile, Organisation } from "./types";
+import { Entity, Person, EntityPersonRelationship, Document, AuditLogEntry, UserProfile, Organisation, BankAccount, EntityGstin } from "./types";
 
 // --- Mock Initial Data ---
 
@@ -20,6 +20,89 @@ export const MOCK_USER: UserProfile = {
   updated_at: new Date().toISOString(),
 };
 
+const ent1_bank_accounts: BankAccount[] = [
+  {
+    id: "bank_1",
+    entity_id: "ent_1",
+    bank_name: "HDFC Bank",
+    account_holder_name: "Acme Private Limited",
+    branch: "Mumbai Main",
+    account_number: "50100234567890",
+    ifsc_code: "HDFC0000001",
+    swift_code: "HDFCINBB",
+    iban: "IN64HDFC000000150100234567890",
+    account_type: "current",
+    is_primary: true,
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "bank_2",
+    entity_id: "ent_1",
+    bank_name: "ICICI Bank",
+    account_holder_name: "Acme Private Limited",
+    branch: "Andheri East",
+    account_number: "000405001234",
+    ifsc_code: "ICIC0000004",
+    swift_code: "ICICINBB",
+    account_type: "current",
+    is_primary: false,
+    created_at: new Date().toISOString(),
+  }
+];
+
+const ent1_gstins: EntityGstin[] = [
+  {
+    id: "gst_1",
+    entity_id: "ent_1",
+    gstin: "27ABCDE1234F1Z5",
+    state: "Maharashtra",
+    status: "active",
+    created_at: new Date().toISOString(),
+  }
+];
+
+const ent1_documents: Document[] = [
+  {
+    id: "doc_1",
+    organisation_id: "org_1",
+    entity_id: "ent_1",
+    file_name: "Certificate_of_Incorporation.pdf",
+    file_path: "/docs/coi.pdf",
+    document_type: "certificate_of_incorporation",
+    document_date: "2010-05-15",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "doc_2",
+    organisation_id: "org_1",
+    entity_id: "ent_1",
+    file_name: "PAN_Card_Acme.pdf",
+    file_path: "/docs/pan.pdf",
+    document_type: "pan_card",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "doc_3",
+    organisation_id: "org_1",
+    entity_id: "ent_1",
+    file_name: "ITR_V_FY_2023_24.pdf",
+    file_path: "/docs/itr_2024.pdf",
+    document_type: "itr_acknowledgement",
+    financial_year: "2023-24",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "doc_4",
+    organisation_id: "org_1",
+    entity_id: "ent_1",
+    file_name: "FSSAI_License_2024.pdf",
+    file_path: "/docs/fssai.pdf",
+    document_type: "other",
+    description: "FSSAI Food Safety License",
+    created_at: new Date().toISOString(),
+  }
+];
+
 export const MOCK_ENTITIES: Entity[] = [
   {
     id: "ent_1",
@@ -33,7 +116,9 @@ export const MOCK_ENTITIES: Entity[] = [
     financial_year_end: "march_31",
     nature_of_business: "Software Development",
     pan: "ABCDE1234F",
+    tan: "MUMA12345C",
     cin: "U12345MH2010PTC123456",
+    fssai: "12345678901234",
     completeness_score: 85,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -41,6 +126,9 @@ export const MOCK_ENTITIES: Entity[] = [
     city: "Mumbai",
     state: "Maharashtra",
     pin_code: "400001",
+    bank_accounts: ent1_bank_accounts,
+    gstins: ent1_gstins,
+    documents: ent1_documents,
   },
   {
     id: "ent_2",
@@ -58,6 +146,9 @@ export const MOCK_ENTITIES: Entity[] = [
     completeness_score: 60,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    bank_accounts: [],
+    gstins: [],
+    documents: [],
   }
 ];
 
@@ -85,6 +176,39 @@ export const MOCK_PEOPLE: Person[] = [
     completeness_score: 40,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+  },
+  {
+    id: "per_3",
+    organisation_id: "org_1",
+    full_name: "Charlie Brown",
+    nationality: "Indian",
+    email: "charlie@invest.com",
+    pan: "WXYZA1234B",
+    completeness_score: 50,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "per_4",
+    organisation_id: "org_1",
+    full_name: "David Smith & Associates",
+    nationality: "Indian",
+    email: "audit@davidsmith.com",
+    pan: "AUDIT9999S",
+    completeness_score: 100,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "per_5",
+    organisation_id: "org_1",
+    full_name: "Meera Iyer",
+    nationality: "Indian",
+    email: "cs.meera@outlook.com",
+    pan: "CSMEE1234I",
+    completeness_score: 100,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
   }
 ];
 
@@ -104,6 +228,44 @@ export const MOCK_RELATIONSHIPS: EntityPersonRelationship[] = [
     person_id: "per_2",
     role: "partner",
     effective_from: "2015-08-20",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "rel_3",
+    entity_id: "ent_1",
+    person_id: "per_3",
+    role: "shareholder",
+    shareholding_pct: 45,
+    effective_from: "2012-01-10",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "rel_4",
+    entity_id: "ent_1",
+    person_id: "per_1",
+    role: "shareholder",
+    shareholding_pct: 55,
+    effective_from: "2010-05-15",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "rel_5",
+    entity_id: "ent_1",
+    person_id: "per_4",
+    role: "auditor",
+    effective_from: "2020-04-01",
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: "rel_6",
+    entity_id: "ent_1",
+    person_id: "per_5",
+    role: "company_secretary",
+    effective_from: "2021-06-15",
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   }
