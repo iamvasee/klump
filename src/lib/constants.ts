@@ -40,6 +40,8 @@ export const RELATIONSHIP_ROLE_LABELS: Record<RelationshipRole, string> = {
   proprietor: "Proprietor",
   authorised_signatory: "Authorised Signatory",
   beneficial_owner: "Beneficial Owner",
+  auditor: "Statutory Auditor",
+  company_secretary: "Company Secretary",
 };
 
 export const DOCUMENT_TYPE_LABELS: Record<DocumentType, string> = {
