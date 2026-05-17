@@ -3,12 +3,12 @@ import { cn } from '../../utils/cn';
 
 export interface BaseButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'ghost' | 'outline';
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'icon' | 'icon-sm';
   loading?: boolean;
   leftIcon?: React.ReactNode;
   rightIcon?: React.ReactNode;
   fullWidth?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 const BaseButton = React.forwardRef<HTMLButtonElement, BaseButtonProps>(
@@ -84,6 +84,8 @@ const BaseButton = React.forwardRef<HTMLButtonElement, BaseButtonProps>(
       md: 'px-4 py-2 text-sm min-h-[40px]',
       lg: 'px-6 py-3 text-base min-h-[48px]',
       xl: 'px-8 py-4 text-lg min-h-[56px]',
+      'icon': 'p-2 min-h-[40px] min-w-[40px]',
+      'icon-sm': 'p-1.5 min-h-[32px] min-w-[32px]',
     };
 
     const iconSizeClasses = {
@@ -92,6 +94,8 @@ const BaseButton = React.forwardRef<HTMLButtonElement, BaseButtonProps>(
       md: 'w-4 h-4',
       lg: 'w-5 h-5',
       xl: 'w-6 h-6',
+      'icon': 'w-5 h-5',
+      'icon-sm': 'w-4 h-4',
     };
 
     const classes = cn(

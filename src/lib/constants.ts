@@ -85,5 +85,6 @@ export const NAV_ITEMS = [
   { label: "Dashboard", href: "/", icon: "LayoutDashboard" },
   { label: "Entities", href: "/entities", icon: "Building2" },
   { label: "People", href: "/people", icon: "Users" },
+  { label: "Professionals", href: "/professionals", icon: "Briefcase" },
   { label: "Settings", href: "/settings", icon: "Settings" },
 ] as const;

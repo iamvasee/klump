@@ -271,10 +271,10 @@ Branch: ${acc.branch || 'N/A'}`;
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Name</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Designation</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">DIN / DPIN</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Since</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Name</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Designation</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">DIN / DPIN</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Since</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
@@ -289,7 +289,7 @@ Branch: ${acc.branch || 'N/A'}`;
                               </Link>
                             </td>
                             <td className="px-6 py-5 whitespace-nowrap">
-                              <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold rounded-lg uppercase tracking-wider">
+                              <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-semibold rounded-lg uppercase tracking-wider">
                                 {rel.role.replace('_', ' ')}
                               </span>
                             </td>
@@ -316,9 +316,9 @@ Branch: ${acc.branch || 'N/A'}`;
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Professional / Firm</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Role</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Since</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Professional / Firm</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Role</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Since</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
@@ -326,14 +326,14 @@ Branch: ${acc.branch || 'N/A'}`;
                           <tr key={rel.id} className="hover:bg-indigo-50/30 transition-colors">
                             <td className="px-6 py-5 whitespace-nowrap">
                               <div className="flex items-center">
-                                <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center mr-3">
+                                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-3">
                                   <span className="text-indigo-700 font-bold text-sm">{rel.person?.full_name[0]}</span>
                                 </div>
-                                <div className="text-sm font-bold text-gray-900">{rel.person?.full_name}</div>
+                                <div className="text-sm font-semibold text-gray-900">{rel.person?.full_name}</div>
                               </div>
                             </td>
                             <td className="px-6 py-5 whitespace-nowrap">
-                              <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold rounded-lg uppercase tracking-wider min-w-[140px] text-center inline-block">
+                              <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-semibold rounded-lg uppercase tracking-wider min-w-[140px] text-center inline-block">
                                 {rel.role.replace('_', ' ')}
                               </span>
                             </td>
@@ -357,9 +357,9 @@ Branch: ${acc.branch || 'N/A'}`;
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Shareholder</th>
-                          <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Holdings (%)</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Shareholder</th>
+                          <th className="px-6 py-4 text-right text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Holdings (%)</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Status</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
@@ -375,11 +375,11 @@ Branch: ${acc.branch || 'N/A'}`;
                                 <div className="w-24 bg-gray-100 rounded-full h-1.5 hidden md:block">
                                   <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${rel.shareholding_pct}%` }}></div>
                                 </div>
-                                <span className="text-sm font-bold text-gray-900">{rel.shareholding_pct}%</span>
+                                <span className="text-sm font-semibold text-gray-900">{rel.shareholding_pct}%</span>
                               </div>
                             </td>
                             <td className="px-6 py-5 whitespace-nowrap">
-                              <span className="flex items-center text-green-600 text-[10px] font-bold uppercase tracking-widest">
+                              <span className="flex items-center text-green-600 text-[10px] font-semibold uppercase tracking-widest">
                                 <CheckCircle className="w-3.5 h-3.5 mr-1" /> Active
                               </span>
                             </td>
@@ -408,7 +408,7 @@ Branch: ${acc.branch || 'N/A'}`;
                           </div>
                           <div>
                             <h3 className="font-bold text-gray-900 tracking-tight">{acc.bank_name}</h3>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest">{acc.account_type} Account</p>
+                            <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">{acc.account_type} Account</p>
                           </div>
                         </div>
                         <button 
@@ -426,38 +426,38 @@ Branch: ${acc.branch || 'N/A'}`;
                       <div className="space-y-3.5 pt-4 border-t border-gray-50">
                         <div className="flex justify-between items-center">
                           <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">Account Name</span>
-                          <span className="text-sm font-bold text-gray-900">{acc.account_holder_name}</span>
+                          <span className="text-sm font-semibold text-gray-900">{acc.account_holder_name}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">Account Number</span>
-                          <span className="text-sm font-mono font-semibold text-gray-900">{acc.account_number}</span>
+                          <span className="text-sm font-mono font-medium text-gray-900">{acc.account_number}</span>
                         </div>
                         <div className="flex justify-between items-center">
                           <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">IFSC Code</span>
-                          <span className="text-sm font-mono font-semibold text-gray-900">{acc.ifsc_code}</span>
+                          <span className="text-sm font-mono font-medium text-gray-900">{acc.ifsc_code}</span>
                         </div>
                         {acc.swift_code && (
                           <div className="flex justify-between items-center">
                             <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">SWIFT / BIC</span>
-                            <span className="text-sm font-mono font-semibold text-gray-900">{acc.swift_code}</span>
+                            <span className="text-sm font-mono font-medium text-gray-900">{acc.swift_code}</span>
                           </div>
                         )}
                         {acc.iban && (
                           <div className="space-y-1">
                             <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">IBAN</span>
-                            <p className="text-xs font-mono font-semibold text-gray-900 bg-gray-50 p-2 rounded-lg border border-gray-100/50 break-all">{acc.iban}</p>
+                            <p className="text-xs font-mono font-medium text-gray-900 bg-gray-50 p-2 rounded-lg border border-gray-100/50 break-all">{acc.iban}</p>
                           </div>
                         )}
                         <div className="flex justify-between items-center">
                           <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">Branch</span>
-                          <span className="text-sm text-gray-700 font-semibold">{acc.branch || 'N/A'}</span>
+                          <span className="text-sm text-gray-700 font-medium">{acc.branch || 'N/A'}</span>
                         </div>
                       </div>
                     </div>
                   ))}
                   <button className="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center text-gray-300 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-all duration-300 group">
                     <Plus className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform" />
-                    <span className="text-xs font-bold uppercase tracking-widest">Link New Account</span>
+                    <span className="text-xs font-semibold uppercase tracking-widest">Link New Account</span>
                   </button>
                 </div>
               </div>
@@ -482,11 +482,11 @@ Branch: ${acc.branch || 'N/A'}`;
                             <Building2 className="w-6 h-6" />
                           </div>
                           <div>
-                            <p className="text-base font-bold text-gray-900 font-mono tracking-tighter">{gst.gstin}</p>
-                            <p className="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">{gst.state} • <span className="text-green-600">VERIFIED</span></p>
+                            <p className="text-base font-semibold text-gray-900 font-mono tracking-tighter">{gst.gstin}</p>
+                            <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest mt-0.5">{gst.state} • <span className="text-green-600 font-bold">VERIFIED</span></p>
                           </div>
                         </div>
-                        <GhostButton size="sm" className="font-bold text-[10px] uppercase tracking-widest text-blue-600" leftIcon={<Download className="w-4 h-4" />}>Certificate</GhostButton>
+                        <GhostButton size="sm" className="font-semibold text-[10px] uppercase tracking-widest text-blue-600" leftIcon={<Download className="w-4 h-4" />}>Certificate</GhostButton>
                       </div>
                     ))}
                   </div>
@@ -504,18 +504,18 @@ Branch: ${acc.branch || 'N/A'}`;
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Financial Year</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filing Date</th>
-                          <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Action</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Financial Year</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Filing Date</th>
+                          <th className="px-6 py-4 text-right text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Action</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
                         {entity.documents?.filter(d => d.document_type === 'itr_acknowledgement').map((doc) => (
                           <tr key={doc.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-900">{doc.financial_year}</td>
-                            <td className="px-6 py-5 whitespace-nowrap text-xs font-semibold text-gray-500">{doc.document_date || 'Jul 2024'}</td>
+                            <td className="px-6 py-5 whitespace-nowrap text-sm font-semibold text-gray-900">{doc.financial_year}</td>
+                            <td className="px-6 py-5 whitespace-nowrap text-xs font-medium text-gray-500">{doc.document_date || 'Jul 2024'}</td>
                             <td className="px-6 py-5 whitespace-nowrap text-right">
-                              <GhostButton size="sm" className="text-blue-600 font-bold text-[10px] uppercase tracking-widest" leftIcon={<Download className="w-3.5 h-3.5" />}>Acknowledgement</GhostButton>
+                              <GhostButton size="sm" className="text-blue-600 font-semibold text-[10px] uppercase tracking-widest" leftIcon={<Download className="w-3.5 h-3.5" />}>Acknowledgement</GhostButton>
                             </td>
                           </tr>
                         ))}
@@ -535,12 +535,12 @@ Branch: ${acc.branch || 'N/A'}`;
                       {getDocumentIcon(doc.document_type)}
                     </div>
                     <div className="flex-1 space-y-1 mb-6">
-                      <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 leading-tight transition-colors">{doc.file_name}</h3>
-                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                      <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 leading-tight transition-colors">{doc.file_name}</h3>
+                      <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-widest">
                         {doc.document_type.replace(/_/g, ' ')}
                       </p>
                     </div>
-                    <button className="w-full py-3 bg-gray-50 group-hover:bg-blue-50 text-gray-400 group-hover:text-blue-600 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-bold text-[10px] uppercase tracking-widest">
+                    <button className="w-full py-3 bg-gray-50 group-hover:bg-blue-50 text-gray-400 group-hover:text-blue-600 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-semibold text-[10px] uppercase tracking-widest">
                       <Download className="w-3.5 h-3.5" />
                       Download File
                     </button>

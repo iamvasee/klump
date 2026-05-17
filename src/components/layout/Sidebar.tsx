@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Users2,
+  Briefcase,
   UserCheck,
   CreditCard,
   Wallet,
@@ -29,6 +30,7 @@ const navigation: Array<{
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Entities', href: '/entities', icon: Users2 },
   { name: 'People', href: '/people', icon: Users },
+  { name: 'Professionals', href: '/professionals', icon: Briefcase },
   { name: 'Compliance', href: '/compliance', icon: CheckCircle, badge: 2 },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
