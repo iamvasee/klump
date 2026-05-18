@@ -11,13 +11,8 @@ export default function AuthPage() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
-  // Force light mode for auth page
+  // Check for existing session (Mock)
   useEffect(() => {
-    document.documentElement.classList.remove('dark');
-    document.documentElement.classList.add('light');
-    document.documentElement.setAttribute('data-theme', 'light');
-    
-    // Check for existing session (Mock)
     const session = localStorage.getItem('clyra-session');
     if (session) {
       router.push('/');
@@ -36,21 +31,8 @@ export default function AuthPage() {
   };
 
   return (
-    <>
-      {/* Script to force light mode immediately */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `
-            (function() {
-              document.documentElement.classList.remove('dark');
-              document.documentElement.classList.add('light');
-              document.documentElement.setAttribute('data-theme', 'light');
-            })();
-          `,
-        }}
-      />
-      <div className="min-h-screen flex bg-gray-50 font-sans">
-        {/* Left Column - Branding & Visual */}
+    <div className="min-h-screen flex bg-gray-50 font-sans">
+      {/* Left Column - Branding & Visual */}
         <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-blue-700 via-indigo-800 to-slate-900">
             {/* Abstract brand pattern */}
@@ -254,7 +236,6 @@ export default function AuthPage() {
             </div>
           </div>
         </div>
-      </div>
-    </>
+    </div>
   );
 }

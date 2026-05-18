@@ -607,3 +607,6 @@ pnpm dev              # Verify app starts on localhost:3000
 
 > [!TIP]
 > I'll build this iteratively — each phase will produce a working, runnable app. You can review and course-correct at each checkpoint.
+\n### Professionals Module
+- **Listing Page**: Added `/professionals` to view all individuals acting as Statutory Auditors or Company Secretaries.
+- **Detail View**: Added `/professionals/[uid]` to show their specific profile and associated entities.
