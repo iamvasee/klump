@@ -166,19 +166,15 @@ export default function Sidebar() {
         isCollapsed ? 'w-16' : 'w-64'
       } ${isMobile && !isCollapsed ? 'fixed left-0 top-0 z-50' : 'relative'}`}>
       {/* Logo */}
-      <div className={`flex items-center border-b border-gray-100 ${
-        isCollapsed ? 'justify-center px-3 py-6' : 'px-6 py-6'
+      <div className={`flex border-b border-gray-100 py-6 ${
+        isCollapsed ? 'justify-center px-3' : 'justify-start px-6'
       }`}>
-        <div className={`flex items-center ${
-          isCollapsed ? 'justify-center' : 'space-x-3'
-        }`}>
-          <div className="flex items-center space-x-2.5">
-            {isCollapsed ? (
-              <BrandMark className="h-6 w-6 text-blue-600" />
-            ) : (
-              <FullLogo className="h-7" />
-            )}
-          </div>
+        <div className="flex items-center">
+          {isCollapsed ? (
+            <BrandMark className="h-6 w-6" />
+          ) : (
+            <FullLogo className="h-7" />
+          )}
         </div>
       </div>
 

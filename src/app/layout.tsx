@@ -18,12 +18,12 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       {
-        url: "/Klump.svg",
+        url: "/brandmark.svg",
         type: "image/svg+xml",
       },
     ],
-    shortcut: "/Klump.svg",
-    apple: "/Klump.svg",
+    shortcut: "/brandmark.svg",
+    apple: "/brandmark.svg",
   },
 };
 
