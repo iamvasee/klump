@@ -4,6 +4,7 @@ import { Eye, EyeOff, Shield, Lock, Mail, ArrowRight, CheckCircle } from 'lucide
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { PrimaryButton } from '@/components/ui/Button/index';
+import { FullLogo } from '@/components/ui/Logo';
 
 export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
@@ -13,7 +14,7 @@ export default function AuthPage() {
 
   // Check for existing session (Mock)
   useEffect(() => {
-    const session = localStorage.getItem('clyra-session');
+    const session = localStorage.getItem('klump-session');
     if (session) {
       router.push('/');
     }
@@ -25,7 +26,7 @@ export default function AuthPage() {
     
     // Simulate API call
     setTimeout(() => {
-      localStorage.setItem('clyra-session', 'true');
+      localStorage.setItem('klump-session', 'true');
       router.push('/');
     }, 1500);
   };
@@ -46,10 +47,7 @@ export default function AuthPage() {
           <div className="relative z-10 flex flex-col justify-center px-16 text-white">
             {/* Logo */}
             <div className="flex items-center space-x-3 mb-12">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-2xl">
-                <span className="text-indigo-800 font-bold text-2xl italic tracking-tighter">C</span>
-              </div>
-              <span className="text-3xl font-bold tracking-tight">Clyra<span className="text-blue-400">.</span></span>
+              <FullLogo className="h-10" fill="white" />
             </div>
             
             <div className="space-y-8">
@@ -84,7 +82,7 @@ export default function AuthPage() {
             
             <div className="absolute bottom-12 left-16">
               <p className="text-sm text-blue-200/50">
-                © {new Date().getFullYear()} Clyra Technologies. All rights reserved.
+                © {new Date().getFullYear()} Klump Technologies. All rights reserved.
               </p>
             </div>
           </div>
@@ -95,10 +93,7 @@ export default function AuthPage() {
           <div className="max-w-md mx-auto w-full">
             {/* Mobile logo */}
             <div className="lg:hidden flex items-center space-x-2 mb-12">
-              <div className="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-xl italic tracking-tighter">C</span>
-              </div>
-              <span className="text-2xl font-bold tracking-tight text-gray-900">Clyra<span className="text-indigo-600">.</span></span>
+              <FullLogo className="h-8" />
             </div>
             
             <div className="mb-10">
@@ -108,7 +103,7 @@ export default function AuthPage() {
               <p className="mt-2 text-gray-500">
                 {isLogin 
                   ? 'Access your entity compliance dashboard' 
-                  : 'Start managing your portfolio with Clyra'}
+                  : 'Start managing your portfolio with Klump'}
               </p>
             </div>
 
@@ -198,7 +193,7 @@ export default function AuthPage() {
                       </div>
                     ) : (
                       <div className="flex items-center justify-center space-x-2">
-                        <span>{isLogin ? 'Sign In to Dashboard' : 'Create Clyra Account'}</span>
+                        <span>{isLogin ? 'Sign In to Dashboard' : 'Create Klump Account'}</span>
                         <ArrowRight className="w-5 h-5" />
                       </div>
                     )}

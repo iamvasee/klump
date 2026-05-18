@@ -1,6 +1,6 @@
-# Clyra
+# Klump
 
-**Clyra** is a premium statutory management and compliance platform designed for modern entities, companies, and portfolios.
+**Klump** is a premium statutory management and compliance platform designed for modern entities, companies, and portfolios.
 
 ## Key Features
 

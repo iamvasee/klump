@@ -226,7 +226,7 @@ export default function FilingDetailView({ uid, filingId }: FilingDetailViewProp
                
                {/* Watermark Overlay */}
                <div className="absolute bottom-6 right-8 pointer-events-none opacity-20 select-none">
-                  <p className="text-4xl font-black text-white/10 tracking-widest uppercase -rotate-12">CLYRA SECURE</p>
+                  <p className="text-4xl font-black text-white/10 tracking-widest uppercase -rotate-12">KLUMP SECURE</p>
                </div>
             </div>
           </div>

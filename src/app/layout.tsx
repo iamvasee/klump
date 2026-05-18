@@ -13,17 +13,17 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Clyra - Premium Entity & Compliance Management",
+  title: "Klump - Premium Entity & Compliance Management",
   description: "Manage your entities and statutory compliance efficiently with our comprehensive dashboard",
   icons: {
     icon: [
       {
-        url: "/clyra_full.svg",
+        url: "/Klump.svg",
         type: "image/svg+xml",
       },
     ],
-    shortcut: "/clyra_full.svg",
-    apple: "/clyra_full.svg",
+    shortcut: "/Klump.svg",
+    apple: "/Klump.svg",
   },
 };
 

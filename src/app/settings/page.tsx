@@ -133,7 +133,7 @@ export default function SettingsPage() {
                         <input
                           id="companyName"
                           type="text"
-                          defaultValue="Clyra Pvt Ltd"
+                          defaultValue="Klump Pvt Ltd"
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           placeholder="Enter company name"
                         />
@@ -554,7 +554,7 @@ export default function SettingsPage() {
                             <input
                               id="officeEmail"
                               type="email"
-                              defaultValue="office@clyra.com"
+                              defaultValue="office@klump.com"
                               className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                               placeholder="Office email address"
                             />
@@ -572,7 +572,7 @@ export default function SettingsPage() {
                             <input
                               id="website"
                               type="url"
-                              defaultValue="https://www.clyra.com"
+                              defaultValue="https://www.klump.com"
                               className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                               placeholder="Company website"
                             />
@@ -802,7 +802,7 @@ export default function SettingsPage() {
                           <input
                             id="backupLocation"
                             type="text"
-                            defaultValue="/var/backups/clyra"
+                            defaultValue="/var/backups/klump"
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             placeholder="Backup directory path"
                           />

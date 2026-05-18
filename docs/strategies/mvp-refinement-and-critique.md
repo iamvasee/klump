@@ -1,12 +1,12 @@
-# Clyra — MVP Refinement & Architectural Strategy
+# Klump — MVP Refinement & Architectural Strategy
 
-This document outlines the strategic shifts, architectural refinements, and critical code reviews performed during the initial build phase of **Clyra**.
+This document outlines the strategic shifts, architectural refinements, and critical code reviews performed during the initial build phase of **Klump**.
 
 ---
 
 ## 1. Brand Identity & Domain Alignment
 
-The application was rebranded from a legacy boilerplate to **Clyra**, a premium statutory management and compliance platform.
+The application was rebranded from a legacy boilerplate to **Klump**, a premium statutory management and compliance platform.
 
 ### Key Shifts:
 - **Domain Focus**: Shifted from "Chit Funds" to **Corporate Statutory Compliance**.

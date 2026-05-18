@@ -25,7 +25,7 @@ export default function ProfileMenu() {
     // Add logout logic here
     console.log('Logging out...');
     setIsUserMenuOpen(false);
-    localStorage.removeItem('clyra-session');
+    localStorage.removeItem('klump-session');
     window.location.href = '/auth';
   };
 
@@ -56,7 +56,7 @@ export default function ProfileMenu() {
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">David Spade</p>
-                <p className="text-xs text-gray-500">david.spade@clyra.com</p>
+                <p className="text-xs text-gray-500">david.spade@klump.com</p>
               </div>
             </div>
           </div>

@@ -20,6 +20,7 @@ import {
   Gavel,
   CheckCircle
 } from 'lucide-react';
+import { FullLogo, BrandMark } from '@/components/ui/Logo';
 
 const navigation: Array<{
   name: string;
@@ -172,13 +173,10 @@ export default function Sidebar() {
           isCollapsed ? 'justify-center' : 'space-x-3'
         }`}>
           <div className="flex items-center space-x-2.5">
-            <div className="flex-shrink-0 w-9 h-9 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-              <span className="text-white font-bold text-xl tracking-tighter italic">C</span>
-            </div>
-            {!isCollapsed && (
-              <span className="text-xl font-bold tracking-tight text-gray-900">
-                Clyra<span className="text-blue-600">.</span>
-              </span>
+            {isCollapsed ? (
+              <BrandMark className="h-6 w-6 text-blue-600" />
+            ) : (
+              <FullLogo className="h-7" />
             )}
           </div>
         </div>

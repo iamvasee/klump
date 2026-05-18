@@ -1,5 +1,5 @@
 // ============================================================
-// Clyra — Constants & Enum Labels
+// Klump — Constants & Enum Labels
 // ============================================================
 
 import { EntityType, EntityStatus, RelationshipRole, DocumentType, AccountType } from "./types";
