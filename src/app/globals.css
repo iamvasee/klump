@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Ensure consistent box-sizing and prevent layout shifts */
 * {
@@ -10,7 +10,7 @@ body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: "kern" 1;
+  font-feature-settings: 'kern' 1;
   background-color: #f8fafc; /* slate-50 */
   color: #171717;
 }

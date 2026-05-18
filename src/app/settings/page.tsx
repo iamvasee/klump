@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
 import React from 'react';
-import { 
-  Building2, 
-  FileText, 
-  Globe, 
-  Database, 
-  Shield, 
+import {
+  Building2,
+  FileText,
+  Globe,
+  Database,
+  Shield,
   Download,
   Save,
   Settings as SettingsIcon,
@@ -18,50 +18,63 @@ import {
   Calendar,
   AlertTriangle,
   CheckCircle,
-  Edit
-} from "lucide-react";
+  Edit,
+} from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
-import { PrimaryButton, SecondaryButton, DangerButton, SuccessButton, WarningButton } from '@/components/ui/Button/index';
+import {
+  PrimaryButton,
+  SecondaryButton,
+  DangerButton,
+  SuccessButton,
+  WarningButton,
+} from '@/components/ui/Button/index';
 import { Select } from '@/components/ui/Select';
 
 export default function SettingsPage() {
-  const breadcrumbs = [
-    { label: 'Settings', current: true }
-  ];
+  const breadcrumbs = [{ label: 'Settings', current: true }];
 
   const [activeTab, setActiveTab] = React.useState('company');
 
   const tabs = [
     { id: 'company', label: 'Company Info', icon: Building2, active: true },
     { id: 'compliance', label: 'Compliance', icon: FileText, active: false },
-    { id: 'billing', label: 'Billing & Invoicing', icon: Receipt, active: false },
+    {
+      id: 'billing',
+      label: 'Billing & Invoicing',
+      icon: Receipt,
+      active: false,
+    },
     { id: 'office', label: 'Office Details', icon: MapPin, active: false },
     { id: 'security', label: 'Security', icon: Shield, active: false },
-    { id: 'backup', label: 'Backup & Export', icon: Database, active: false }
+    { id: 'backup', label: 'Backup & Export', icon: Database, active: false },
   ];
 
   return (
     <MainLayout breadcrumbs={breadcrumbs}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+          {/* Header */}
           <div className="mb-8">
             <div className="flex items-center space-x-3 mb-4">
               <div className="p-2 bg-blue-100 rounded-xl">
                 <SettingsIcon className="w-6 h-6 text-blue-600" />
               </div>
-          <div>
+              <div>
                 <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-                <p className="text-gray-600 mt-1">Manage your account and application preferences</p>
+                <p className="text-gray-600 mt-1">
+                  Manage your account and application preferences
+                </p>
               </div>
             </div>
-        </div>
+          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Settings Navigation */}
-          <div className="lg:col-span-1">
+            {/* Settings Navigation */}
+            <div className="lg:col-span-1">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sticky top-8">
-                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">Settings</h3>
+                <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider mb-4">
+                  Settings
+                </h3>
                 <nav className="space-y-2">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
@@ -80,11 +93,11 @@ export default function SettingsPage() {
                       </button>
                     );
                   })}
-            </nav>
+                </nav>
               </div>
-          </div>
+            </div>
 
-          {/* Settings Content */}
+            {/* Settings Content */}
             <div className="lg:col-span-3 space-y-8">
               {/* Company Information */}
               {activeTab === 'company' && (
@@ -94,9 +107,12 @@ export default function SettingsPage() {
                       <Building2 className="w-5 h-5 mr-3 text-blue-600" />
                       Company Information
                     </h2>
-                    <p className="text-gray-600 mt-1">Manage your entity management company details and legal information</p>
+                    <p className="text-gray-600 mt-1">
+                      Manage your entity management company details and legal
+                      information
+                    </p>
                   </div>
-                  
+
                   <div className="p-8">
                     {/* Company Logo */}
                     <div className="flex items-center space-x-6 mb-8">
@@ -104,30 +120,42 @@ export default function SettingsPage() {
                         <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-2xl flex items-center justify-center">
                           <Building2 className="w-10 h-10 text-blue-600" />
                         </div>
-                        <button 
+                        <button
                           className="absolute -bottom-2 -right-2 p-2 bg-blue-600 text-white rounded-full hover:bg-blue-700 transition-colors"
                           aria-label="Change company logo"
                         >
                           <Edit className="w-4 h-4" />
                         </button>
-                  </div>
-                  <div>
-                        <h3 className="text-lg font-medium text-gray-900">Company Logo</h3>
-                        <p className="text-gray-500 text-sm mb-3">Upload your company logo for invoices and documents</p>
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Company Logo
+                        </h3>
+                        <p className="text-gray-500 text-sm mb-3">
+                          Upload your company logo for invoices and documents
+                        </p>
                         <div className="flex space-x-3">
-                          <PrimaryButton size="sm" leftIcon={<Edit className="w-4 h-4" />}>
+                          <PrimaryButton
+                            size="sm"
+                            leftIcon={<Edit className="w-4 h-4" />}
+                          >
                             Change Logo
-                    </PrimaryButton>
+                          </PrimaryButton>
                           <SecondaryButton size="sm">Remove</SecondaryButton>
                         </div>
-                        <p className="text-xs text-gray-400 mt-2">PNG, JPG or SVG. Max size 2MB. Recommended: 200x200px</p>
-                  </div>
+                        <p className="text-xs text-gray-400 mt-2">
+                          PNG, JPG or SVG. Max size 2MB. Recommended: 200x200px
+                        </p>
+                      </div>
                     </div>
 
                     {/* Company Details */}
                     <div className="space-y-6 mb-8">
                       <div className="space-y-2">
-                        <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="companyName"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Company Name *
                         </label>
                         <input
@@ -137,11 +165,14 @@ export default function SettingsPage() {
                           className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           placeholder="Enter company name"
                         />
-                </div>
+                      </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label htmlFor="cin" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="cin"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             CIN (Corporate Identity Number) *
                           </label>
                           <div className="relative">
@@ -156,55 +187,67 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <label htmlFor="pan" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="pan"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             PAN Number *
                           </label>
                           <div className="relative">
                             <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
+                            <input
                               id="pan"
-                      type="text"
+                              type="text"
                               defaultValue="ABCDE1234F"
                               className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                               placeholder="Enter PAN"
-                    />
-                  </div>
+                            />
+                          </div>
                         </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="gst" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="gst"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           GST Number *
                         </label>
                         <div className="relative">
                           <Hash className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                    <input
+                          <input
                             id="gst"
-                      type="text"
+                            type="text"
                             defaultValue="33ABCDE1234F1Z5"
                             className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             placeholder="Enter GST number"
-                    />
-                  </div>
-                </div>
+                          />
+                        </div>
+                      </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="registrationDate" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="registrationDate"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Registration Date *
                         </label>
                         <div className="relative">
                           <Calendar className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
+                          <input
                             id="registrationDate"
                             type="date"
                             defaultValue="2020-01-15"
                             className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                           />
                         </div>
-                </div>
+                      </div>
 
                       <div className="space-y-2">
-                        <label htmlFor="businessType" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="businessType"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Business Type *
                         </label>
                         <Select
@@ -212,18 +255,33 @@ export default function SettingsPage() {
                           placeholder="Select Business Type"
                           required
                           options={[
-                            { value: 'private', label: 'Private Limited Company' },
-                            { value: 'public', label: 'Public Limited Company' },
-                            { value: 'llp', label: 'Limited Liability Partnership' },
+                            {
+                              value: 'private',
+                              label: 'Private Limited Company',
+                            },
+                            {
+                              value: 'public',
+                              label: 'Public Limited Company',
+                            },
+                            {
+                              value: 'llp',
+                              label: 'Limited Liability Partnership',
+                            },
                             { value: 'partnership', label: 'Partnership Firm' },
-                            { value: 'proprietorship', label: 'Sole Proprietorship' }
+                            {
+                              value: 'proprietorship',
+                              label: 'Sole Proprietorship',
+                            },
                           ]}
                         />
                       </div>
                     </div>
 
                     <div className="flex justify-end pt-6 border-t border-gray-100">
-                      <PrimaryButton leftIcon={<Save className="w-4 h-4" />} size="lg">
+                      <PrimaryButton
+                        leftIcon={<Save className="w-4 h-4" />}
+                        size="lg"
+                      >
                         Save Company Details
                       </PrimaryButton>
                     </div>
@@ -239,8 +297,10 @@ export default function SettingsPage() {
                       <FileText className="w-5 h-5 mr-3 text-green-600" />
                       Compliance & Regulatory
                     </h2>
-                    <p className="text-gray-600 mt-1">Manage regulatory compliance and legal requirements</p>
-                </div>
+                    <p className="text-gray-600 mt-1">
+                      Manage regulatory compliance and legal requirements
+                    </p>
+                  </div>
 
                   <div className="p-8">
                     <div className="space-y-8">
@@ -251,22 +311,34 @@ export default function SettingsPage() {
                             <div className="p-3 bg-green-100 rounded-xl">
                               <CheckCircle className="w-6 h-6 text-green-600" />
                             </div>
-                <div>
-                              <h4 className="text-lg font-medium text-green-900">Entity Management License</h4>
-                              <p className="text-green-700 text-sm">License Number: CF/2020/12345</p>
-                              <p className="text-green-600 text-xs">Valid until: Dec 31, 2025</p>
+                            <div>
+                              <h4 className="text-lg font-medium text-green-900">
+                                Entity Management License
+                              </h4>
+                              <p className="text-green-700 text-sm">
+                                License Number: CF/2020/12345
+                              </p>
+                              <p className="text-green-600 text-xs">
+                                Valid until: Dec 31, 2025
+                              </p>
                             </div>
                           </div>
                           <div className="flex space-x-2">
-                            <SecondaryButton size="sm" leftIcon={<Edit className="w-4 h-4" />}>
+                            <SecondaryButton
+                              size="sm"
+                              leftIcon={<Edit className="w-4 h-4" />}
+                            >
                               Update
                             </SecondaryButton>
-                            <WarningButton size="sm" leftIcon={<AlertTriangle className="w-4 h-4" />}>
+                            <WarningButton
+                              size="sm"
+                              leftIcon={<AlertTriangle className="w-4 h-4" />}
+                            >
                               Renew
                             </WarningButton>
                           </div>
                         </div>
-                </div>
+                      </div>
 
                       {/* RBI Registration */}
                       <div className="bg-blue-50 border border-blue-200 rounded-2xl p-6">
@@ -276,32 +348,50 @@ export default function SettingsPage() {
                               <Building2 className="w-6 h-6 text-blue-600" />
                             </div>
                             <div>
-                              <h4 className="text-lg font-medium text-blue-900">RBI Registration</h4>
-                              <p className="text-blue-700 text-sm">Registration Number: RBI/CF/2020/001234</p>
-                              <p className="text-blue-600 text-xs">Last Updated: Jan 15, 2024</p>
+                              <h4 className="text-lg font-medium text-blue-900">
+                                RBI Registration
+                              </h4>
+                              <p className="text-blue-700 text-sm">
+                                Registration Number: RBI/CF/2020/001234
+                              </p>
+                              <p className="text-blue-600 text-xs">
+                                Last Updated: Jan 15, 2024
+                              </p>
                             </div>
                           </div>
                           <div className="flex space-x-2">
-                            <SecondaryButton size="sm" leftIcon={<Edit className="w-4 h-4" />}>
+                            <SecondaryButton
+                              size="sm"
+                              leftIcon={<Edit className="w-4 h-4" />}
+                            >
                               Update
                             </SecondaryButton>
-                            <PrimaryButton size="sm" leftIcon={<Download className="w-4 h-4" />}>
+                            <PrimaryButton
+                              size="sm"
+                              leftIcon={<Download className="w-4 h-4" />}
+                            >
                               Download
-                  </PrimaryButton>
-                </div>
-              </div>
-            </div>
+                            </PrimaryButton>
+                          </div>
+                        </div>
+                      </div>
 
                       {/* Compliance Forms */}
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-gray-900">Required Compliance Documents</h3>
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Required Compliance Documents
+                        </h3>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
                             <div className="flex items-center space-x-3">
                               <FileText className="w-5 h-5 text-gray-400" />
                               <div>
-                                <h4 className="font-medium text-gray-900">Audit Report</h4>
-                                <p className="text-sm text-gray-500">Annual audit report</p>
+                                <h4 className="font-medium text-gray-900">
+                                  Audit Report
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  Annual audit report
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
@@ -314,8 +404,12 @@ export default function SettingsPage() {
                             <div className="flex items-center space-x-3">
                               <FileText className="w-5 h-5 text-gray-400" />
                               <div>
-                                <h4 className="font-medium text-gray-900">Annual Return</h4>
-                                <p className="text-sm text-gray-500">Annual return filing</p>
+                                <h4 className="font-medium text-gray-900">
+                                  Annual Return
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  Annual return filing
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
@@ -328,8 +422,12 @@ export default function SettingsPage() {
                             <div className="flex items-center space-x-3">
                               <FileText className="w-5 h-5 text-gray-400" />
                               <div>
-                                <h4 className="font-medium text-gray-900">Tax Returns</h4>
-                                <p className="text-sm text-gray-500">Income tax returns</p>
+                                <h4 className="font-medium text-gray-900">
+                                  Tax Returns
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  Income tax returns
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
@@ -341,9 +439,13 @@ export default function SettingsPage() {
                           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
                             <div className="flex items-center space-x-3">
                               <FileText className="w-5 h-5 text-gray-400" />
-                <div>
-                                <h4 className="font-medium text-gray-900">GST Returns</h4>
-                                <p className="text-sm text-gray-500">Monthly GST returns</p>
+                              <div>
+                                <h4 className="font-medium text-gray-900">
+                                  GST Returns
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  Monthly GST returns
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
@@ -366,18 +468,25 @@ export default function SettingsPage() {
                       <Receipt className="w-5 h-5 mr-3 text-purple-600" />
                       Billing & Invoicing
                     </h2>
-                    <p className="text-gray-600 mt-1">Configure billing settings and invoice templates</p>
+                    <p className="text-gray-600 mt-1">
+                      Configure billing settings and invoice templates
+                    </p>
                   </div>
-                  
+
                   <div className="p-8">
                     <div className="space-y-8">
                       {/* Invoice Settings */}
                       <div className="space-y-6">
-                        <h3 className="text-lg font-medium text-gray-900">Invoice Settings</h3>
-                        
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Invoice Settings
+                        </h3>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label htmlFor="invoicePrefix" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="invoicePrefix"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               Invoice Prefix
                             </label>
                             <input
@@ -389,7 +498,10 @@ export default function SettingsPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="invoiceNumber" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="invoiceNumber"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               Next Invoice Number
                             </label>
                             <input
@@ -403,24 +515,33 @@ export default function SettingsPage() {
                         </div>
 
                         <div className="space-y-2">
-                          <label htmlFor="paymentTerms" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="paymentTerms"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Payment Terms
                           </label>
                           <Select
                             id="paymentTerms"
                             placeholder="Select Payment Terms"
                             options={[
-                              { value: 'immediate', label: 'Immediate Payment' },
+                              {
+                                value: 'immediate',
+                                label: 'Immediate Payment',
+                              },
                               { value: '7days', label: '7 Days' },
                               { value: '15days', label: '15 Days' },
                               { value: '30days', label: '30 Days' },
-                              { value: 'custom', label: 'Custom' }
+                              { value: 'custom', label: 'Custom' },
                             ]}
                           />
                         </div>
 
                         <div className="space-y-2">
-                          <label htmlFor="lateFee" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="lateFee"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Late Payment Fee (% per month)
                           </label>
                           <input
@@ -436,11 +557,16 @@ export default function SettingsPage() {
 
                       {/* Bank Details */}
                       <div className="space-y-6">
-                        <h3 className="text-lg font-medium text-gray-900">Bank Account Details</h3>
-                        
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Bank Account Details
+                        </h3>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label htmlFor="bankName" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="bankName"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               Bank Name
                             </label>
                             <input
@@ -452,7 +578,10 @@ export default function SettingsPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="accountNumber" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="accountNumber"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               Account Number
                             </label>
                             <input
@@ -467,7 +596,10 @@ export default function SettingsPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label htmlFor="ifscCode" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="ifscCode"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               IFSC Code
                             </label>
                             <input
@@ -479,10 +611,13 @@ export default function SettingsPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="branchName" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="branchName"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               Branch Name
                             </label>
-                    <input
+                            <input
                               id="branchName"
                               type="text"
                               defaultValue="Chennai Main Branch"
@@ -494,7 +629,10 @@ export default function SettingsPage() {
                       </div>
 
                       <div className="flex justify-end pt-6 border-t border-gray-100">
-                        <PrimaryButton leftIcon={<Save className="w-4 h-4" />} size="lg">
+                        <PrimaryButton
+                          leftIcon={<Save className="w-4 h-4" />}
+                          size="lg"
+                        >
                           Save Billing Settings
                         </PrimaryButton>
                       </div>
@@ -511,13 +649,18 @@ export default function SettingsPage() {
                       <MapPin className="w-5 h-5 mr-3 text-orange-600" />
                       Office Details
                     </h2>
-                    <p className="text-gray-600 mt-1">Manage office address and contact information</p>
-                </div>
+                    <p className="text-gray-600 mt-1">
+                      Manage office address and contact information
+                    </p>
+                  </div>
 
                   <div className="p-8">
                     <div className="space-y-6">
                       <div className="space-y-2">
-                        <label htmlFor="officeAddress" className="block text-sm font-medium text-gray-700">
+                        <label
+                          htmlFor="officeAddress"
+                          className="block text-sm font-medium text-gray-700"
+                        >
                           Office Address *
                         </label>
                         <textarea
@@ -531,7 +674,10 @@ export default function SettingsPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label htmlFor="officePhone" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="officePhone"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Office Phone *
                           </label>
                           <div className="relative">
@@ -546,7 +692,10 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <label htmlFor="officeEmail" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="officeEmail"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Office Email *
                           </label>
                           <div className="relative">
@@ -564,10 +713,13 @@ export default function SettingsPage() {
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-2">
-                          <label htmlFor="website" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="website"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Website
                           </label>
-                  <div className="relative">
+                          <div className="relative">
                             <Globe className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                             <input
                               id="website"
@@ -579,21 +731,27 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <label htmlFor="workingHours" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="workingHours"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Working Hours
                           </label>
-                    <input
+                          <input
                             id="workingHours"
                             type="text"
                             defaultValue="9:00 AM - 6:00 PM (Mon-Fri)"
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
                             placeholder="Working hours"
                           />
-                  </div>
-                </div>
+                        </div>
+                      </div>
 
                       <div className="flex justify-end pt-6 border-t border-gray-100">
-                        <PrimaryButton leftIcon={<Save className="w-4 h-4" />} size="lg">
+                        <PrimaryButton
+                          leftIcon={<Save className="w-4 h-4" />}
+                          size="lg"
+                        >
                           Save Office Details
                         </PrimaryButton>
                       </div>
@@ -610,18 +768,25 @@ export default function SettingsPage() {
                       <Shield className="w-5 h-5 mr-3 text-red-600" />
                       System Security
                     </h2>
-                    <p className="text-gray-600 mt-1">Configure system security and access controls</p>
+                    <p className="text-gray-600 mt-1">
+                      Configure system security and access controls
+                    </p>
                   </div>
-                  
+
                   <div className="p-8">
                     <div className="space-y-8">
                       {/* Session Management */}
                       <div className="space-y-6">
-                        <h3 className="text-lg font-medium text-gray-900">Session Management</h3>
-                        
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Session Management
+                        </h3>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label htmlFor="sessionTimeout" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="sessionTimeout"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               Session Timeout (minutes)
                             </label>
                             <input
@@ -633,7 +798,10 @@ export default function SettingsPage() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="maxLoginAttempts" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="maxLoginAttempts"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               Max Login Attempts
                             </label>
                             <input
@@ -649,8 +817,10 @@ export default function SettingsPage() {
 
                       {/* Data Encryption */}
                       <div className="space-y-6">
-                        <h3 className="text-lg font-medium text-gray-900">Data Encryption</h3>
-                        
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Data Encryption
+                        </h3>
+
                         <div className="bg-green-50 border border-green-200 rounded-2xl p-6">
                           <div className="flex items-center justify-between">
                             <div className="flex items-center space-x-4">
@@ -658,39 +828,59 @@ export default function SettingsPage() {
                                 <Shield className="w-6 h-6 text-green-600" />
                               </div>
                               <div>
-                                <h4 className="text-lg font-medium text-green-900">Database Encryption</h4>
-                                <p className="text-green-700 text-sm">AES-256 encryption enabled</p>
-                                <p className="text-green-600 text-xs">Last updated: Jan 15, 2024</p>
+                                <h4 className="text-lg font-medium text-green-900">
+                                  Database Encryption
+                                </h4>
+                                <p className="text-green-700 text-sm">
+                                  AES-256 encryption enabled
+                                </p>
+                                <p className="text-green-600 text-xs">
+                                  Last updated: Jan 15, 2024
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
-                              <SecondaryButton size="sm" leftIcon={<Edit className="w-4 h-4" />}>
+                              <SecondaryButton
+                                size="sm"
+                                leftIcon={<Edit className="w-4 h-4" />}
+                              >
                                 Configure
                               </SecondaryButton>
-                              <PrimaryButton size="sm" leftIcon={<Download className="w-4 h-4" />}>
+                              <PrimaryButton
+                                size="sm"
+                                leftIcon={<Download className="w-4 h-4" />}
+                              >
                                 Export Keys
-                  </PrimaryButton>
-                </div>
-              </div>
-            </div>
+                              </PrimaryButton>
+                            </div>
+                          </div>
+                        </div>
                       </div>
 
                       {/* Audit Logs */}
                       <div className="space-y-6">
-                        <h3 className="text-lg font-medium text-gray-900">Audit & Logging</h3>
-                        
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Audit & Logging
+                        </h3>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
                             <div className="flex items-center space-x-3">
                               <FileText className="w-5 h-5 text-gray-400" />
                               <div>
-                                <h4 className="font-medium text-gray-900">Login Logs</h4>
-                                <p className="text-sm text-gray-500">User login activities</p>
+                                <h4 className="font-medium text-gray-900">
+                                  Login Logs
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  User login activities
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
                               <PrimaryButton size="sm">View</PrimaryButton>
-                              <SecondaryButton size="sm">Export</SecondaryButton>
+                              <SecondaryButton size="sm">
+                                Export
+                              </SecondaryButton>
                             </div>
                           </div>
 
@@ -698,13 +888,19 @@ export default function SettingsPage() {
                             <div className="flex items-center space-x-3">
                               <FileText className="w-5 h-5 text-gray-400" />
                               <div>
-                                <h4 className="font-medium text-gray-900">Transaction Logs</h4>
-                                <p className="text-sm text-gray-500">Financial transactions</p>
+                                <h4 className="font-medium text-gray-900">
+                                  Transaction Logs
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  Financial transactions
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
                               <PrimaryButton size="sm">View</PrimaryButton>
-                              <SecondaryButton size="sm">Export</SecondaryButton>
+                              <SecondaryButton size="sm">
+                                Export
+                              </SecondaryButton>
                             </div>
                           </div>
 
@@ -712,34 +908,49 @@ export default function SettingsPage() {
                             <div className="flex items-center space-x-3">
                               <FileText className="w-5 h-5 text-gray-400" />
                               <div>
-                                <h4 className="font-medium text-gray-900">System Logs</h4>
-                                <p className="text-sm text-gray-500">System activities</p>
+                                <h4 className="font-medium text-gray-900">
+                                  System Logs
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  System activities
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
                               <PrimaryButton size="sm">View</PrimaryButton>
-                              <SecondaryButton size="sm">Export</SecondaryButton>
+                              <SecondaryButton size="sm">
+                                Export
+                              </SecondaryButton>
                             </div>
                           </div>
 
                           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
                             <div className="flex items-center space-x-3">
                               <FileText className="w-5 h-5 text-gray-400" />
-                  <div>
-                                <h4 className="font-medium text-gray-900">Error Logs</h4>
-                                <p className="text-sm text-gray-500">System errors</p>
+                              <div>
+                                <h4 className="font-medium text-gray-900">
+                                  Error Logs
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  System errors
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
                               <PrimaryButton size="sm">View</PrimaryButton>
-                              <SecondaryButton size="sm">Export</SecondaryButton>
+                              <SecondaryButton size="sm">
+                                Export
+                              </SecondaryButton>
                             </div>
                           </div>
                         </div>
                       </div>
 
                       <div className="flex justify-end pt-6 border-t border-gray-100">
-                        <PrimaryButton leftIcon={<Save className="w-4 h-4" />} size="lg">
+                        <PrimaryButton
+                          leftIcon={<Save className="w-4 h-4" />}
+                          size="lg"
+                        >
                           Save Security Settings
                         </PrimaryButton>
                       </div>
@@ -756,18 +967,25 @@ export default function SettingsPage() {
                       <Database className="w-5 h-5 mr-3 text-indigo-600" />
                       Backup & Export
                     </h2>
-                    <p className="text-gray-600 mt-1">Manage data backup and export settings</p>
+                    <p className="text-gray-600 mt-1">
+                      Manage data backup and export settings
+                    </p>
                   </div>
-                  
+
                   <div className="p-8">
                     <div className="space-y-8">
                       {/* Backup Settings */}
                       <div className="space-y-6">
-                        <h3 className="text-lg font-medium text-gray-900">Backup Configuration</h3>
-                        
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Backup Configuration
+                        </h3>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="space-y-2">
-                            <label htmlFor="backupFrequency" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="backupFrequency"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               Backup Frequency
                             </label>
                             <Select
@@ -777,12 +995,15 @@ export default function SettingsPage() {
                                 { value: 'daily', label: 'Daily' },
                                 { value: 'weekly', label: 'Weekly' },
                                 { value: 'monthly', label: 'Monthly' },
-                                { value: 'manual', label: 'Manual Only' }
+                                { value: 'manual', label: 'Manual Only' },
                               ]}
                             />
                           </div>
                           <div className="space-y-2">
-                            <label htmlFor="backupRetention" className="block text-sm font-medium text-gray-700">
+                            <label
+                              htmlFor="backupRetention"
+                              className="block text-sm font-medium text-gray-700"
+                            >
                               Retention Period (days)
                             </label>
                             <input
@@ -796,7 +1017,10 @@ export default function SettingsPage() {
                         </div>
 
                         <div className="space-y-2">
-                          <label htmlFor="backupLocation" className="block text-sm font-medium text-gray-700">
+                          <label
+                            htmlFor="backupLocation"
+                            className="block text-sm font-medium text-gray-700"
+                          >
                             Backup Location
                           </label>
                           <input
@@ -811,8 +1035,10 @@ export default function SettingsPage() {
 
                       {/* Export Options */}
                       <div className="space-y-6">
-                        <h3 className="text-lg font-medium text-gray-900">Data Export</h3>
-                        
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Data Export
+                        </h3>
+
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                           <div className="flex items-center justify-between p-6 bg-green-50 border border-green-200 rounded-2xl">
                             <div className="flex items-center space-x-4">
@@ -820,42 +1046,62 @@ export default function SettingsPage() {
                                 <Download className="w-6 h-6 text-green-600" />
                               </div>
                               <div>
-                                <h4 className="text-lg font-medium text-green-900">Export All Data</h4>
-                                <p className="text-green-700 text-sm">Complete database export</p>
+                                <h4 className="text-lg font-medium text-green-900">
+                                  Export All Data
+                                </h4>
+                                <p className="text-green-700 text-sm">
+                                  Complete database export
+                                </p>
                               </div>
                             </div>
-                            <SuccessButton size="lg" leftIcon={<Download className="w-4 h-4" />}>
-                    Export
-                  </SuccessButton>
-                </div>
+                            <SuccessButton
+                              size="lg"
+                              leftIcon={<Download className="w-4 h-4" />}
+                            >
+                              Export
+                            </SuccessButton>
+                          </div>
 
                           <div className="flex items-center justify-between p-6 bg-blue-50 border border-blue-200 rounded-2xl">
                             <div className="flex items-center space-x-4">
                               <div className="p-3 bg-blue-100 rounded-xl">
                                 <FileText className="w-6 h-6 text-blue-600" />
                               </div>
-                  <div>
-                                <h4 className="text-lg font-medium text-blue-900">Export Reports</h4>
-                                <p className="text-blue-700 text-sm">Financial reports only</p>
+                              <div>
+                                <h4 className="text-lg font-medium text-blue-900">
+                                  Export Reports
+                                </h4>
+                                <p className="text-blue-700 text-sm">
+                                  Financial reports only
+                                </p>
                               </div>
-                  </div>
-                            <PrimaryButton size="lg" leftIcon={<FileText className="w-4 h-4" />}>
+                            </div>
+                            <PrimaryButton
+                              size="lg"
+                              leftIcon={<FileText className="w-4 h-4" />}
+                            >
                               Export
-                  </PrimaryButton>
-                </div>
+                            </PrimaryButton>
+                          </div>
                         </div>
                       </div>
 
                       {/* Recent Backups */}
                       <div className="space-y-4">
-                        <h3 className="text-lg font-medium text-gray-900">Recent Backups</h3>
+                        <h3 className="text-lg font-medium text-gray-900">
+                          Recent Backups
+                        </h3>
                         <div className="space-y-3">
                           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
                             <div className="flex items-center space-x-3">
                               <Database className="w-5 h-5 text-gray-400" />
                               <div>
-                                <h4 className="font-medium text-gray-900">backup_2024_01_15_120000.sql</h4>
-                                <p className="text-sm text-gray-500">Jan 15, 2024 at 12:00 PM • 2.3 MB</p>
+                                <h4 className="font-medium text-gray-900">
+                                  backup_2024_01_15_120000.sql
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  Jan 15, 2024 at 12:00 PM • 2.3 MB
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
@@ -867,9 +1113,13 @@ export default function SettingsPage() {
                           <div className="flex items-center justify-between p-4 border border-gray-200 rounded-xl">
                             <div className="flex items-center space-x-3">
                               <Database className="w-5 h-5 text-gray-400" />
-                  <div>
-                                <h4 className="font-medium text-gray-900">backup_2024_01_14_120000.sql</h4>
-                                <p className="text-sm text-gray-500">Jan 14, 2024 at 12:00 PM • 2.2 MB</p>
+                              <div>
+                                <h4 className="font-medium text-gray-900">
+                                  backup_2024_01_14_120000.sql
+                                </h4>
+                                <p className="text-sm text-gray-500">
+                                  Jan 14, 2024 at 12:00 PM • 2.2 MB
+                                </p>
                               </div>
                             </div>
                             <div className="flex space-x-2">
@@ -881,7 +1131,10 @@ export default function SettingsPage() {
                       </div>
 
                       <div className="flex justify-end pt-6 border-t border-gray-100">
-                        <PrimaryButton leftIcon={<Save className="w-4 h-4" />} size="lg">
+                        <PrimaryButton
+                          leftIcon={<Save className="w-4 h-4" />}
+                          size="lg"
+                        >
                           Save Backup Settings
                         </PrimaryButton>
                       </div>
@@ -889,7 +1142,6 @@ export default function SettingsPage() {
                   </div>
                 </div>
               )}
-
             </div>
           </div>
         </div>

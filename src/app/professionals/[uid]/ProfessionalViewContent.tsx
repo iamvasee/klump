@@ -1,44 +1,38 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { 
-  User, 
-  FileText, 
+import {
+  User,
   ArrowLeft,
   Mail,
   Phone,
-  Calendar,
   IdCard,
   Building2,
-  Shield,
   Eye,
   EyeOff,
   CheckCircle,
   Briefcase,
-  Globe,
   Hash,
   ExternalLink,
-  MapPin,
-  Clock,
-  Edit,
-  Plus
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
-import { SecondaryButton, OutlineButton, PrimaryButton, GhostButton } from '@/components/ui/Button/index';
+import { SecondaryButton, GhostButton } from '@/components/ui/Button/index';
 import { db } from '@/lib/mockdb';
 import { Person, Entity, EntityPersonRelationship } from '@/lib/types';
 import Link from 'next/link';
 
 export default function ProfessionalViewContent({ uid }: { uid: string }) {
   const [person, setPerson] = useState<Person | null>(null);
-  const [relationships, setRelationships] = useState<Array<EntityPersonRelationship & { entity?: Entity }>>([]);
+  const [relationships, setRelationships] = useState<
+    Array<EntityPersonRelationship & { entity?: Entity }>
+  >([]);
   const [loading, setLoading] = useState(true);
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
 
   const breadcrumbs = [
     { label: 'Professionals', href: '/professionals' },
-    { label: person?.full_name || 'Loading...', current: true }
+    { label: person?.full_name || 'Loading...', current: true },
   ];
 
   useEffect(() => {
@@ -48,10 +42,12 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
       if (personData) {
         setPerson(personData);
         // Filter only professional relationships (auditor, cs)
-        const rels = db.getRelationshipsForPerson(uid).filter(r => ['auditor', 'company_secretary'].includes(r.role));
-        const relsWithEntities = rels.map(rel => ({
+        const rels = db
+          .getRelationshipsForPerson(uid)
+          .filter((r) => ['auditor', 'company_secretary'].includes(r.role));
+        const relsWithEntities = rels.map((rel) => ({
           ...rel,
-          entity: db.getEntity(rel.entity_id)
+          entity: db.getEntity(rel.entity_id),
         }));
         setRelationships(relsWithEntities);
       }
@@ -76,9 +72,17 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
       <MainLayout breadcrumbs={breadcrumbs}>
         <div className="text-center py-12">
           <Briefcase className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Professional Not Found</h2>
-          <p className="text-gray-600 mb-6">The requested professional record doesn&apos;t exist or has no professional appointments.</p>
-          <SecondaryButton leftIcon={<ArrowLeft className="w-4 h-4" />} onClick={() => window.history.back()}>
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">
+            Professional Not Found
+          </h2>
+          <p className="text-gray-600 mb-6">
+            The requested professional record doesn&apos;t exist or has no
+            professional appointments.
+          </p>
+          <SecondaryButton
+            leftIcon={<ArrowLeft className="w-4 h-4" />}
+            onClick={() => window.history.back()}
+          >
             Go Back
           </SecondaryButton>
         </div>
@@ -86,14 +90,17 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
     );
   }
 
-  const professionalRoles = Array.from(new Set(relationships.map(r => 
-    r.role === 'auditor' ? 'Statutory Auditor' : 'Company Secretary'
-  )));
+  const professionalRoles = Array.from(
+    new Set(
+      relationships.map((r) =>
+        r.role === 'auditor' ? 'Statutory Auditor' : 'Company Secretary'
+      )
+    )
+  );
 
   return (
     <MainLayout breadcrumbs={breadcrumbs}>
       <div className="max-w-7xl mx-auto space-y-6">
-        
         {/* Header Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -103,26 +110,36 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
               </div>
               <div>
                 <div className="flex items-center space-x-3 mb-1">
-                  <h1 className="text-2xl font-bold text-gray-900">{person.full_name}</h1>
+                  <h1 className="text-2xl font-bold text-gray-900">
+                    {person.full_name}
+                  </h1>
                   <div className="flex gap-2">
-                    {professionalRoles.map(role => (
-                      <span key={role} className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 border border-blue-200">
+                    {professionalRoles.map((role) => (
+                      <span
+                        key={role}
+                        className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-100 text-blue-700 border border-blue-200"
+                      >
                         {role}
                       </span>
                     ))}
                   </div>
                 </div>
                 <div className="flex flex-wrap items-center gap-y-2 gap-x-6 mt-3 text-sm text-gray-600">
-                  <span className="flex items-center gap-1.5"><Hash className="w-4 h-4 text-gray-400" />{person.id}</span>
+                  <span className="flex items-center gap-1.5">
+                    <Hash className="w-4 h-4 text-gray-400" />
+                    {person.id}
+                  </span>
                   <span className="flex items-center gap-1.5 text-blue-600 font-semibold">
                     <Building2 className="w-4 h-4 text-gray-400" />
                     {relationships.length} Associated Entities
                   </span>
-                  <span className="flex items-center gap-1.5"><Mail className="w-4 h-4 text-gray-400" />{person.email}</span>
+                  <span className="flex items-center gap-1.5">
+                    <Mail className="w-4 h-4 text-gray-400" />
+                    {person.email}
+                  </span>
                 </div>
               </div>
             </div>
-
           </div>
         </div>
 
@@ -131,7 +148,7 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
           <div className="flex items-center border-b border-gray-200 px-6 bg-white">
             {[
               { id: 'overview', label: 'Overview', icon: User },
-              { id: 'entities', label: 'Associated Entities', icon: Building2 }
+              { id: 'entities', label: 'Associated Entities', icon: Building2 },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -142,7 +159,9 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                 }`}
               >
-                <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'}`} />
+                <tab.icon
+                  className={`w-4 h-4 ${activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'}`}
+                />
                 {tab.label}
               </button>
             ))}
@@ -159,21 +178,40 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
                   </h3>
                   <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100 space-y-5">
                     <div className="flex justify-between items-center py-1">
-                      <span className="text-sm font-medium text-gray-500">Full Name / Firm Name</span>
-                      <span className="text-sm font-bold text-gray-900">{person.full_name}</span>
+                      <span className="text-sm font-medium text-gray-500">
+                        Full Name / Firm Name
+                      </span>
+                      <span className="text-sm font-bold text-gray-900">
+                        {person.full_name}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center py-1">
-                      <span className="text-sm font-medium text-gray-500">Nationality</span>
-                      <span className="text-sm font-bold text-gray-900">{person.nationality}</span>
+                      <span className="text-sm font-medium text-gray-500">
+                        Nationality
+                      </span>
+                      <span className="text-sm font-bold text-gray-900">
+                        {person.nationality}
+                      </span>
                     </div>
                     <div className="flex justify-between items-center py-1">
-                      <span className="text-sm font-medium text-gray-500">PAN</span>
+                      <span className="text-sm font-medium text-gray-500">
+                        PAN
+                      </span>
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-mono font-semibold text-gray-900">
                           {showSensitiveData ? person.pan : '••••••••••'}
                         </span>
-                        <button onClick={() => setShowSensitiveData(!showSensitiveData)} className="text-blue-600 hover:text-blue-700">
-                          {showSensitiveData ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        <button
+                          onClick={() =>
+                            setShowSensitiveData(!showSensitiveData)
+                          }
+                          className="text-blue-600 hover:text-blue-700"
+                        >
+                          {showSensitiveData ? (
+                            <EyeOff className="w-4 h-4" />
+                          ) : (
+                            <Eye className="w-4 h-4" />
+                          )}
                         </button>
                       </div>
                     </div>
@@ -191,8 +229,12 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
                         <Mail className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Email Address</p>
-                        <p className="text-sm font-semibold text-gray-900">{person.email}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Email Address
+                        </p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {person.email}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -200,8 +242,12 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
                         <Phone className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Phone Number</p>
-                        <p className="text-sm font-semibold text-gray-900">{person.phone || '+91 00000 00000'}</p>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Phone Number
+                        </p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {person.phone || '+91 00000 00000'}
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -216,22 +262,40 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
                   <table className="min-w-full divide-y divide-gray-200">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Entity Name</th>
-                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Appointed Role</th>
-                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Appointment Date</th>
-                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                        <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Action</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Entity Name
+                        </th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Appointed Role
+                        </th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Appointment Date
+                        </th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Status
+                        </th>
+                        <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          Action
+                        </th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-200">
                       {relationships.map((rel) => (
-                        <tr key={rel.id} className="hover:bg-blue-50/30 transition-colors">
+                        <tr
+                          key={rel.id}
+                          className="hover:bg-blue-50/30 transition-colors"
+                        >
                           <td className="px-6 py-5 whitespace-nowrap">
-                            <Link href={`/entities/${rel.entity_id}`} className="flex items-center group">
+                            <Link
+                              href={`/entities/${rel.entity_id}`}
+                              className="flex items-center group"
+                            >
                               <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-3 group-hover:bg-indigo-600 transition-all duration-300">
                                 <Building2 className="w-5 h-5 text-indigo-600 group-hover:text-white" />
                               </div>
-                              <div className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{rel.entity?.legal_name}</div>
+                              <div className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                {rel.entity?.legal_name}
+                              </div>
                             </Link>
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
@@ -244,12 +308,19 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <span className="flex items-center text-green-600 text-[10px] font-bold uppercase tracking-widest">
-                              <CheckCircle className="w-3.5 h-3.5 mr-1" /> Active
+                              <CheckCircle className="w-3.5 h-3.5 mr-1" />{' '}
+                              Active
                             </span>
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap text-right">
                             <Link href={`/entities/${rel.entity_id}`}>
-                              <GhostButton size="sm" className="text-blue-600 font-bold text-[10px] uppercase tracking-widest" rightIcon={<ExternalLink className="w-3.5 h-3.5" />}>
+                              <GhostButton
+                                size="sm"
+                                className="text-blue-600 font-bold text-[10px] uppercase tracking-widest"
+                                rightIcon={
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                }
+                              >
                                 Open Entity
                               </GhostButton>
                             </Link>

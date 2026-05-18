@@ -64,4 +64,3 @@ export interface MainLayoutProps {
 
 // Note: Component types are exported directly by their respective components
 // No module declarations needed to prevent duplicate identifier errors
-

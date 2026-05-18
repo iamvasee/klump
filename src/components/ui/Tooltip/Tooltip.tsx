@@ -39,14 +39,12 @@ const Tooltip: React.FC<TooltipProps> = ({
           className={`absolute z-50 px-3 py-2 text-xs font-medium text-white bg-gray-900 rounded-md shadow-lg whitespace-nowrap ${positionClasses[position]}`}
         >
           {content}
-          <div 
+          <div
             className={`absolute w-2 h-2 bg-gray-900 transform rotate-45 -translate-x-1/2 ${
               position === 'top' ? '-bottom-1 left-1/2' : ''
             } ${
               position === 'right' ? '-left-1 top-1/2 -translate-y-1/2' : ''
-            } ${
-              position === 'bottom' ? '-top-1 left-1/2' : ''
-            } ${
+            } ${position === 'bottom' ? '-top-1 left-1/2' : ''} ${
               position === 'left' ? '-right-1 top-1/2 -translate-y-1/2' : ''
             }`}
           />

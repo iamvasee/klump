@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown, Check } from 'lucide-react';
@@ -30,7 +30,7 @@ const Select: React.FC<SelectProps> = ({
   options,
   value,
   onChange,
-  placeholder = "Select an option",
+  placeholder = 'Select an option',
   label,
   disabled = false,
   error = false,
@@ -39,52 +39,57 @@ const Select: React.FC<SelectProps> = ({
   name,
   required = false,
   size = 'md',
-  variant = 'default'
+  variant = 'default',
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [dropdownPosition, setDropdownPosition] = useState<'below' | 'above'>('below');
+  const [dropdownPosition, setDropdownPosition] = useState<'below' | 'above'>(
+    'below'
+  );
   const selectRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
-  const selectedOption = options.find(option => option.value === value);
+  const selectedOption = options.find((option) => option.value === value);
 
-  const filteredOptions = options.filter(option =>
+  const filteredOptions = options.filter((option) =>
     option.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const calculateDropdownPosition = () => {
     if (!selectRef.current) return 'below';
-    
+
     const rect = selectRef.current.getBoundingClientRect();
     const viewportHeight = window.innerHeight;
     const dropdownHeight = 200; // Approximate height of dropdown
     const spaceBelow = viewportHeight - rect.bottom;
     const spaceAbove = rect.top;
-    
+
     // If there's not enough space below but enough space above, show above
     if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
       return 'above';
     }
-    
+
     return 'below';
   };
 
   const sizeClasses = {
     sm: 'px-3 py-2 text-sm',
     md: 'px-4 py-3 text-sm',
-    lg: 'px-4 py-3 text-base'
+    lg: 'px-4 py-3 text-base',
   };
 
   const variantClasses = {
     default: 'border-gray-200 bg-white',
     outline: 'border-gray-300 bg-transparent',
-    ghost: 'border-transparent bg-gray-50'
+    ghost: 'border-transparent bg-gray-50',
   };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (selectRef.current && !selectRef.current.contains(event.target as Node)) {
+      if (
+        selectRef.current &&
+        !selectRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setSearchTerm('');
       }
@@ -105,7 +110,7 @@ const Select: React.FC<SelectProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleScroll, true);
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('resize', handleResize);
@@ -174,7 +179,7 @@ const Select: React.FC<SelectProps> = ({
         </label>
       )}
       <div ref={selectRef} className="relative">
-              <div
+        <div
           className={cn(
             'relative flex items-center justify-between w-full border rounded-xl cursor-pointer transition-all duration-200',
             'focus:ring-2 focus:ring-blue-500 focus:border-blue-500',
@@ -196,81 +201,89 @@ const Select: React.FC<SelectProps> = ({
           aria-label={placeholder}
           id={id}
         >
-        <span className={cn(
-          'block truncate',
-          !selectedOption && 'text-gray-500'
-        )}>
-          {selectedOption ? selectedOption.label : placeholder}
-        </span>
-        
-        <ChevronDown 
-          className={cn(
-            'w-5 h-5 text-gray-400 transition-transform duration-200',
-            isOpen && 'rotate-180'
-          )}
-        />
-      </div>
+          <span
+            className={cn('block truncate', !selectedOption && 'text-gray-500')}
+          >
+            {selectedOption ? selectedOption.label : placeholder}
+          </span>
 
-      {isOpen && (
-        <div className={cn(
-          "absolute z-50 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-hidden",
-          dropdownPosition === 'above' ? 'bottom-full mb-1' : 'top-full mt-1'
-        )}>
-          {/* Search input for filtering */}
-          <div className="p-2 border-b border-gray-100">
-            <input
-              ref={searchRef}
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search options..."
-              className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              aria-label="Search options"
-              title="Search options"
-            />
-          </div>
-
-          {/* Options list */}
-          <div id={`${id}-listbox`} className="max-h-48 overflow-y-auto" role="listbox">
-            {filteredOptions.length > 0 ? (
-              filteredOptions.map((option) => {
-                const isSelected = value === option.value;
-                return (
-                  <div
-                    key={option.value}
-                    className={cn(
-                      'px-4 py-3 text-sm cursor-pointer transition-colors duration-150 flex items-center justify-between',
-                      'hover:bg-gray-50',
-                      option.disabled && 'opacity-50 cursor-not-allowed hover:bg-transparent',
-                      isSelected && 'bg-blue-50 text-blue-700'
-                    )}
-                    onClick={() => handleSelect(option)}
-                    role="option"
-                    aria-selected={isSelected}
-                  >
-                    <span className="truncate">{option.label}</span>
-                    {isSelected && (
-                      <Check className="w-4 h-4 text-blue-600" />
-                    )}
-                  </div>
-                );
-              })
-            ) : (
-              <div className="px-4 py-3 text-sm text-gray-500 text-center">
-                No options found
-              </div>
+          <ChevronDown
+            className={cn(
+              'w-5 h-5 text-gray-400 transition-transform duration-200',
+              isOpen && 'rotate-180'
             )}
-          </div>
+          />
         </div>
-      )}
 
-      {/* Hidden input for form submission */}
-      <input
-        type="hidden"
-        name={name}
-        value={value || ''}
-        required={required}
-      />
+        {isOpen && (
+          <div
+            className={cn(
+              'absolute z-50 w-full bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-hidden',
+              dropdownPosition === 'above'
+                ? 'bottom-full mb-1'
+                : 'top-full mt-1'
+            )}
+          >
+            {/* Search input for filtering */}
+            <div className="p-2 border-b border-gray-100">
+              <input
+                ref={searchRef}
+                type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                placeholder="Search options..."
+                className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                aria-label="Search options"
+                title="Search options"
+              />
+            </div>
+
+            {/* Options list */}
+            <div
+              id={`${id}-listbox`}
+              className="max-h-48 overflow-y-auto"
+              role="listbox"
+            >
+              {filteredOptions.length > 0 ? (
+                filteredOptions.map((option) => {
+                  const isSelected = value === option.value;
+                  return (
+                    <div
+                      key={option.value}
+                      className={cn(
+                        'px-4 py-3 text-sm cursor-pointer transition-colors duration-150 flex items-center justify-between',
+                        'hover:bg-gray-50',
+                        option.disabled &&
+                          'opacity-50 cursor-not-allowed hover:bg-transparent',
+                        isSelected && 'bg-blue-50 text-blue-700'
+                      )}
+                      onClick={() => handleSelect(option)}
+                      role="option"
+                      aria-selected={isSelected}
+                    >
+                      <span className="truncate">{option.label}</span>
+                      {isSelected && (
+                        <Check className="w-4 h-4 text-blue-600" />
+                      )}
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="px-4 py-3 text-sm text-gray-500 text-center">
+                  No options found
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Hidden input for form submission */}
+        <input
+          type="hidden"
+          name={name}
+          value={value || ''}
+          required={required}
+        />
       </div>
     </div>
   );

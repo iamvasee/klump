@@ -2,34 +2,29 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { 
-  Plus, 
-  Search, 
-  Filter, 
-  Eye, 
-  Edit, 
-  Building2, 
-  Calendar,
+import {
+  Plus,
+  Search,
+  Filter,
+  Eye,
+  Edit,
+  Building2,
   Shield,
   Clock,
   CheckCircle,
   XCircle,
   MoreVertical,
-  UserPlus,
-  FileText
-} from "lucide-react";
+} from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
-import { 
-  PrimaryButton, 
-  GhostButton, 
-  OutlineButton 
+import {
+  PrimaryButton,
+  GhostButton,
+  OutlineButton,
 } from '@/components/ui/Button/index';
 import { db } from '@/lib/mockdb';
 
 export default function EntitiesPage() {
-  const breadcrumbs = [
-    { label: 'Entities', current: true }
-  ];
+  const breadcrumbs = [{ label: 'Entities', current: true }];
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
 
@@ -63,19 +58,25 @@ export default function EntitiesPage() {
     }
   };
 
-  const filteredEntities = entities.filter(entity => {
-    const matchesSearch = entity.legal_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         entity.short_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         entity.pan?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = selectedStatus === 'all' || entity.status.toLowerCase() === selectedStatus.toLowerCase();
+  const filteredEntities = entities.filter((entity) => {
+    const matchesSearch =
+      entity.legal_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entity.short_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entity.pan?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      selectedStatus === 'all' ||
+      entity.status.toLowerCase() === selectedStatus.toLowerCase();
     return matchesSearch && matchesStatus;
   });
 
   const stats = {
     total: entities.length,
-    active: entities.filter(e => e.status === 'active').length,
-    pending: entities.filter(e => e.status === 'pending').length,
-    avgCompleteness: Math.round(entities.reduce((sum, e) => sum + (e.completeness_score || 0), 0) / entities.length)
+    active: entities.filter((e) => e.status === 'active').length,
+    pending: entities.filter((e) => e.status === 'pending').length,
+    avgCompleteness: Math.round(
+      entities.reduce((sum, e) => sum + (e.completeness_score || 0), 0) /
+        entities.length
+    ),
   };
 
   return (
@@ -85,7 +86,9 @@ export default function EntitiesPage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Entities</h1>
-            <p className="text-gray-600">Manage companies, LLPs, and portfolios</p>
+            <p className="text-gray-600">
+              Manage companies, LLPs, and portfolios
+            </p>
           </div>
           <Link href="/entities/add">
             <PrimaryButton leftIcon={<Plus className="w-4 h-4" />}>
@@ -99,44 +102,58 @@ export default function EntitiesPage() {
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total Entities</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Total Entities
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.total}
+                </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-xl">
                 <Building2 className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Active</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.active}
+                </p>
               </div>
               <div className="p-3 bg-green-100 rounded-xl">
                 <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Avg. Completeness</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.avgCompleteness}%</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Avg. Completeness
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.avgCompleteness}%
+                </p>
               </div>
               <div className="p-3 bg-purple-100 rounded-xl">
                 <Shield className="w-6 h-6 text-purple-600" />
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Pending Actions</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Pending Actions
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.pending}
+                </p>
               </div>
               <div className="p-3 bg-orange-100 rounded-xl">
                 <Clock className="w-6 h-6 text-orange-600" />
@@ -182,9 +199,11 @@ export default function EntitiesPage() {
         {/* Entities Table */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">All Entities ({filteredEntities.length})</h3>
+            <h3 className="text-lg font-semibold text-gray-900">
+              All Entities ({filteredEntities.length})
+            </h3>
           </div>
-          
+
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -214,36 +233,60 @@ export default function EntitiesPage() {
                   <tr key={entity.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{entity.legal_name}</div>
-                        <div className="text-sm text-gray-500">{entity.short_name}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {entity.legal_name}
+                        </div>
+                        <div className="text-sm text-gray-500">
+                          {entity.short_name}
+                        </div>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 capitalize">{entity.entity_type.replace('_', ' ')}</div>
-                      <div className="text-xs text-gray-500 font-mono">PAN: {entity.pan || 'N/A'}</div>
-                      <div className="text-xs text-gray-500 font-mono">CIN: {entity.cin || entity.llpin || 'N/A'}</div>
+                      <div className="text-sm text-gray-900 capitalize">
+                        {entity.entity_type.replace('_', ' ')}
+                      </div>
+                      <div className="text-xs text-gray-500 font-mono">
+                        PAN: {entity.pan || 'N/A'}
+                      </div>
+                      <div className="text-xs text-gray-500 font-mono">
+                        CIN: {entity.cin || entity.llpin || 'N/A'}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{entity.city || 'N/A'}</div>
-                      <div className="text-sm text-gray-500">{entity.state || 'N/A'}</div>
+                      <div className="text-sm text-gray-900">
+                        {entity.city || 'N/A'}
+                      </div>
+                      <div className="text-sm text-gray-500">
+                        {entity.state || 'N/A'}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
                         <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                          <div 
+                          <div
                             className={`h-1.5 rounded-full ${
-                              (entity.completeness_score || 0) > 80 ? 'bg-green-500' : (entity.completeness_score || 0) > 50 ? 'bg-yellow-500' : 'bg-red-500'
+                              (entity.completeness_score || 0) > 80
+                                ? 'bg-green-500'
+                                : (entity.completeness_score || 0) > 50
+                                  ? 'bg-yellow-500'
+                                  : 'bg-red-500'
                             }`}
-                            style={{ width: `${entity.completeness_score || 0}%` }}
+                            style={{
+                              width: `${entity.completeness_score || 0}%`,
+                            }}
                           ></div>
                         </div>
-                        <span className="text-xs font-medium text-gray-700">{entity.completeness_score || 0}%</span>
+                        <span className="text-xs font-medium text-gray-700">
+                          {entity.completeness_score || 0}%
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         {getStatusIcon(entity.status)}
-                        <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(entity.status)}`}>
+                        <span
+                          className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(entity.status)}`}
+                        >
                           {entity.status}
                         </span>
                       </div>
@@ -251,7 +294,7 @@ export default function EntitiesPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex items-center space-x-2">
                         <Link href={`/entities/${entity.id}`}>
-                          <GhostButton 
+                          <GhostButton
                             size="sm"
                             aria-label="View entity details"
                             title="View details"
@@ -259,14 +302,14 @@ export default function EntitiesPage() {
                             <Eye className="w-4 h-4" />
                           </GhostButton>
                         </Link>
-                        <GhostButton 
+                        <GhostButton
                           size="sm"
                           aria-label="Edit entity"
                           title="Edit entity"
                         >
                           <Edit className="w-4 h-4" />
                         </GhostButton>
-                        <GhostButton 
+                        <GhostButton
                           size="sm"
                           aria-label="More options"
                           title="More options"

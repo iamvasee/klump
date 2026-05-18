@@ -4,7 +4,10 @@ export type { ButtonProps } from './Button';
 
 // Compatibility shim for shadcn components that expect buttonVariants
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function buttonVariants(_opts?: { variant?: string; size?: string }): string {
+export function buttonVariants(_opts?: {
+  variant?: string;
+  size?: string;
+}): string {
   return '';
 }
 

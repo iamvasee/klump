@@ -1,6 +1,13 @@
 'use client';
 
-import { User, ChevronDown, Settings, LogOut, UserCircle, Shield } from 'lucide-react';
+import {
+  User,
+  ChevronDown,
+  Settings,
+  LogOut,
+  UserCircle,
+  Shield,
+} from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
 export default function ProfileMenu() {
@@ -10,7 +17,10 @@ export default function ProfileMenu() {
   // Close menus when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (userMenuRef.current && !userMenuRef.current.contains(event.target as Node)) {
+      if (
+        userMenuRef.current &&
+        !userMenuRef.current.contains(event.target as Node)
+      ) {
         setIsUserMenuOpen(false);
       }
     }
@@ -42,7 +52,9 @@ export default function ProfileMenu() {
           <p className="text-sm font-semibold text-gray-900">David Spade</p>
           <p className="text-xs text-gray-500">Entity Management Admin</p>
         </div>
-        <ChevronDown className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown
+          className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`}
+        />
       </button>
 
       {/* Dropdown Menu */}
@@ -55,7 +67,9 @@ export default function ProfileMenu() {
                 <User className="h-5 w-5 text-white" />
               </div>
               <div>
-                <p className="text-sm font-semibold text-gray-900">David Spade</p>
+                <p className="text-sm font-semibold text-gray-900">
+                  David Spade
+                </p>
                 <p className="text-xs text-gray-500">david.spade@klump.com</p>
               </div>
             </div>

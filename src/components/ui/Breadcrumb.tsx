@@ -20,7 +20,7 @@ export interface BreadcrumbProps {
 
 const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
   ({ items, className, showDashboard = true, separator, ...props }, ref) => {
-    const breadcrumbItems = showDashboard 
+    const breadcrumbItems = showDashboard
       ? [{ label: 'Dashboard', href: '/' }, ...items]
       : items;
 
@@ -40,10 +40,12 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
               <li key={index} className="flex items-center">
                 {index > 0 && (
                   <div className="flex items-center mx-2">
-                    {separator || <ChevronRight className="w-4 h-4 text-gray-400" />}
+                    {separator || (
+                      <ChevronRight className="w-4 h-4 text-gray-400" />
+                    )}
                   </div>
                 )}
-                
+
                 {item.href && !isCurrent ? (
                   <Link
                     href={item.href}
@@ -58,9 +60,7 @@ const Breadcrumb = React.forwardRef<HTMLElement, BreadcrumbProps>(
                   <span
                     className={cn(
                       'flex items-center',
-                      isCurrent
-                        ? 'text-gray-900 font-medium'
-                        : 'text-gray-500'
+                      isCurrent ? 'text-gray-900 font-medium' : 'text-gray-500'
                     )}
                   >
                     {index === 0 && showDashboard && (

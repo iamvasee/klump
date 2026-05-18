@@ -5,63 +5,63 @@
 // --- Enums ---
 
 export type EntityType =
-  | "private_limited"
-  | "public_limited"
-  | "llp"
-  | "partnership"
-  | "trust_private"
-  | "trust_public"
-  | "huf"
-  | "proprietorship";
+  | 'private_limited'
+  | 'public_limited'
+  | 'llp'
+  | 'partnership'
+  | 'trust_private'
+  | 'trust_public'
+  | 'huf'
+  | 'proprietorship';
 
 export type EntityStatus =
-  | "active"
-  | "struck_off"
-  | "under_liquidation"
-  | "dormant";
+  | 'active'
+  | 'struck_off'
+  | 'under_liquidation'
+  | 'dormant';
 
 export type RelationshipRole =
-  | "director"
-  | "managing_director"
-  | "partner"
-  | "designated_partner"
-  | "trustee"
-  | "shareholder"
-  | "karta"
-  | "proprietor"
-  | "authorised_signatory"
-  | "beneficial_owner"
-  | "auditor"
-  | "company_secretary";
+  | 'director'
+  | 'managing_director'
+  | 'partner'
+  | 'designated_partner'
+  | 'trustee'
+  | 'shareholder'
+  | 'karta'
+  | 'proprietor'
+  | 'authorised_signatory'
+  | 'beneficial_owner'
+  | 'auditor'
+  | 'company_secretary';
 
 export type DocumentType =
-  | "certificate_of_incorporation"
-  | "llp_agreement"
-  | "pan_card"
-  | "aadhaar_card"
-  | "tan_allotment"
-  | "gst_certificate"
-  | "gst_return"
-  | "moa_aoa"
-  | "balance_sheet"
-  | "itr_acknowledgement"
-  | "tds_return"
-  | "pf_return"
-  | "esi_return"
-  | "professional_tax_return"
-  | "mca_annual_return"
-  | "fssai_license"
-  | "udyam_certificate"
-  | "iec_certificate"
-  | "bank_statement"
-  | "kyc_document"
-  | "other";
+  | 'certificate_of_incorporation'
+  | 'llp_agreement'
+  | 'pan_card'
+  | 'aadhaar_card'
+  | 'tan_allotment'
+  | 'gst_certificate'
+  | 'gst_return'
+  | 'moa_aoa'
+  | 'balance_sheet'
+  | 'itr_acknowledgement'
+  | 'tds_return'
+  | 'pf_return'
+  | 'esi_return'
+  | 'professional_tax_return'
+  | 'mca_annual_return'
+  | 'fssai_license'
+  | 'udyam_certificate'
+  | 'iec_certificate'
+  | 'bank_statement'
+  | 'kyc_document'
+  | 'other';
 
-export type AccountType = "current" | "savings" | "cc";
+export type AccountType = 'current' | 'savings' | 'cc';
 
-export type UserRole = "admin" | "editor" | "viewer";
+export type UserRole = 'admin' | 'editor' | 'viewer';
 
-export type AuditAction = "create" | "update" | "delete";
+export type AuditAction = 'create' | 'update' | 'delete';
 
 // --- Interfaces ---
 
@@ -133,7 +133,7 @@ export interface Filing {
   filing_date: string;
   status: string;
   description?: string;
-  data?: Record<string, any>; // User entered data
+  data?: Record<string, unknown>; // User entered data
   files: Document[];
   created_at: string;
 }

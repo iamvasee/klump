@@ -25,18 +25,18 @@ const Checkbox: React.FC<CheckboxProps> = ({
   description,
   className,
   size = 'md',
-  variant = 'default'
+  variant = 'default',
 }) => {
   const sizeClasses = {
     sm: 'w-6 h-6',
     md: 'w-7 h-7',
-    lg: 'w-8 h-8'
+    lg: 'w-8 h-8',
   };
 
   const iconSizes = {
     sm: 'w-3.5 h-3.5',
     md: 'w-4 h-4',
-    lg: 'w-5 h-5'
+    lg: 'w-5 h-5',
   };
 
   const variantClasses = {
@@ -54,19 +54,19 @@ const Checkbox: React.FC<CheckboxProps> = ({
       : 'bg-white border-gray-300 text-gray-900 hover:border-yellow-400',
     danger: checked
       ? 'bg-red-600 border-red-600 text-white'
-      : 'bg-white border-gray-300 text-gray-900 hover:border-red-400'
+      : 'bg-white border-gray-300 text-gray-900 hover:border-red-400',
   };
 
   const labelSizeClasses = {
     sm: 'text-sm',
     md: 'text-sm',
-    lg: 'text-base'
+    lg: 'text-base',
   };
 
   const descriptionSizeClasses = {
     sm: 'text-xs',
     md: 'text-xs',
-    lg: 'text-sm'
+    lg: 'text-sm',
   };
 
   return (
@@ -94,11 +94,13 @@ const Checkbox: React.FC<CheckboxProps> = ({
           )}
         >
           {checked && (
-            <Check className={cn(iconSizes[size], 'transition-all duration-200')} />
+            <Check
+              className={cn(iconSizes[size], 'transition-all duration-200')}
+            />
           )}
         </label>
       </div>
-      
+
       {(label || description) && (
         <div className="flex-1 min-w-0">
           {label && (
@@ -114,11 +116,13 @@ const Checkbox: React.FC<CheckboxProps> = ({
             </label>
           )}
           {description && (
-            <p className={cn(
-              'text-gray-500 mt-1',
-              descriptionSizeClasses[size],
-              disabled && 'opacity-50'
-            )}>
+            <p
+              className={cn(
+                'text-gray-500 mt-1',
+                descriptionSizeClasses[size],
+                disabled && 'opacity-50'
+              )}
+            >
               {description}
             </p>
           )}

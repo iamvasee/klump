@@ -74,7 +74,7 @@ const countryCodes = [
   { value: '+377', label: '🇲🇨 +377', country: 'Monaco' },
   { value: '+378', label: '🇸🇲 +378', country: 'San Marino' },
   { value: '+376', label: '🇦🇩 +376', country: 'Andorra' },
-  { value: '+423', label: '🇱🇮 +423', country: 'Liechtenstein' }
+  { value: '+423', label: '🇱🇮 +423', country: 'Liechtenstein' },
 ];
 
 const PhoneField: React.FC<PhoneFieldProps> = ({
@@ -82,50 +82,77 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
   name,
   value,
   onChange,
-  placeholder = "Enter phone number",
+  placeholder = 'Enter phone number',
   label,
   required = false,
   disabled = false,
   error,
-  className
+  className,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [dropdownPosition, setDropdownPosition] = useState<'below' | 'above'>('below');
+  const [dropdownPosition, setDropdownPosition] = useState<'below' | 'above'>(
+    'below'
+  );
   const phoneFieldRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
 
   // Parse the current value to extract country code and number
   const parsePhoneValue = (phoneValue: string) => {
     if (!phoneValue) return { countryCode: '+91', number: '' };
-    
+
     // Find matching country code
-    const matchedCode = countryCodes.find(code => phoneValue.startsWith(code.value));
+    const matchedCode = countryCodes.find((code) =>
+      phoneValue.startsWith(code.value)
+    );
     if (matchedCode) {
       return {
         countryCode: matchedCode.value,
-        number: phoneValue.substring(matchedCode.value.length)
+        number: phoneValue.substring(matchedCode.value.length),
       };
     }
-    
+
     // Default to India if no match
     return { countryCode: '+91', number: phoneValue };
   };
 
   const { countryCode, number } = parsePhoneValue(value);
-  const selectedCountry = countryCodes.find(code => code.value === countryCode);
-  
+  const selectedCountry = countryCodes.find(
+    (code) => code.value === countryCode
+  );
+
   // ARIA attributes for accessibility
 
-  const filteredCountries = countryCodes.filter(country =>
-    country.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    country.value.includes(searchTerm) ||
-    country.label.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredCountries = countryCodes.filter(
+    (country) =>
+      country.country.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      country.value.includes(searchTerm) ||
+      country.label.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const calculateDropdownPosition = () => {
+    if (!phoneFieldRef.current) return 'below';
+
+    const rect = phoneFieldRef.current.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const dropdownHeight = 240; // Approximate height of dropdown
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+
+    // If there's not enough space below but enough space above, show above
+    if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
+      return 'above';
+    }
+
+    return 'below';
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (phoneFieldRef.current && !phoneFieldRef.current.contains(event.target as Node)) {
+      if (
+        phoneFieldRef.current &&
+        !phoneFieldRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
         setSearchTerm('');
       }
@@ -146,7 +173,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
     document.addEventListener('mousedown', handleClickOutside);
     window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleScroll, true);
-    
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       window.removeEventListener('resize', handleResize);
@@ -172,7 +199,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
     const numericNumber = newNumber.replace(/\D/g, '');
     const maxLength = getMaxLengthForCountry(countryCode);
     const limitedNumber = numericNumber.slice(0, maxLength);
-    
+
     const newValue = countryCode + limitedNumber;
     onChange(newValue);
   };
@@ -186,34 +213,17 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
     // Common phone number lengths by country
     const lengths: { [key: string]: number } = {
       '+91': 10, // India
-      '+1': 10,  // USA/Canada
+      '+1': 10, // USA/Canada
       '+44': 10, // UK
-      '+33': 9,  // France
+      '+33': 9, // France
       '+49': 11, // Germany
       '+81': 11, // Japan
       '+86': 11, // China
-      '+61': 9,  // Australia
+      '+61': 9, // Australia
       '+55': 11, // Brazil
-      '+7': 10,  // Russia
+      '+7': 10, // Russia
     };
     return lengths[code] || 10; // Default to 10 digits
-  };
-
-  const calculateDropdownPosition = () => {
-    if (!phoneFieldRef.current) return 'below';
-    
-    const rect = phoneFieldRef.current.getBoundingClientRect();
-    const viewportHeight = window.innerHeight;
-    const dropdownHeight = 240; // Approximate height of dropdown
-    const spaceBelow = viewportHeight - rect.bottom;
-    const spaceAbove = rect.top;
-    
-    // If there's not enough space below but enough space above, show above
-    if (spaceBelow < dropdownHeight && spaceAbove > dropdownHeight) {
-      return 'above';
-    }
-    
-    return 'below';
   };
 
   const handleToggle = () => {
@@ -262,7 +272,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      
+
       <div className="relative">
         <div className="flex">
           {/* Country Code Selector */}
@@ -274,8 +284,8 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
               'text-sm text-gray-900',
               'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50',
               'cursor-pointer flex items-center justify-between min-w-[120px] h-[52px]',
-              error 
-                ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+              error
+                ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                 : 'hover:border-gray-300',
               isOpen && 'ring-2 ring-blue-500 border-blue-500'
             )}
@@ -290,11 +300,13 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
             aria-label="Select country code"
           >
             <div className="flex items-center space-x-2">
-              <span className="text-lg">{selectedCountry?.label.split(' ')[0]}</span>
+              <span className="text-lg">
+                {selectedCountry?.label.split(' ')[0]}
+              </span>
               <span className="text-gray-600 font-medium">{countryCode}</span>
             </div>
-            
-            <ChevronDown 
+
+            <ChevronDown
               className={cn(
                 'w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0',
                 isOpen && 'rotate-180'
@@ -316,8 +328,8 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
                 'transition-all duration-200',
                 'text-sm text-gray-900 placeholder-gray-500',
                 'disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-50',
-                error 
-                  ? 'border-red-300 focus:ring-red-500 focus:border-red-500' 
+                error
+                  ? 'border-red-300 focus:ring-red-500 focus:border-red-500'
                   : 'hover:border-gray-300'
               )}
               aria-label="Phone number"
@@ -328,11 +340,15 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
         </div>
 
         {isOpen && (
-          <div className={cn(
-            "absolute z-50 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-hidden",
-            dropdownPosition === 'above' ? 'bottom-full mb-1' : 'top-full mt-1',
-            "w-80" // Fixed width for country dropdown
-          )}>
+          <div
+            className={cn(
+              'absolute z-50 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-hidden',
+              dropdownPosition === 'above'
+                ? 'bottom-full mb-1'
+                : 'top-full mt-1',
+              'w-80' // Fixed width for country dropdown
+            )}
+          >
             {/* Search input for filtering */}
             <div className="p-2 border-b border-gray-100">
               <input
@@ -348,7 +364,11 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
             </div>
 
             {/* Countries list */}
-            <div id={`${id}-listbox`} className="max-h-48 overflow-y-auto" role="listbox">
+            <div
+              id={`${id}-listbox`}
+              className="max-h-48 overflow-y-auto"
+              role="listbox"
+            >
               {filteredCountries.length > 0 ? (
                 filteredCountries.map((country) => {
                   const isSelected = countryCode === country.value;
@@ -365,10 +385,14 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
                       aria-selected={isSelected}
                     >
                       <div className="flex items-center space-x-3">
-                        <span className="text-lg">{country.label.split(' ')[0]}</span>
+                        <span className="text-lg">
+                          {country.label.split(' ')[0]}
+                        </span>
                         <div>
                           <div className="font-medium">{country.country}</div>
-                          <div className="text-xs text-gray-500">{country.value}</div>
+                          <div className="text-xs text-gray-500">
+                            {country.value}
+                          </div>
                         </div>
                       </div>
                       {isSelected && (
@@ -395,9 +419,7 @@ const PhoneField: React.FC<PhoneFieldProps> = ({
         required={required}
       />
 
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );
 };

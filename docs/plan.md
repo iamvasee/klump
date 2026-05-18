@@ -6,17 +6,17 @@ A multi-entity compliance intelligence platform for family offices, promoter gro
 
 ## Tech Stack Decision
 
-| Layer | Choice | Rationale |
-|---|---|---|
-| **Framework** | Next.js 15 (App Router, TypeScript) | Full-stack in one repo — SSR, API routes, RSC |
-| **UI** | Shadcn/UI + TailwindCSS v4 | Accessible, composable, customizable components |
-| **Charts** | Recharts | Lightweight, works well with React/Shadcn |
-| **Tables** | TanStack Table v8 | Headless — filtering, sorting, pagination baked in |
-| **Database** | Supabase (PostgreSQL) | Managed Postgres + Auth + Storage + RLS in one service |
-| **Auth** | Supabase Auth | Email/password, role management via custom claims |
-| **File Storage** | Supabase Storage | S3-compatible, integrated with auth, 10MB per file |
-| **Deployment** | Vercel | Zero-config Next.js hosting, preview deploys |
-| **Package Manager** | pnpm | Faster installs, better monorepo support, avoids peer dep issues |
+| Layer               | Choice                              | Rationale                                                        |
+| ------------------- | ----------------------------------- | ---------------------------------------------------------------- |
+| **Framework**       | Next.js 15 (App Router, TypeScript) | Full-stack in one repo — SSR, API routes, RSC                    |
+| **UI**              | Shadcn/UI + TailwindCSS v4          | Accessible, composable, customizable components                  |
+| **Charts**          | Recharts                            | Lightweight, works well with React/Shadcn                        |
+| **Tables**          | TanStack Table v8                   | Headless — filtering, sorting, pagination baked in               |
+| **Database**        | Supabase (PostgreSQL)               | Managed Postgres + Auth + Storage + RLS in one service           |
+| **Auth**            | Supabase Auth                       | Email/password, role management via custom claims                |
+| **File Storage**    | Supabase Storage                    | S3-compatible, integrated with auth, 10MB per file               |
+| **Deployment**      | Vercel                              | Zero-config Next.js hosting, preview deploys                     |
+| **Package Manager** | pnpm                                | Faster installs, better monorepo support, avoids peer dep issues |
 
 > [!NOTE]
 > Using Supabase as the single backend eliminates the need for a separate Express/FastAPI server for MVP. All data access goes through Supabase client SDK with RLS policies enforcing security at the database level.
@@ -165,6 +165,7 @@ entity/
 ### Core Tables
 
 #### `organisations`
+
 ```sql
 CREATE TABLE organisations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -176,6 +177,7 @@ CREATE TABLE organisations (
 ```
 
 #### `profiles` (extends Supabase auth.users)
+
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -189,6 +191,7 @@ CREATE TABLE profiles (
 ```
 
 #### `entities`
+
 ```sql
 CREATE TABLE entities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -231,6 +234,7 @@ CREATE TABLE entities (
 ```
 
 #### `entity_gstins` (repeatable)
+
 ```sql
 CREATE TABLE entity_gstins (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -243,6 +247,7 @@ CREATE TABLE entity_gstins (
 ```
 
 #### `entity_bank_accounts` (repeatable)
+
 ```sql
 CREATE TABLE entity_bank_accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -258,6 +263,7 @@ CREATE TABLE entity_bank_accounts (
 ```
 
 #### `people`
+
 ```sql
 CREATE TABLE people (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -286,6 +292,7 @@ CREATE TABLE people (
 ```
 
 #### `entity_person_relationships`
+
 ```sql
 CREATE TABLE entity_person_relationships (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -307,6 +314,7 @@ CREATE TABLE entity_person_relationships (
 ```
 
 #### `documents`
+
 ```sql
 CREATE TABLE documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -331,6 +339,7 @@ CREATE TABLE documents (
 ```
 
 #### `audit_log`
+
 ```sql
 CREATE TABLE audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -346,6 +355,7 @@ CREATE TABLE audit_log (
 ```
 
 ### RLS Policies (applied to every table)
+
 ```sql
 -- All tables: users can only access data from their own organisation
 CREATE POLICY "org_isolation" ON entities
@@ -375,6 +385,7 @@ CREATE POLICY "admin_delete" ON entities
 ```
 
 ### Indexes for Search Performance
+
 ```sql
 -- Full-text search indexes
 CREATE INDEX idx_entities_search ON entities USING gin(
@@ -397,21 +408,25 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ### Phase 1: Foundation & Authentication
 
 #### [NEW] Project Scaffold
+
 - Initialize Next.js 15 with TypeScript, TailwindCSS, ESLint
 - Install and initialize Shadcn/UI
 - Install dependencies: `@supabase/ssr`, `@supabase/supabase-js`, `recharts`, `@tanstack/react-table`, `zod`, `react-hook-form`, `lucide-react`, `date-fns`, `xlsx` (for bulk import)
 
 #### [NEW] Supabase Configuration
+
 - `src/lib/supabase/client.ts` — Browser client
 - `src/lib/supabase/server.ts` — Server client
 - `src/middleware.ts` — Session refresh middleware
 
 #### [NEW] Auth Pages
+
 - `src/app/(auth)/login/page.tsx` — Email/password login with validation
 - `src/app/(auth)/signup/page.tsx` — Signup → creates Organisation + Profile
 - `src/app/(auth)/layout.tsx` — Centered auth layout with branding
 
 #### [NEW] Application Shell
+
 - `src/app/(dashboard)/layout.tsx` — Sidebar navigation + Topbar with global search
 - `src/components/layout/sidebar.tsx` — Navigation: Dashboard, Entities, People, Settings
 - `src/components/layout/topbar.tsx` — Global search bar, user avatar, notification bell placeholder
@@ -422,12 +437,14 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ### Phase 2: Entities Module
 
 #### [NEW] Entity List
+
 - `src/app/(dashboard)/entities/page.tsx` — Server component, fetch entities
 - `src/components/entities/entity-table.tsx` — TanStack Table with columns, sorting, pagination
 - `src/components/entities/entity-columns.tsx` — Column definitions (name, type, status, PAN, CIN, completeness)
 - Filters: Entity type (multi-select), Status, State, Has GSTIN toggle, Incomplete flag
 
 #### [NEW] Add/Edit Entity
+
 - `src/app/(dashboard)/entities/new/page.tsx` — Add entity page
 - `src/app/(dashboard)/entities/[id]/edit/page.tsx` — Edit entity page
 - `src/components/entities/entity-form.tsx` — React Hook Form + Zod validation
@@ -437,6 +454,7 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
   - Repeatable sections: GSTINs, Bank Accounts
 
 #### [NEW] Entity Detail
+
 - `src/app/(dashboard)/entities/[id]/page.tsx` — Entity detail page
 - `src/components/entities/entity-detail.tsx` — Read view with inline editing
 - Sections: Basic Info | Identifiers | Address | Bank Accounts | Associated People | Documents | Activity Log
@@ -446,17 +464,20 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ### Phase 3: People Module
 
 #### [NEW] People List
+
 - `src/app/(dashboard)/people/page.tsx`
 - `src/components/people/person-table.tsx`
 - `src/components/people/person-columns.tsx`
 - Filters: Role, Associated Entity, Has DIN, Incomplete
 
 #### [NEW] Add/Edit Person
+
 - `src/app/(dashboard)/people/new/page.tsx`
 - `src/app/(dashboard)/people/[id]/edit/page.tsx`
 - `src/components/people/person-form.tsx` — With PAN, DIN, DSC validation
 
 #### [NEW] Person Detail
+
 - `src/app/(dashboard)/people/[id]/page.tsx`
 - `src/components/people/person-detail.tsx`
 - Mirror of entity detail: Associated Entities (read-only, linked)
@@ -466,6 +487,7 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ### Phase 4: Relationships
 
 #### [NEW] Relationship Linking
+
 - `src/components/relationships/relationship-form.tsx` — Modal/dialog to link person ↔ entity
   - Person lookup (search by name/PAN/DIN)
   - Role dropdown, shareholding %, effective dates
@@ -479,6 +501,7 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ### Phase 5: Dashboard & Global Search
 
 #### [NEW] Dashboard
+
 - `src/app/(dashboard)/page.tsx`
 - `src/components/dashboard/kpi-cards.tsx` — 4 cards: Total Entities, Total People, Total Documents, Incomplete Profiles
 - `src/components/dashboard/entity-type-chart.tsx` — Donut chart (Recharts) with entity type breakdown
@@ -486,6 +509,7 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 - `src/components/dashboard/onboarding-checklist.tsx` — Shown when < 3 entities
 
 #### [NEW] Global Search
+
 - `src/components/layout/global-search.tsx` — Command palette (⌘K / Ctrl+K)
   - Debounced (300ms), min 2 chars
   - Searches: Entity Name, PAN, CIN, LLPIN, GSTIN, Person Name, DIN, DPIN
@@ -497,11 +521,13 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ### Phase 6: Documents & Bulk Import
 
 #### [NEW] Document Management
+
 - `src/components/documents/document-upload.tsx` — Drag & drop, max 10MB, PDF/JPG/PNG
 - `src/components/documents/document-list.tsx` — Card grid, filterable by type and FY
 - Upload to Supabase Storage → record in `documents` table
 
 #### [NEW] Bulk Import
+
 - `src/app/api/bulk-import/route.ts` — Parse XLSX, validate, return draft records
 - `public/templates/entity-import-template.xlsx` — Downloadable template
 - UI: Upload → Parse → Review table → Confirm → Create records
@@ -511,15 +537,18 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ### Phase 7: Settings, Activity Log & Polish
 
 #### [NEW] Settings Pages
+
 - `src/app/(dashboard)/settings/page.tsx` — Account & billing placeholder
 - `src/app/(dashboard)/settings/users/page.tsx` — Invite users, assign roles
 - `src/app/(dashboard)/settings/organisation/page.tsx` — Org name, profile
 
 #### [NEW] Activity Log
+
 - Automatic audit logging via Supabase triggers (or API-level logging)
 - Activity log component on entity and person detail pages
 
 #### Polish
+
 - Empty states with illustrations
 - Loading skeletons (Shadcn Skeleton)
 - Toast notifications for CRUD operations
@@ -531,27 +560,30 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ## Design System
 
 ### Color Palette
+
 ```css
 /* Dark theme with deep navy + electric accent */
---background: 222 47% 6%;          /* Deep navy-black */
---foreground: 210 20% 95%;         /* Soft white */
---card: 222 47% 8%;                /* Slightly lighter navy */
---primary: 217 91% 60%;            /* Electric blue */
+--background: 222 47% 6%; /* Deep navy-black */
+--foreground: 210 20% 95%; /* Soft white */
+--card: 222 47% 8%; /* Slightly lighter navy */
+--primary: 217 91% 60%; /* Electric blue */
 --primary-foreground: 0 0% 100%;
---secondary: 215 25% 15%;          /* Muted navy */
---accent: 172 66% 50%;             /* Teal accent */
---destructive: 0 84% 60%;          /* Red for errors/delete */
---warning: 38 92% 50%;             /* Amber for incomplete indicators */
+--secondary: 215 25% 15%; /* Muted navy */
+--accent: 172 66% 50%; /* Teal accent */
+--destructive: 0 84% 60%; /* Red for errors/delete */
+--warning: 38 92% 50%; /* Amber for incomplete indicators */
 --muted: 215 20% 20%;
 --border: 215 20% 18%;
 ```
 
 ### Typography
+
 - **Font**: Inter (Google Fonts) — clean, professional, excellent readability
 - **Headings**: Semi-bold, tracking-tight
 - **Body**: Regular weight, 16px base
 
 ### Component Patterns
+
 - **Cards** with subtle glassmorphism (backdrop blur + semi-transparent bg)
 - **Tables** with hover rows, sticky headers, alternating row tint
 - **Forms** with floating labels, inline validation icons
@@ -563,6 +595,7 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ## Verification Plan
 
 ### Automated Tests
+
 ```bash
 # Build verification
 pnpm build            # Ensure zero build errors
@@ -576,6 +609,7 @@ pnpm dev              # Verify app starts on localhost:3000
 ```
 
 ### Browser Verification (using browser tool)
+
 1. **Auth flow**: Signup → Login → Redirect to dashboard
 2. **Entity CRUD**: Create entity → Verify in list → View detail → Edit → Delete
 3. **People CRUD**: Same flow for people
@@ -586,6 +620,7 @@ pnpm dev              # Verify app starts on localhost:3000
 8. **Responsive**: Test at 1440px, 1024px, 768px widths
 
 ### Manual Verification
+
 - User to verify Supabase project connection
 - User to test with real entity data for validation accuracy
 - User to confirm design aesthetics match expectations
@@ -594,19 +629,20 @@ pnpm dev              # Verify app starts on localhost:3000
 
 ## Estimated Build Time
 
-| Phase | Estimated Duration |
-|---|---|
-| Phase 1: Foundation & Auth | ~2 hours |
-| Phase 2: Entities Module | ~3 hours |
-| Phase 3: People Module | ~2 hours |
-| Phase 4: Relationships | ~1.5 hours |
-| Phase 5: Dashboard & Search | ~2 hours |
-| Phase 6: Documents & Bulk Import | ~2 hours |
-| Phase 7: Settings, Audit, Polish | ~1.5 hours |
-| **Total** | **~14 hours** |
+| Phase                            | Estimated Duration |
+| -------------------------------- | ------------------ |
+| Phase 1: Foundation & Auth       | ~2 hours           |
+| Phase 2: Entities Module         | ~3 hours           |
+| Phase 3: People Module           | ~2 hours           |
+| Phase 4: Relationships           | ~1.5 hours         |
+| Phase 5: Dashboard & Search      | ~2 hours           |
+| Phase 6: Documents & Bulk Import | ~2 hours           |
+| Phase 7: Settings, Audit, Polish | ~1.5 hours         |
+| **Total**                        | **~14 hours**      |
 
 > [!TIP]
 > I'll build this iteratively — each phase will produce a working, runnable app. You can review and course-correct at each checkpoint.
-\n### Professionals Module
+> \n### Professionals Module
+
 - **Listing Page**: Added `/professionals` to view all individuals acting as Statutory Auditors or Company Secretaries.
 - **Detail View**: Added `/professionals/[uid]` to show their specific profile and associated entities.

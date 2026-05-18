@@ -7,11 +7,11 @@
 
 ## Tech Stack (Backend)
 
-| Layer | Choice | Rationale |
-|---|---|---|
-| **Database** | Supabase (PostgreSQL) | Managed Postgres + Auth + Storage + RLS in one service |
-| **Auth** | Supabase Auth | Email/password, role management via custom claims |
-| **File Storage** | Supabase Storage | S3-compatible, integrated with auth, 10MB per file |
+| Layer            | Choice                | Rationale                                              |
+| ---------------- | --------------------- | ------------------------------------------------------ |
+| **Database**     | Supabase (PostgreSQL) | Managed Postgres + Auth + Storage + RLS in one service |
+| **Auth**         | Supabase Auth         | Email/password, role management via custom claims      |
+| **File Storage** | Supabase Storage      | S3-compatible, integrated with auth, 10MB per file     |
 
 > [!NOTE]
 > Using Supabase as the single backend eliminates the need for a separate Express/FastAPI server for MVP. All data access goes through Supabase client SDK with RLS policies enforcing security at the database level.
@@ -74,6 +74,7 @@ supabase/
 ### Core Tables
 
 #### `organisations`
+
 ```sql
 CREATE TABLE organisations (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -85,6 +86,7 @@ CREATE TABLE organisations (
 ```
 
 #### `profiles` (extends Supabase auth.users)
+
 ```sql
 CREATE TABLE profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -98,6 +100,7 @@ CREATE TABLE profiles (
 ```
 
 #### `entities`
+
 ```sql
 CREATE TABLE entities (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -140,6 +143,7 @@ CREATE TABLE entities (
 ```
 
 #### `entity_gstins` (repeatable)
+
 ```sql
 CREATE TABLE entity_gstins (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -152,6 +156,7 @@ CREATE TABLE entity_gstins (
 ```
 
 #### `entity_bank_accounts` (repeatable)
+
 ```sql
 CREATE TABLE entity_bank_accounts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -167,6 +172,7 @@ CREATE TABLE entity_bank_accounts (
 ```
 
 #### `people`
+
 ```sql
 CREATE TABLE people (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -195,6 +201,7 @@ CREATE TABLE people (
 ```
 
 #### `entity_person_relationships`
+
 ```sql
 CREATE TABLE entity_person_relationships (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -216,6 +223,7 @@ CREATE TABLE entity_person_relationships (
 ```
 
 #### `documents`
+
 ```sql
 CREATE TABLE documents (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -240,6 +248,7 @@ CREATE TABLE documents (
 ```
 
 #### `audit_log`
+
 ```sql
 CREATE TABLE audit_log (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -255,6 +264,7 @@ CREATE TABLE audit_log (
 ```
 
 ### RLS Policies (applied to every table)
+
 ```sql
 -- All tables: users can only access data from their own organisation
 CREATE POLICY "org_isolation" ON entities
@@ -284,6 +294,7 @@ CREATE POLICY "admin_delete" ON entities
 ```
 
 ### Indexes for Search Performance
+
 ```sql
 -- Full-text search indexes
 CREATE INDEX idx_entities_search ON entities USING gin(
@@ -304,6 +315,7 @@ CREATE INDEX idx_people_name_trgm ON people USING gin(full_name gin_trgm_ops);
 ## Backend Verification Plan
 
 ### When Backend is Implemented
+
 1. **Auth flow**: Signup → Login → Redirect to dashboard
 2. **RLS**: Verify org isolation — User A cannot see User B's data
 3. **Role enforcement**: Viewer cannot create/edit, Editor cannot delete

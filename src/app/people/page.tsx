@@ -1,8 +1,8 @@
 'use client';
 
-import { 
-  Plus, 
-  Eye, 
+import {
+  Plus,
+  Eye,
   Calendar,
   Users,
   ChevronUp,
@@ -10,8 +10,8 @@ import {
   Search,
   Mail,
   Shield,
-  Clock
-} from "lucide-react";
+  Clock,
+} from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { PrimaryButton, GhostButton } from '@/components/ui/Button/index';
 import Link from 'next/link';
@@ -19,9 +19,7 @@ import { useState } from 'react';
 import { db } from '@/lib/mockdb';
 
 export default function PeoplePage() {
-  const breadcrumbs = [
-    { label: 'People', current: true }
-  ];
+  const breadcrumbs = [{ label: 'People', current: true }];
 
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
@@ -41,36 +39,44 @@ export default function PeoplePage() {
   const getSortedPeople = () => {
     let filtered = people;
     if (searchTerm) {
-      filtered = people.filter(p => 
-        p.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        p.pan?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = people.filter(
+        (p) =>
+          p.full_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          p.pan?.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
 
     if (!sortField) return filtered;
 
     return [...filtered].sort((a, b) => {
-      const aValue = a[sortField as keyof typeof a] as any;
-      const bValue = b[sortField as keyof typeof b] as any;
+      const aValue = (a as Record<string, unknown>)[sortField];
+      const bValue = (b as Record<string, unknown>)[sortField];
 
-      if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      if (typeof aValue === 'string' && typeof bValue === 'string') {
+        if (aValue < bValue) return sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
+      }
       return 0;
     });
   };
 
   const getSortIcon = (field: string) => {
     if (sortField !== field) return null;
-    return sortDirection === 'asc' ? 
-      <ChevronUp className="w-4 h-4" /> : 
-      <ChevronDown className="w-4 h-4" />;
+    return sortDirection === 'asc' ? (
+      <ChevronUp className="w-4 h-4" />
+    ) : (
+      <ChevronDown className="w-4 h-4" />
+    );
   };
 
   const stats = {
     total: people.length,
-    avgCompleteness: Math.round(people.reduce((sum, p) => sum + (p.completeness_score || 0), 0) / people.length),
-    withDin: people.filter(p => p.din).length
+    avgCompleteness: Math.round(
+      people.reduce((sum, p) => sum + (p.completeness_score || 0), 0) /
+        people.length
+    ),
+    withDin: people.filter((p) => p.din).length,
   };
 
   return (
@@ -80,7 +86,9 @@ export default function PeoplePage() {
         <div className="flex justify-between items-center">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">People</h1>
-            <p className="text-gray-600">Manage stakeholders, directors, and partners</p>
+            <p className="text-gray-600">
+              Manage stakeholders, directors, and partners
+            </p>
           </div>
           <Link href="/people/add">
             <PrimaryButton leftIcon={<Plus className="w-4 h-4" />}>
@@ -94,43 +102,57 @@ export default function PeoplePage() {
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Total People</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Total People
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.total}
+                </p>
               </div>
               <div className="p-3 bg-blue-100 rounded-xl">
                 <Users className="w-6 h-6 text-blue-600" />
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Avg. Completeness</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.avgCompleteness}%</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Avg. Completeness
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.avgCompleteness}%
+                </p>
               </div>
               <div className="p-3 bg-green-100 rounded-xl">
                 <Shield className="w-6 h-6 text-green-600" />
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">Directors (with DIN)</p>
-                <p className="text-2xl font-bold text-gray-900">{stats.withDin}</p>
+                <p className="text-sm font-medium text-gray-600">
+                  Directors (with DIN)
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {stats.withDin}
+                </p>
               </div>
               <div className="p-3 bg-purple-100 rounded-xl">
                 <Calendar className="w-6 h-6 text-purple-600" />
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-xl shadow-sm p-6 border border-gray-100">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-600">New This Month</p>
+                <p className="text-sm font-medium text-gray-600">
+                  New This Month
+                </p>
                 <p className="text-2xl font-bold text-gray-900">2</p>
               </div>
               <div className="p-3 bg-orange-100 rounded-xl">
@@ -163,7 +185,7 @@ export default function PeoplePage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     #
                   </th>
-                  <th 
+                  <th
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 select-none"
                     onClick={() => handleSort('full_name')}
                   >
@@ -193,11 +215,16 @@ export default function PeoplePage() {
                       <div className="flex items-center">
                         <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center mr-3">
                           <span className="text-blue-600 font-semibold text-sm">
-                            {person.full_name.split(' ').map(n => n[0]).join('')}
+                            {person.full_name
+                              .split(' ')
+                              .map((n) => n[0])
+                              .join('')}
                           </span>
                         </div>
                         <div>
-                          <div className="text-sm font-medium text-gray-900">{person.full_name}</div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {person.full_name}
+                          </div>
                           <div className="text-sm text-gray-500 flex items-center">
                             <Mail className="w-3 h-3 mr-1" />
                             {person.email}
@@ -206,25 +233,40 @@ export default function PeoplePage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-xs text-gray-500 font-mono">PAN: {person.pan || 'N/A'}</div>
-                      <div className="text-xs text-gray-500 font-mono">DIN: {person.din || 'N/A'}</div>
+                      <div className="text-xs text-gray-500 font-mono">
+                        PAN: {person.pan || 'N/A'}
+                      </div>
+                      <div className="text-xs text-gray-500 font-mono">
+                        DIN: {person.din || 'N/A'}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center space-x-2">
                         <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                          <div 
+                          <div
                             className={`h-1.5 rounded-full ${
-                              (person.completeness_score || 0) > 80 ? 'bg-green-500' : (person.completeness_score || 0) > 50 ? 'bg-yellow-500' : 'bg-red-500'
+                              (person.completeness_score || 0) > 80
+                                ? 'bg-green-500'
+                                : (person.completeness_score || 0) > 50
+                                  ? 'bg-yellow-500'
+                                  : 'bg-red-500'
                             }`}
-                            style={{ width: `${person.completeness_score || 0}%` }}
+                            style={{
+                              width: `${person.completeness_score || 0}%`,
+                            }}
                           ></div>
                         </div>
-                        <span className="text-xs font-medium text-gray-700">{person.completeness_score || 0}%</span>
+                        <span className="text-xs font-medium text-gray-700">
+                          {person.completeness_score || 0}%
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <Link href={`/people/${person.id}`}>
-                        <GhostButton size="sm" leftIcon={<Eye className="w-4 h-4" />}>
+                        <GhostButton
+                          size="sm"
+                          leftIcon={<Eye className="w-4 h-4" />}
+                        >
                           View
                         </GhostButton>
                       </Link>

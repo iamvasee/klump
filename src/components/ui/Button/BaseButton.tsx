@@ -2,7 +2,14 @@ import React from 'react';
 import { cn } from '../../utils/cn';
 
 export interface BaseButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'success' | 'warning' | 'ghost' | 'outline';
+  variant?:
+    | 'primary'
+    | 'secondary'
+    | 'danger'
+    | 'success'
+    | 'warning'
+    | 'ghost'
+    | 'outline';
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl' | 'icon' | 'icon-sm';
   loading?: boolean;
   leftIcon?: React.ReactNode;
@@ -84,7 +91,7 @@ const BaseButton = React.forwardRef<HTMLButtonElement, BaseButtonProps>(
       md: 'px-4 py-2 text-sm min-h-[40px]',
       lg: 'px-6 py-3 text-base min-h-[48px]',
       xl: 'px-8 py-4 text-lg min-h-[56px]',
-      'icon': 'p-2 min-h-[40px] min-w-[40px]',
+      icon: 'p-2 min-h-[40px] min-w-[40px]',
       'icon-sm': 'p-1.5 min-h-[32px] min-w-[32px]',
     };
 
@@ -94,7 +101,7 @@ const BaseButton = React.forwardRef<HTMLButtonElement, BaseButtonProps>(
       md: 'w-4 h-4',
       lg: 'w-5 h-5',
       xl: 'w-6 h-6',
-      'icon': 'w-5 h-5',
+      icon: 'w-5 h-5',
       'icon-sm': 'w-4 h-4',
     };
 
@@ -137,19 +144,15 @@ const BaseButton = React.forwardRef<HTMLButtonElement, BaseButtonProps>(
             />
           </svg>
         )}
-        
+
         {!loading && leftIcon && (
-          <span className={cn('mr-2', iconSize)}>
-            {leftIcon}
-          </span>
+          <span className={cn('mr-2', iconSize)}>{leftIcon}</span>
         )}
-        
+
         {children}
-        
+
         {!loading && rightIcon && (
-          <span className={cn('ml-2', iconSize)}>
-            {rightIcon}
-          </span>
+          <span className={cn('ml-2', iconSize)}>{rightIcon}</span>
         )}
       </button>
     );

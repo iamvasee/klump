@@ -46,9 +46,11 @@ const TextField: React.FC<TextFieldProps> = ({
   rightIcon,
   rightLabel,
   multiline = false,
-  rows = 3
+  rows = 3,
 }) => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
     onChange(e.target.value);
   };
 
@@ -57,14 +59,14 @@ const TextField: React.FC<TextFieldProps> = ({
 
   const sizeClasses = {
     sm: 'py-2 text-sm',
-    md: 'py-3 text-sm', 
-    lg: 'py-3 text-base'
+    md: 'py-3 text-sm',
+    lg: 'py-3 text-base',
   };
 
   const variantClasses = {
     default: 'border-gray-200 bg-white',
     outline: 'border-gray-300 bg-transparent',
-    ghost: 'border-transparent bg-gray-50'
+    ghost: 'border-transparent bg-gray-50',
   };
 
   const inputClasses = cn(
@@ -78,17 +80,14 @@ const TextField: React.FC<TextFieldProps> = ({
       'pl-3 pr-12': !leftIcon && rightLabel,
       'pl-4 pr-12': leftIcon && rightLabel,
       'border-red-300 focus:ring-red-500 focus:border-red-500': error,
-      'opacity-50 cursor-not-allowed bg-gray-50': disabled
+      'opacity-50 cursor-not-allowed bg-gray-50': disabled,
     }
   );
 
   return (
     <div className={cn('space-y-2', className)}>
       {label && (
-        <label 
-          htmlFor={id} 
-          className="block text-sm font-medium text-gray-700"
-        >
+        <label htmlFor={id} className="block text-sm font-medium text-gray-700">
           {label} {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
