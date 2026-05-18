@@ -152,6 +152,52 @@ export const MOCK_ENTITIES: Entity[] = [
   }
 ];
 
+const per1_bank_accounts: BankAccount[] = [
+  {
+    id: "bank_p1_1",
+    entity_id: "", // Individual
+    bank_name: "HDFC Bank",
+    account_holder_name: "Alice Smith",
+    branch: "Bandra West",
+    account_number: "50100456789012",
+    ifsc_code: "HDFC0000001",
+    account_type: "savings",
+    is_primary: true,
+    created_at: new Date().toISOString(),
+  }
+];
+
+const per1_documents: Document[] = [
+  {
+    id: "doc_p1_1",
+    organisation_id: "org_1",
+    person_id: "per_1",
+    file_name: "PAN_Alice_Smith.pdf",
+    file_path: "/docs/alice_pan.pdf",
+    document_type: "pan_card",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "doc_p1_2",
+    organisation_id: "org_1",
+    person_id: "per_1",
+    file_name: "Aadhaar_Alice_Smith.pdf",
+    file_path: "/docs/alice_aadhaar.pdf",
+    document_type: "aadhaar_card",
+    created_at: new Date().toISOString(),
+  },
+  {
+    id: "doc_p1_3",
+    organisation_id: "org_1",
+    person_id: "per_1",
+    file_name: "ITR_V_Alice_2023_24.pdf",
+    file_path: "/docs/alice_itr_2024.pdf",
+    document_type: "itr_acknowledgement",
+    financial_year: "2023-24",
+    created_at: new Date().toISOString(),
+  }
+];
+
 export const MOCK_PEOPLE: Person[] = [
   {
     id: "per_1",
@@ -161,10 +207,15 @@ export const MOCK_PEOPLE: Person[] = [
     nationality: "Indian",
     email: "alice@acme.com",
     pan: "PQRTS9876Z",
+    aadhaar_number: "1234 5678 9012",
     din: "01234567",
     completeness_score: 90,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
+    bank_accounts: per1_bank_accounts,
+    documents: per1_documents,
+    residential_address: "Apartment 4B, 123 Main Street, Mumbai, Maharashtra 400058",
+    phone: "+91 98765 43210"
   },
   {
     id: "per_2",

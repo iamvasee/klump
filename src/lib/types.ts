@@ -38,6 +38,7 @@ export type DocumentType =
   | "certificate_of_incorporation"
   | "llp_agreement"
   | "pan_card"
+  | "aadhaar_card"
   | "tan_allotment"
   | "gst_certificate"
   | "moa_aoa"
@@ -149,7 +150,7 @@ export interface Person {
   phone?: string;
   // Identifiers
   pan?: string;
-  aadhaar_last4?: string;
+  aadhaar_number?: string;
   din?: string;
   dpin?: string;
   passport_number?: string;
@@ -162,6 +163,7 @@ export interface Person {
   // Relations
   relationships?: EntityPersonRelationship[];
   documents?: Document[];
+  bank_accounts?: BankAccount[];
 }
 
 export interface EntityPersonRelationship {

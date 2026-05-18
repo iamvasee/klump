@@ -24,14 +24,25 @@ import {
   Lock,
   RefreshCw,
   Upload,
+  Plus,
   Globe,
   MapPin,
-  Hash
+  Hash,
+  CreditCard,
+  Download,
+  Info,
+  BadgeCheck,
+  FileCheck,
+  Briefcase,
+  ExternalLink,
+  Copy,
+  Check,
+  History
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
-import { SecondaryButton, OutlineButton } from '@/components/ui/Button/index';
+import { SecondaryButton, OutlineButton, PrimaryButton, GhostButton } from '@/components/ui/Button/index';
 import { db } from '@/lib/mockdb';
-import { Person, Entity, EntityPersonRelationship } from '@/lib/types';
+import { Person, Entity, EntityPersonRelationship, Document, BankAccount } from '@/lib/types';
 import Link from 'next/link';
 
 export default function PersonViewContent({ uid }: { uid: string }) {
@@ -39,6 +50,8 @@ export default function PersonViewContent({ uid }: { uid: string }) {
   const [relationships, setRelationships] = useState<Array<EntityPersonRelationship & { entity?: Entity }>>([]);
   const [loading, setLoading] = useState(true);
   const [showSensitiveData, setShowSensitiveData] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [copiedId, setCopiedId] = useState<string | null>(null);
 
   const breadcrumbs = [
     { label: 'People', href: '/people' },
@@ -64,17 +77,44 @@ export default function PersonViewContent({ uid }: { uid: string }) {
     fetchData();
   }, [uid]);
 
+  const handleCopyBankDetails = async (acc: BankAccount) => {
+    const details = `Bank: ${acc.bank_name}
+Account Name: ${acc.account_holder_name}
+Account Number: ${acc.account_number}
+IFSC: ${acc.ifsc_code}
+${acc.swift_code ? `SWIFT: ${acc.swift_code}` : ''}
+${acc.iban ? `IBAN: ${acc.iban}` : ''}
+Branch: ${acc.branch || 'N/A'}`;
+
+    try {
+      await navigator.clipboard.writeText(details);
+      setCopiedId(acc.id);
+      setTimeout(() => setCopiedId(null), 2000);
+    } catch (err) {
+      console.error('Failed to copy!', err);
+    }
+  };
+
   const getStatusColor = (completeness: number) => {
-    if (completeness > 80) return 'bg-green-100 text-green-800';
-    if (completeness > 50) return 'bg-yellow-100 text-yellow-800';
-    return 'bg-red-100 text-red-800';
+    if (completeness > 80) return 'bg-green-100 text-green-800 border-green-200';
+    if (completeness > 50) return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+    return 'bg-red-100 text-red-800 border-red-200';
+  };
+
+  const getDocumentIcon = (type: string) => {
+    switch (type) {
+      case 'aadhaar_card': return <IdCard className="w-5 h-5 text-blue-600" />;
+      case 'pan_card': return <FileText className="w-5 h-5 text-orange-600" />;
+      case 'itr_acknowledgement': return <FileCheck className="w-5 h-5 text-green-600" />;
+      default: return <FileText className="w-5 h-5 text-gray-600" />;
+    }
   };
 
   if (loading) {
     return (
       <MainLayout breadcrumbs={breadcrumbs}>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
         </div>
       </MainLayout>
     );
@@ -86,7 +126,6 @@ export default function PersonViewContent({ uid }: { uid: string }) {
         <div className="text-center py-12">
           <User className="w-16 h-16 text-gray-400 mx-auto mb-4" />
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Person Not Found</h2>
-          <p className="text-gray-600 mb-6">The person you&apos;re looking for doesn&apos;t exist.</p>
           <SecondaryButton leftIcon={<ArrowLeft className="w-4 h-4" />} onClick={() => window.history.back()}>
             Go Back
           </SecondaryButton>
@@ -97,179 +136,306 @@ export default function PersonViewContent({ uid }: { uid: string }) {
 
   return (
     <MainLayout breadcrumbs={breadcrumbs}>
-      <div className="max-w-7xl mx-auto space-y-8">
-        {/* Header Section */}
-        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-visible">
-          <div className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl flex items-center justify-center border border-blue-200">
-                  <User className="w-8 h-8 text-blue-600" />
-                </div>
-                <div>
-                  <div className="flex items-center space-x-3 mb-2">
-                    <h1 className="text-2xl font-bold text-gray-900">{person.full_name}</h1>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(person.completeness_score || 0)}`}>
-                      Profile {person.completeness_score}% Complete
-                    </span>
-                  </div>
-                  
-                  <div className="flex items-center space-x-6 text-sm text-gray-600">
-                    <div className="flex items-center space-x-1">
-                      <Hash className="w-3 h-3 text-gray-400" />
-                      <span>{person.id}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Globe className="w-3 h-3 text-gray-400" />
-                      <span>{person.nationality || 'N/A'}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Mail className="w-3 h-3 text-gray-400" />
-                      <span>{person.email}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div className="relative">
-                <OutlineButton 
-                  leftIcon={<Edit className="w-4 h-4" />} 
-                  onClick={() => {}}
+      <div className="max-w-7xl mx-auto space-y-6">
+        
+        {/* Navigation Tabs */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+          <div className="flex items-center justify-between border-b border-gray-200 px-6 bg-white sticky top-0 z-10">
+            <div className="flex overflow-x-auto no-scrollbar">
+              {[
+                { id: 'overview', label: 'Overview', icon: Info },
+                { id: 'entities', label: 'Associated Entities', icon: Building2 },
+                { id: 'banking', label: 'Banking', icon: CreditCard },
+                { id: 'filings', label: 'Filings', icon: Shield },
+                { id: 'documents', label: 'Documents', icon: FileText }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`py-5 px-6 text-sm font-semibold border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+                    activeTab === tab.id
+                      ? 'border-blue-600 text-blue-600 bg-blue-50/30'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  }`}
                 >
-                  Edit Profile
-                </OutlineButton>
-              </div>
+                  <tab.icon className={`w-4 h-4 ${activeTab === tab.id ? 'text-blue-600' : 'text-gray-400'}`} />
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+            
+            <div className="hidden md:flex items-center gap-3">
+               <OutlineButton size="sm" leftIcon={<Edit className="w-3.5 h-3.5" />}>Edit</OutlineButton>
+               <PrimaryButton size="sm" leftIcon={<Plus className="w-3.5 h-3.5" />}>Appointment</PrimaryButton>
             </div>
           </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 space-y-8">
-            {/* Personal Details */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <IdCard className="w-5 h-5 mr-2 text-blue-600" />
-                  Identification & Personal Info
-                </h2>
-                <OutlineButton 
-                  size="sm"
-                  leftIcon={showSensitiveData ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  onClick={() => setShowSensitiveData(!showSensitiveData)}
-                >
-                  {showSensitiveData ? 'Hide' : 'Show'} Details
-                </OutlineButton>
-              </div>
-              <div className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="space-y-1">
-                    <label className="block text-sm font-medium text-gray-500">Date of Birth</label>
-                    <p className="text-gray-900">{person.date_of_birth || 'N/A'}</p>
+          <div className="p-8">
+            {/* Overview Tab */}
+            {activeTab === 'overview' && (
+              <div className="space-y-10">
+                {/* Person Identity Section */}
+                <div className="flex flex-col md:flex-row md:items-start gap-8">
+                  <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-indigo-700 rounded-2xl flex items-center justify-center shadow-xl shadow-blue-500/20 shrink-0">
+                    <User className="w-10 h-10 text-white" />
                   </div>
-                  <div className="space-y-1">
-                    <label className="block text-sm font-medium text-gray-500">Nationality</label>
-                    <p className="text-gray-900">{person.nationality || 'N/A'}</p>
+                  <div className="flex-1 space-y-4">
+                    <div>
+                      <div className="flex items-center gap-3 mb-2">
+                        <h1 className="text-2xl font-bold text-gray-900 tracking-tight">{person.full_name}</h1>
+                        <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(person.completeness_score || 0)}`}>
+                          Profile {person.completeness_score}% Complete
+                        </span>
+                      </div>
+                      <p className="text-base text-gray-500 font-medium">Individual Profile</p>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4 border-t border-gray-100">
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Nationality</label>
+                        <p className="text-sm font-semibold text-gray-700">{person.nationality}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Date of Birth</label>
+                        <p className="text-sm font-semibold text-gray-700">{person.date_of_birth || 'N/A'}</p>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">PAN</label>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-mono font-semibold text-gray-700">{showSensitiveData ? (person.pan || 'N/A') : '••••••••••'}</p>
+                          <button onClick={() => setShowSensitiveData(!showSensitiveData)} className="text-blue-600">
+                            {showSensitiveData ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
+                          </button>
+                        </div>
+                      </div>
+                      <div className="space-y-1">
+                        <label className="text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Aadhaar</label>
+                        <p className="text-sm font-mono font-semibold text-gray-700">{showSensitiveData ? (person.aadhaar_number || 'N/A') : '•••• •••• ••••'}</p>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <label className="block text-sm font-medium text-gray-500">PAN</label>
-                    <p className="text-gray-900 font-mono">
-                      {showSensitiveData ? (person.pan || 'N/A') : '••••••••••'}
-                    </p>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10 pt-6">
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                      <Mail className="w-4 h-4 text-blue-600" />
+                      Contact Details
+                    </h3>
+                    <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100 space-y-4">
+                      <div className="flex justify-between items-center py-2 border-b border-gray-200/50">
+                        <span className="text-sm font-medium text-gray-500">Email Address</span>
+                        <span className="text-sm font-semibold text-gray-900">{person.email}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2 border-b border-gray-200/50">
+                        <span className="text-sm font-medium text-gray-500">Phone Number</span>
+                        <span className="text-sm font-semibold text-gray-900">{person.phone || 'N/A'}</span>
+                      </div>
+                      <div className="flex justify-between items-center py-2">
+                        <span className="text-sm font-medium text-gray-500">DIN / DPIN</span>
+                        <span className="text-sm font-mono font-semibold text-gray-900">{person.din || person.dpin || 'N/A'}</span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-1">
-                    <label className="block text-sm font-medium text-gray-500">DIN (Director Identification Number)</label>
-                    <p className="text-gray-900 font-mono">
-                      {showSensitiveData ? (person.din || 'N/A') : '••••••••'}
-                    </p>
+
+                  <div className="space-y-6">
+                    <h3 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-blue-600" />
+                      Residential Address
+                    </h3>
+                    <div className="bg-gray-50/50 rounded-2xl p-6 border border-gray-100">
+                      <p className="text-gray-700 font-medium leading-relaxed">
+                        {person.residential_address || 'Address not provided'}<br />
+                        <span className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mt-2 block">India</span>
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+            )}
 
-            {/* Entity Relationships */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 border-b border-gray-100">
-                <h2 className="text-lg font-semibold text-gray-900 flex items-center">
-                  <Building2 className="w-5 h-5 mr-2 text-emerald-600" />
-                  Associated Entities
-                </h2>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-50">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Entity</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
-                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Since</th>
-                    </tr>
-                  </thead>
-                  <tbody className="bg-white divide-y divide-gray-200">
-                    {relationships.map((rel) => (
-                      <tr key={rel.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <Link href={`/entities/${rel.entity_id}`} className="flex items-center group">
-                            <div className="w-8 h-8 rounded-lg bg-emerald-100 flex items-center justify-center mr-3 group-hover:bg-emerald-200 transition-colors">
-                              <Building2 className="w-4 h-4 text-emerald-600" />
-                            </div>
-                            <div className="text-sm font-medium text-gray-900 group-hover:text-emerald-600 transition-colors">
-                              {rel.entity?.legal_name}
-                            </div>
-                          </Link>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="px-2 py-1 bg-emerald-100 text-emerald-800 text-xs font-medium rounded-full capitalize">
-                            {rel.role}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {rel.effective_from}
-                        </td>
-                      </tr>
-                    ))}
-                    {relationships.length === 0 && (
+            {/* Entities Tab */}
+            {activeTab === 'entities' && (
+              <div className="space-y-6">
+                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
                       <tr>
-                        <td colSpan={3} className="px-6 py-8 text-center text-sm text-gray-500">
-                          No associated entities found for this person.
-                        </td>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Entity Name</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Role</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Since</th>
+                        <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Action</th>
                       </tr>
-                    )}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {relationships.map((rel) => (
+                        <tr key={rel.id} className="hover:bg-blue-50/30 transition-colors">
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <Link href={`/entities/${rel.entity_id}`} className="flex items-center group">
+                              <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center mr-3 group-hover:bg-blue-600 transition-all duration-300">
+                                <Building2 className="w-5 h-5 text-blue-700 group-hover:text-white transition-colors" />
+                              </div>
+                              <div className="text-sm font-bold text-gray-900 group-hover:text-blue-600 transition-colors">{rel.entity?.legal_name}</div>
+                            </Link>
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-bold rounded-lg uppercase tracking-wider">
+                              {rel.role.replace('_', ' ')}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
+                            {rel.effective_from}
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap text-right">
+                            <Link href={`/entities/${rel.entity_id}`}>
+                              <GhostButton size="sm" className="text-blue-600 font-bold text-[10px] uppercase tracking-widest" rightIcon={<ExternalLink className="w-3.5 h-3.5" />}>View Entity</GhostButton>
+                            </Link>
+                          </td>
+                        </tr>
+                      ))}
+                      {relationships.length === 0 && (
+                        <tr>
+                          <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500 font-medium">
+                            No associated entities found.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
               </div>
-            </div>
-          </div>
+            )}
 
-          <div className="space-y-8">
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-100 bg-gray-50">
-                <h3 className="font-semibold text-gray-900">Profile Completeness</h3>
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-sm text-gray-600">Completeness Score</span>
-                  <span className="text-sm font-bold text-gray-900">{person.completeness_score}%</span>
+            {/* Banking Tab */}
+            {activeTab === 'banking' && (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {person.bank_accounts?.map((acc) => (
+                    <div key={acc.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:border-blue-300 hover:shadow-xl hover:shadow-blue-500/5 transition-all relative group">
+                      {acc.is_primary && (
+                        <div className="absolute top-4 right-4 bg-blue-600 text-white text-[9px] font-bold uppercase px-2 py-0.5 rounded-full shadow-lg shadow-blue-600/20 tracking-tighter">Primary</div>
+                      )}
+                      <div className="flex items-center justify-between mb-6">
+                        <div className="flex items-center gap-4">
+                          <div className="p-3 bg-blue-50 rounded-2xl text-blue-600 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                            <CreditCard className="w-6 h-6" />
+                          </div>
+                          <div>
+                            <h3 className="font-bold text-gray-900 tracking-tight">{acc.bank_name}</h3>
+                            <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">{acc.account_type} Account</p>
+                          </div>
+                        </div>
+                        <button 
+                          onClick={() => handleCopyBankDetails(acc)}
+                          className={`p-2 rounded-xl transition-all ${
+                            copiedId === acc.id 
+                              ? 'bg-green-50 text-green-600' 
+                              : 'bg-gray-50 text-gray-400 hover:bg-blue-50 hover:text-blue-600'
+                          }`}
+                          title="Copy Account Details"
+                        >
+                          {copiedId === acc.id ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <div className="space-y-3.5 pt-4 border-t border-gray-50">
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">Account Name</span>
+                          <span className="text-sm font-semibold text-gray-900">{acc.account_holder_name}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">Account Number</span>
+                          <span className="text-sm font-mono font-medium text-gray-900">{acc.account_number}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">IFSC Code</span>
+                          <span className="text-sm font-mono font-medium text-gray-900">{acc.ifsc_code}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest">Branch</span>
+                          <span className="text-sm text-gray-700 font-medium">{acc.branch || 'N/A'}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <button className="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center text-gray-300 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-all duration-300 group">
+                    <Plus className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-bold uppercase tracking-widest">Add Personal Account</span>
+                  </button>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div 
-                    className="bg-blue-600 h-2 rounded-full" 
-                    style={{ width: `${person.completeness_score}%` }}
-                  ></div>
-                </div>
-                <ul className="mt-4 space-y-2">
-                  <li className="flex items-center text-xs text-gray-500">
-                    <CheckCircle className="w-3 h-3 mr-2 text-green-500" /> Basic details provided
-                  </li>
-                  <li className="flex items-center text-xs text-gray-500">
-                    {person.pan ? <CheckCircle className="w-3 h-3 mr-2 text-green-500" /> : <Clock className="w-3 h-3 mr-2 text-yellow-500" />}
-                    PAN details
-                  </li>
-                  <li className="flex items-center text-xs text-gray-500">
-                    {person.din ? <CheckCircle className="w-3 h-3 mr-2 text-green-500" /> : <Clock className="w-3 h-3 mr-2 text-yellow-500" />}
-                    DIN details
-                  </li>
-                </ul>
               </div>
-            </div>
+            )}
+
+            {/* Filings Tab */}
+            {activeTab === 'filings' && (
+              <div className="space-y-8">
+                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+                    <h2 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                      <History className="w-4 h-4 text-blue-600" />
+                      Personal Tax Filings
+                    </h2>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Financial Year</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filing Type</th>
+                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
+                          <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-200">
+                        {person.documents?.filter(d => d.document_type === 'itr_acknowledgement').map((doc) => (
+                          <tr key={doc.id} className="hover:bg-gray-50 transition-colors">
+                            <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-900">{doc.financial_year}</td>
+                            <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-600 font-medium">Income Tax Return (ITR)</td>
+                            <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">{doc.document_date || 'Jul 2024'}</td>
+                            <td className="px-6 py-5 whitespace-nowrap text-right">
+                              <GhostButton size="sm" className="text-blue-600 font-bold text-[10px] uppercase tracking-widest" leftIcon={<Download className="w-3.5 h-3.5" />}>Download</GhostButton>
+                            </td>
+                          </tr>
+                        ))}
+                        {person.documents?.filter(d => d.document_type === 'itr_acknowledgement').length === 0 && (
+                          <tr>
+                            <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500 font-medium">
+                              No tax filings records found.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Documents Tab */}
+            {activeTab === 'documents' && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {person.documents?.map((doc) => (
+                  <div key={doc.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-start hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group">
+                    <div className="p-4 bg-gray-50 rounded-2xl text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-6">
+                      {getDocumentIcon(doc.document_type)}
+                    </div>
+                    <div className="flex-1 space-y-1 mb-6">
+                      <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 leading-tight transition-colors">{doc.file_name}</h3>
+                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
+                        {doc.document_type.replace(/_/g, ' ')}
+                      </p>
+                    </div>
+                    <button className="w-full py-3 bg-gray-50 group-hover:bg-blue-50 text-gray-400 group-hover:text-blue-600 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-semibold text-[10px] uppercase tracking-widest">
+                      <Download className="w-3.5 h-3.5" />
+                      Download File
+                    </button>
+                  </div>
+                ))}
+                <button className="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center text-gray-300 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-all duration-300 group min-h-[220px]">
+                  <Plus className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold uppercase tracking-widest">Upload Document</span>
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
