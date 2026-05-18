@@ -7,8 +7,11 @@ import {
   LogOut,
   UserCircle,
   Shield,
+  Building2,
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
+import Link from 'next/link';
+import { MOCK_ORGANISATION, MOCK_USER } from '@/lib/mockdb';
 
 export default function ProfileMenu() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
@@ -49,8 +52,12 @@ export default function ProfileMenu() {
           <User className="h-5 w-5 text-white" />
         </div>
         <div className="hidden md:block text-left">
-          <p className="text-sm font-semibold text-gray-900">David Spade</p>
-          <p className="text-xs text-gray-500">Entity Management Admin</p>
+          <p className="text-sm font-semibold text-gray-900">
+            {MOCK_USER.full_name}
+          </p>
+          <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none mt-1">
+            {MOCK_ORGANISATION.name}
+          </p>
         </div>
         <ChevronDown
           className={`h-4 w-4 text-gray-400 transition-transform duration-200 ${isUserMenuOpen ? 'rotate-180' : ''}`}
@@ -61,18 +68,31 @@ export default function ProfileMenu() {
       {isUserMenuOpen && (
         <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-lg border border-gray-200/60 py-2 z-50">
           {/* User Info */}
-          <div className="px-4 py-3 border-b border-gray-100">
+          <div className="px-4 py-3 border-b border-gray-100 bg-gray-50/50">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
                 <User className="h-5 w-5 text-white" />
               </div>
               <div>
                 <p className="text-sm font-semibold text-gray-900">
-                  David Spade
+                  {MOCK_USER.full_name}
                 </p>
-                <p className="text-xs text-gray-500">david.spade@klump.com</p>
+                <p className="text-xs text-gray-500">{MOCK_USER.email}</p>
               </div>
             </div>
+          </div>
+
+          {/* Org Info */}
+          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Building2 className="w-4 h-4 text-gray-400" />
+              <span className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+                {MOCK_ORGANISATION.name}
+              </span>
+            </div>
+            <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[9px] font-bold rounded uppercase">
+              {MOCK_USER.role}
+            </span>
           </div>
 
           {/* Menu Items */}
@@ -81,10 +101,10 @@ export default function ProfileMenu() {
               <UserCircle className="h-4 w-4 mr-3 text-gray-400" />
               My Profile
             </button>
-            <button className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+            <Link href="/settings" onClick={() => setIsUserMenuOpen(false)} className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
               <Settings className="h-4 w-4 mr-3 text-gray-400" />
               Account Settings
-            </button>
+            </Link>
             <button className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
               <Shield className="h-4 w-4 mr-3 text-gray-400" />
               Security & Privacy

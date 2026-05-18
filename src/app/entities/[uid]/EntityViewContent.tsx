@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Users,
+  User,
   Building2,
   Shield,
   CheckCircle,
@@ -23,6 +24,7 @@ import {
   Search,
   Book,
   Eye,
+  Edit,
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { PrimaryButton, SecondaryButton } from '@/components/ui/Button/index';
@@ -32,20 +34,107 @@ import {
   Person,
   EntityPersonRelationship,
   BankAccount,
+  CapTableEntry,
 } from '@/lib/types';
 import { DOCUMENT_TYPE_LABELS } from '@/lib/constants';
 import Link from 'next/link';
+import AddMemberModal from './AddMemberModal';
+import IssueSharesModal from './IssueSharesModal';
+import AddBankAccountModal from './AddBankAccountModal';
+import UploadDocumentModal from './UploadDocumentModal';
 
 export default function EntityViewContent({ uid }: { uid: string }) {
   const [entity, setEntity] = useState<Entity | null>(null);
   const [relationships, setRelationships] = useState<
-    Array<EntityPersonRelationship & { person?: Person }>
+    Array<EntityPersonRelationship & { person?: Person; related_entity?: Entity }>
   >([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [filingFilter, setFilingFilter] = useState('all');
   const [filingSearch, setFilingSearch] = useState('');
+  const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
+  const [isIssueSharesModalOpen, setIsIssueSharesModalOpen] = useState(false);
+  const [isAddBankModalOpen, setIsAddBankModalOpen] = useState(false);
+  const [isUploadDocModalOpen, setIsUploadDocModalOpen] = useState(false);
+
+  const fetchData = async () => {
+    setLoading(true);
+    const entityData = db.getEntity(uid);
+    if (entityData) {
+      setEntity(entityData);
+      const rels = db.getRelationshipsForEntity(uid);
+      const relsWithPeople = rels.map((rel) => ({
+        ...rel,
+        person: rel.person_id ? db.getPerson(rel.person_id) : undefined,
+        related_entity: rel.related_entity_id ? db.getEntity(rel.related_entity_id) : undefined,
+      }));
+      setRelationships(relsWithPeople);
+    }
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [uid]);
+  const calculateCapTable = (entity: Entity): CapTableEntry[] => {
+    if (!entity.equity_ledger || !entity.share_classes) return [];
+
+    const balances: Record<string, number> = {};
+    const stakeholderInfo: Record<
+      string,
+      { name: string; type: 'person' | 'entity' }
+    > = {};
+
+    entity.equity_ledger.forEach((tx) => {
+      const classId = tx.share_class_id;
+      // Outgoing
+      if (tx.from_stakeholder_id) {
+        const key = `${tx.from_stakeholder_type}:${tx.from_stakeholder_id}:${classId}`;
+        balances[key] = (balances[key] || 0) - tx.share_count;
+      }
+      // Incoming
+      if (tx.to_stakeholder_id) {
+        const key = `${tx.to_stakeholder_type}:${tx.to_stakeholder_id}:${classId}`;
+        balances[key] = (balances[key] || 0) + tx.share_count;
+
+        // Resolve names for display
+        if (!stakeholderInfo[key]) {
+          if (tx.to_stakeholder_type === 'person') {
+            const person = db.getPerson(tx.to_stakeholder_id);
+            stakeholderInfo[key] = {
+              name: person?.full_name || 'Unknown Person',
+              type: 'person',
+            };
+          } else {
+            const ent = db.getEntity(tx.to_stakeholder_id);
+            stakeholderInfo[key] = {
+              name: ent?.legal_name || 'Unknown Entity',
+              type: 'entity',
+            };
+          }
+        }
+      }
+    });
+
+    const totalIssued = Object.values(balances).reduce((a, b) => a + b, 0);
+
+    return Object.entries(balances)
+      .filter(([, balance]) => balance > 0)
+      .map(([key, balance]) => {
+        const [type, id, classId] = key.split(':');
+        const info = stakeholderInfo[key];
+        return {
+          stakeholder_id: id,
+          stakeholder_type: type as 'person' | 'entity',
+          stakeholder_name: info.name,
+          share_class_id: classId,
+          shares_held: balance,
+          percentage_holding: (balance / totalIssued) * 100,
+        };
+      })
+      .sort((a, b) => b.shares_held - a.shares_held);
+  };
 
   const breadcrumbs = [
     { label: 'Entities', href: '/entities' },
@@ -55,24 +144,7 @@ export default function EntityViewContent({ uid }: { uid: string }) {
     },
   ];
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      const entityData = db.getEntity(uid);
-      if (entityData) {
-        setEntity(entityData);
-        const rels = db.getRelationshipsForEntity(uid);
-        const relsWithPeople = rels.map((rel) => ({
-          ...rel,
-          person: db.getPerson(rel.person_id),
-        }));
-        setRelationships(relsWithPeople);
-      }
-      setLoading(false);
-    };
-
-    fetchData();
-  }, [uid]);
+  // Empty string since I already moved useEffect
 
   const handleCopyBankDetails = async (acc: BankAccount) => {
     const details = `Bank: ${acc.bank_name}
@@ -188,7 +260,6 @@ Branch: ${acc.branch || 'N/A'}`;
       r.role
     )
   );
-  const shareholders = relationships.filter((r) => r.role === 'shareholder');
   const professionalAppointments = relationships.filter((r) =>
     ['auditor', 'company_secretary'].includes(r.role)
   );
@@ -235,6 +306,19 @@ Branch: ${acc.branch || 'N/A'}`;
     { id: 'others', label: 'Others' },
   ];
 
+  const isLimitedCompany = ['private_limited', 'public_limited'].includes(
+    entity.entity_type
+  );
+
+  const tabs = [
+    { id: 'overview', label: 'Overview', icon: Info },
+    { id: 'management', label: 'Management', icon: Users },
+    ...(isLimitedCompany ? [{ id: 'ownership', label: 'Ownership', icon: TrendingUp }] : []),
+    { id: 'banking', label: 'Banking', icon: CreditCard },
+    { id: 'statutory', label: 'Statutory Docs', icon: Book },
+    { id: 'filings', label: 'Filings', icon: Shield },
+  ];
+
   return (
     <MainLayout breadcrumbs={breadcrumbs}>
       <div className="max-w-7xl mx-auto space-y-6">
@@ -242,13 +326,7 @@ Branch: ${acc.branch || 'N/A'}`;
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="flex items-center justify-between border-b border-gray-200 px-6 bg-white sticky top-0 z-10">
             <div className="flex overflow-x-auto no-scrollbar">
-              {[
-                { id: 'overview', label: 'Overview', icon: Info },
-                { id: 'management', label: 'Management', icon: Users },
-                { id: 'banking', label: 'Banking', icon: CreditCard },
-                { id: 'statutory', label: 'Statutory Docs', icon: Book },
-                { id: 'filings', label: 'Filings', icon: Shield },
-              ].map((tab) => (
+              {tabs.map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
@@ -288,9 +366,16 @@ Branch: ${acc.branch || 'N/A'}`;
                           {entity.status}
                         </span>
                       </div>
-                      <p className="text-base text-gray-500 font-medium">
-                        {entity.short_name || 'Legal Entity Identity'}
-                      </p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-base text-gray-500 font-medium">
+                          {entity.short_name || 'Legal Entity Identity'}
+                        </p>
+                        <Link href={`/entities/${uid}/edit`}>
+                          <SecondaryButton size="sm" leftIcon={<Edit className="w-4 h-4" />}>
+                            Edit Entity
+                          </SecondaryButton>
+                        </Link>
+                      </div>
                     </div>
 
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6 pt-4 border-t border-gray-100">
@@ -345,14 +430,7 @@ Branch: ${acc.branch || 'N/A'}`;
                           {entity.cin || entity.llpin || 'N/A'}
                         </span>
                       </div>
-                      <div className="flex justify-between items-center py-2 border-b border-gray-200/50">
-                        <span className="text-sm font-medium text-gray-500">
-                          FSSAI License
-                        </span>
-                        <span className="text-sm font-mono font-semibold text-gray-900">
-                          {entity.fssai || 'N/A'}
-                        </span>
-                      </div>
+
                       <div className="flex justify-between items-center py-2">
                         <span className="text-sm font-medium text-gray-500">
                           Nature of Business
@@ -393,17 +471,27 @@ Branch: ${acc.branch || 'N/A'}`;
 
             {/* Management Tab */}
             {activeTab === 'management' && (
-              <div className="space-y-8">
-                {/* Directors */}
+              <div className="space-y-10">
+                {/* Board of Directors / Partners */}
                 <div className="space-y-4">
-                  <h2 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                    <Users className="w-4 h-4 text-blue-600" />
-                    Board of Directors & Partners
-                  </h2>
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                      <Users className="w-4 h-4 text-blue-600" />
+                      {['llp', 'partnership'].includes(entity.entity_type)
+                        ? 'Partners'
+                        : 'Board of Directors'}
+                    </h2>
+                    <PrimaryButton size="sm" onClick={() => setIsAddMemberModalOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+                      Add Member
+                    </PrimaryButton>
+                  </div>
                   <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest w-16">
+                            S.No.
+                          </th>
                           <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                             Name
                           </th>
@@ -414,44 +502,76 @@ Branch: ${acc.branch || 'N/A'}`;
                             DIN / DPIN
                           </th>
                           <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
-                            Since
+                            Start Date
+                          </th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                            End Date
+                          </th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                            Authority
                           </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {directors.map((rel) => (
-                          <tr
-                            key={rel.id}
-                            className="hover:bg-blue-50/30 transition-colors"
-                          >
-                            <td className="px-6 py-5 whitespace-nowrap">
-                              <Link
-                                href={`/people/${rel.person_id}`}
-                                className="flex items-center group"
-                              >
-                                <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center mr-3 group-hover:bg-blue-600 transition-all duration-300">
-                                  <span className="text-blue-700 group-hover:text-white font-bold text-sm">
-                                    {rel.person?.full_name[0]}
+                        {directors.map((rel, index) => {
+                          const appointmentFiling = entity.filings?.find(
+                            (f) => f.id === rel.appointment_filing_id
+                          );
+                          return (
+                            <tr
+                              key={rel.id}
+                              className="hover:bg-blue-50/30 transition-colors"
+                            >
+                              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
+                                {index + 1}
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                <Link
+                                  href={`/people/${rel.person_id}`}
+                                  className="flex items-center group"
+                                >
+                                  <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center mr-3 group-hover:bg-blue-600 transition-all duration-300">
+                                    <span className="text-blue-700 group-hover:text-white font-bold text-sm">
+                                      {rel.person?.full_name[0]}
+                                    </span>
+                                  </div>
+                                  <div className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
+                                    {rel.person?.full_name}
+                                  </div>
+                                </Link>
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-semibold rounded-lg uppercase tracking-wider">
+                                  {rel.role.replace('_', ' ')}
+                                </span>
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap text-xs font-mono font-medium text-gray-500">
+                                {rel.person?.din || rel.person?.dpin || 'N/A'}
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
+                                {rel.effective_from || 'N/A'}
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
+                                {rel.effective_to || 'Present'}
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                {appointmentFiling ? (
+                                  <Link
+                                    href={`/entities/${entity.id}/filings/${appointmentFiling.id}`}
+                                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                                  >
+                                    <FileCheck className="w-3.5 h-3.5" />
+                                    {appointmentFiling.name.split('(')[0].trim()}
+                                  </Link>
+                                ) : (
+                                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter italic">
+                                    Not Linked
                                   </span>
-                                </div>
-                                <div className="text-sm font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                                  {rel.person?.full_name}
-                                </div>
-                              </Link>
-                            </td>
-                            <td className="px-6 py-5 whitespace-nowrap">
-                              <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-semibold rounded-lg uppercase tracking-wider">
-                                {rel.role.replace('_', ' ')}
-                              </span>
-                            </td>
-                            <td className="px-6 py-5 whitespace-nowrap text-xs font-mono font-medium text-gray-500">
-                              {rel.person?.din || rel.person?.dpin || 'N/A'}
-                            </td>
-                            <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
-                              {rel.effective_from}
-                            </td>
-                          </tr>
-                        ))}
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
@@ -467,6 +587,9 @@ Branch: ${acc.branch || 'N/A'}`;
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest w-16">
+                            S.No.
+                          </th>
                           <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                             Professional / Firm
                           </th>
@@ -474,55 +597,100 @@ Branch: ${acc.branch || 'N/A'}`;
                             Role
                           </th>
                           <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
-                            Since
+                            Start Date
+                          </th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                            End Date
+                          </th>
+                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                            Authority
                           </th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {professionalAppointments.map((rel) => (
-                          <tr
-                            key={rel.id}
-                            className="hover:bg-indigo-50/30 transition-colors"
-                          >
-                            <td className="px-6 py-5 whitespace-nowrap">
-                              <div className="flex items-center">
-                                <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center mr-3">
-                                  <span className="text-indigo-700 font-bold text-sm">
-                                    {rel.person?.full_name[0]}
+                        {professionalAppointments.map((rel, index) => {
+                          const appointmentFiling = entity.filings?.find(
+                            (f) => f.id === rel.appointment_filing_id
+                          );
+                          return (
+                            <tr
+                              key={rel.id}
+                              className="hover:bg-indigo-50/30 transition-colors"
+                            >
+                              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
+                                {index + 1}
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                <div className="flex items-center">
+                                  <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center mr-3">
+                                    <span className="text-indigo-700 font-bold text-sm">
+                                      {(rel.person?.full_name || rel.related_entity?.legal_name)?.[0]}
+                                    </span>
+                                  </div>
+                                  <div className="text-sm font-bold text-gray-900">
+                                    {rel.person?.full_name || rel.related_entity?.legal_name}
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-semibold rounded-lg uppercase tracking-wider min-w-[140px] text-center inline-block">
+                                  {rel.role.replace('_', ' ')}
+                                </span>
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
+                                {rel.effective_from || 'N/A'}
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
+                                {rel.effective_to || 'Present'}
+                              </td>
+                              <td className="px-6 py-5 whitespace-nowrap">
+                                {appointmentFiling ? (
+                                  <Link
+                                    href={`/entities/${entity.id}/filings/${appointmentFiling.id}`}
+                                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
+                                  >
+                                    <FileCheck className="w-3.5 h-3.5" />
+                                    {appointmentFiling.name.split('(')[0].trim()}
+                                  </Link>
+                                ) : (
+                                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter italic">
+                                    Not Linked
                                   </span>
-                                </div>
-                                <div className="text-sm font-bold text-gray-900">
-                                  {rel.person?.full_name}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-6 py-5 whitespace-nowrap">
-                              <span className="px-2.5 py-1 bg-indigo-50 text-indigo-700 text-[10px] font-semibold rounded-lg uppercase tracking-wider min-w-[140px] text-center inline-block">
-                                {rel.role.replace('_', ' ')}
-                              </span>
-                            </td>
-                            <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
-                              {rel.effective_from}
-                            </td>
-                          </tr>
-                        ))}
+                                )}
+                              </td>
+                            </tr>
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>
                 </div>
+              </div>
+            )}
 
+            {/* Ownership Tab */}
+            {activeTab === 'ownership' && isLimitedCompany && (
+              <div className="space-y-10">
                 {/* Shareholders */}
                 <div className="space-y-4">
-                  <h2 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                    <TrendingUp className="w-4 h-4 text-green-600" />
-                    Shareholding Pattern
-                  </h2>
+                  <div className="flex justify-between items-center">
+                    <h2 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
+                      <TrendingUp className="w-4 h-4 text-green-600" />
+                      Shareholding Pattern
+                    </h2>
+                    <PrimaryButton size="sm" onClick={() => setIsIssueSharesModalOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+                      Issue Shares
+                    </PrimaryButton>
+                  </div>
                   <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
                     <table className="min-w-full divide-y divide-gray-200">
                       <thead className="bg-gray-50">
                         <tr>
                           <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                             Shareholder
+                          </th>
+                          <th className="px-6 py-4 text-right text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
+                            Shares
                           </th>
                           <th className="px-6 py-4 text-right text-[10px] font-semibold text-gray-400 uppercase tracking-widest">
                             Holdings (%)
@@ -533,18 +701,34 @@ Branch: ${acc.branch || 'N/A'}`;
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-gray-200">
-                        {shareholders.map((rel) => (
+                        {calculateCapTable(entity).map((entry) => (
                           <tr
-                            key={rel.id}
+                            key={`${entry.stakeholder_type}:${entry.stakeholder_id}:${entry.share_class_id}`}
                             className="hover:bg-green-50/30 transition-colors"
                           >
                             <td className="px-6 py-5 whitespace-nowrap">
-                              <Link
-                                href={`/people/${rel.person_id}`}
-                                className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors"
-                              >
-                                {rel.person?.full_name}
-                              </Link>
+                              <div className="flex items-center">
+                                {entry.stakeholder_type === 'entity' ? (
+                                  <Building2 className="w-4 h-4 text-gray-400 mr-2" />
+                                ) : (
+                                  <User className="w-4 h-4 text-gray-400 mr-2" />
+                                )}{' '}
+                                <Link
+                                  href={
+                                    entry.stakeholder_type === 'entity'
+                                      ? `/entities/${entry.stakeholder_id}`
+                                      : `/people/${entry.stakeholder_id}`
+                                  }
+                                  className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors"
+                                >
+                                  {entry.stakeholder_name}
+                                </Link>
+                              </div>
+                            </td>
+                            <td className="px-6 py-5 whitespace-nowrap text-right">
+                              <span className="text-sm font-bold text-gray-900">
+                                {entry.shares_held.toLocaleString()}
+                              </span>
                             </td>
                             <td className="px-6 py-5 whitespace-nowrap text-right">
                               <div className="flex items-center justify-end gap-3">
@@ -552,19 +736,18 @@ Branch: ${acc.branch || 'N/A'}`;
                                   <div
                                     className="bg-green-500 h-1.5 rounded-full"
                                     style={{
-                                      width: `${rel.shareholding_pct}%`,
+                                      width: `${entry.percentage_holding}%`,
                                     }}
                                   ></div>
                                 </div>
                                 <span className="text-sm font-bold text-gray-900">
-                                  {rel.shareholding_pct}%
+                                  {entry.percentage_holding.toFixed(2)}%
                                 </span>
                               </div>
                             </td>
                             <td className="px-6 py-5 whitespace-nowrap">
                               <span className="flex items-center text-green-600 text-[10px] font-bold uppercase tracking-widest">
-                                <CheckCircle className="w-3.5 h-3.5 mr-1" />{' '}
-                                Active
+                                <CheckCircle className="w-3.5 h-3.5 mr-1" /> Active
                               </span>
                             </td>
                           </tr>
@@ -579,6 +762,12 @@ Branch: ${acc.branch || 'N/A'}`;
             {/* Banking Tab */}
             {activeTab === 'banking' && (
               <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold text-gray-900">Bank Accounts</h2>
+                  <PrimaryButton size="sm" onClick={() => setIsAddBankModalOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+                    Add Bank Account
+                  </PrimaryButton>
+                </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {entity.bank_accounts?.map((acc) => (
                     <div
@@ -688,7 +877,14 @@ Branch: ${acc.branch || 'N/A'}`;
 
             {/* Statutory Documents Tab */}
             {activeTab === 'statutory' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                  <h2 className="text-xl font-bold text-gray-900">Statutory Documents</h2>
+                  <PrimaryButton size="sm" onClick={() => setIsUploadDocModalOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+                    Upload Document
+                  </PrimaryButton>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {staticDocuments.map((doc) => (
                   <div
                     key={doc.id}
@@ -732,6 +928,7 @@ Branch: ${acc.branch || 'N/A'}`;
                     Add Statutory Doc
                   </span>
                 </button>
+                </div>
               </div>
             )}
 
@@ -884,6 +1081,32 @@ Branch: ${acc.branch || 'N/A'}`;
           </div>
         </div>
       </div>
+      
+      {/* Modals */}
+      <AddMemberModal 
+        entityId={uid} 
+        isOpen={isAddMemberModalOpen} 
+        onClose={() => setIsAddMemberModalOpen(false)} 
+        onSuccess={fetchData} 
+      />
+      <IssueSharesModal 
+        entity={entity} 
+        isOpen={isIssueSharesModalOpen} 
+        onClose={() => setIsIssueSharesModalOpen(false)} 
+        onSuccess={fetchData} 
+      />
+      <AddBankAccountModal 
+        entityId={uid} 
+        isOpen={isAddBankModalOpen} 
+        onClose={() => setIsAddBankModalOpen(false)} 
+        onSuccess={fetchData} 
+      />
+      <UploadDocumentModal 
+        entityId={uid} 
+        isOpen={isUploadDocModalOpen} 
+        onClose={() => setIsUploadDocModalOpen(false)} 
+        onSuccess={fetchData} 
+      />
     </MainLayout>
   );
 }

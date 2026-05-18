@@ -5,14 +5,13 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import React from 'react';
 import {
-  Home,
-  Users,
-  Settings,
+  LayoutDashboard,
+  User,
+  Building2,
+  ShieldCheck,
   ChevronLeft,
   ChevronRight,
-  Users2,
   Briefcase,
-  CheckCircle,
 } from 'lucide-react';
 import { FullLogo, BrandMark } from '@/components/ui/Logo';
 
@@ -22,12 +21,11 @@ const navigation: Array<{
   icon: React.ComponentType<{ className?: string }>;
   badge?: number;
 }> = [
-  { name: 'Dashboard', href: '/', icon: Home },
-  { name: 'Entities', href: '/entities', icon: Users2 },
-  { name: 'People', href: '/people', icon: Users },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Entities', href: '/entities', icon: Building2 },
+  { name: 'People', href: '/people', icon: User },
   { name: 'Professionals', href: '/professionals', icon: Briefcase },
-  { name: 'Compliance', href: '/compliance', icon: CheckCircle, badge: 2 },
-  { name: 'Settings', href: '/settings', icon: Settings },
+  { name: 'Compliance', href: '/compliance', icon: ShieldCheck, badge: 2 },
 ];
 
 export default function Sidebar() {
@@ -167,21 +165,19 @@ export default function Sidebar() {
       >
         {/* Logo */}
         <div
-          className={`flex border-b border-gray-100 py-6 ${
-            isCollapsed ? 'justify-center px-3' : 'justify-start px-6'
+          className={`flex items-center pt-8 pb-4 ${
+            isCollapsed ? 'justify-center px-3' : 'justify-start pl-6'
           }`}
         >
-          <div className="flex items-center">
-            {isCollapsed ? (
-              <BrandMark className="h-6 w-6" />
-            ) : (
-              <FullLogo className="h-7" />
-            )}
-          </div>
+          {isCollapsed ? (
+            <BrandMark className="h-6 w-6" />
+          ) : (
+            <FullLogo className="h-7" />
+          )}
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 px-3 py-6 space-y-1">
+        <nav className="flex-1 px-3 py-2 space-y-1">
           {navigation.map((item) => {
             const isActive =
               item.href === '/'

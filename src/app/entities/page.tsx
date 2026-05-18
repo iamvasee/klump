@@ -21,14 +21,33 @@ import {
   GhostButton,
   OutlineButton,
 } from '@/components/ui/Button/index';
-import { db } from '@/lib/mockdb';
+import { supabase } from '@/lib/supabase';
+import { Entity } from '@/lib/types';
 
 export default function EntitiesPage() {
   const breadcrumbs = [{ label: 'Entities', current: true }];
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
+  const [entities, setEntities] = useState<Entity[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const entities = db.getEntities();
+  React.useEffect(() => {
+    const fetchEntities = async () => {
+      const { data, error } = await supabase
+        .from('entities')
+        .select('*')
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error('Error fetching entities:', error);
+      } else {
+        setEntities(data as Entity[]);
+      }
+      setLoading(false);
+    };
+
+    fetchEntities();
+  }, []);
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -61,7 +80,7 @@ export default function EntitiesPage() {
   const filteredEntities = entities.filter((entity) => {
     const matchesSearch =
       entity.legal_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      entity.short_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      entity.short_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       entity.pan?.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus =
       selectedStatus === 'all' ||
@@ -72,10 +91,10 @@ export default function EntitiesPage() {
   const stats = {
     total: entities.length,
     active: entities.filter((e) => e.status === 'active').length,
-    pending: entities.filter((e) => e.status === 'pending').length,
+    pending: entities.filter((e) => e.status === 'under_liquidation').length,
     avgCompleteness: Math.round(
       entities.reduce((sum, e) => sum + (e.completeness_score || 0), 0) /
-        entities.length
+        (entities.length || 1)
     ),
   };
 
@@ -196,133 +215,151 @@ export default function EntitiesPage() {
           </div>
         </div>
 
-        {/* Entities Table */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              All Entities ({filteredEntities.length})
-            </h3>
-          </div>
-
-          <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Entity Details
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Type & identifiers
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Completeness
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {filteredEntities.map((entity) => (
-                  <tr key={entity.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div>
-                        <div className="text-sm font-medium text-gray-900">
-                          {entity.legal_name}
+        {/* Data Table */}
+        <div className="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden">
+          {loading ? (
+            <div className="p-12 text-center text-gray-500">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              Loading entities...
+            </div>
+          ) : filteredEntities.length === 0 ? (
+            <div className="p-12 text-center">
+              <Building2 className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-lg font-medium text-gray-900 mb-1">
+                No entities found
+              </h3>
+              <p className="text-gray-500 mb-6">
+                Get started by creating your first entity.
+              </p>
+              <Link href="/entities/add">
+                <PrimaryButton leftIcon={<Plus className="w-4 h-4" />}>
+                  Add Entity
+                </PrimaryButton>
+              </Link>
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Entity Details
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Type & identifiers
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Location
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Completeness
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Status
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {filteredEntities.map((entity) => (
+                    <tr key={entity.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div>
+                          <div className="text-sm font-medium text-gray-900">
+                            {entity.legal_name}
+                          </div>
+                          <div className="text-sm text-gray-500">
+                            {entity.short_name}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 capitalize">
+                          {entity.entity_type.replace('_', ' ')}
+                        </div>
+                        <div className="text-xs text-gray-500 font-mono">
+                          PAN: {entity.pan || 'N/A'}
+                        </div>
+                        <div className="text-xs text-gray-500 font-mono">
+                          CIN: {entity.cin || entity.llpin || 'N/A'}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900">
+                          {entity.city || 'N/A'}
                         </div>
                         <div className="text-sm text-gray-500">
-                          {entity.short_name}
+                          {entity.state || 'N/A'}
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900 capitalize">
-                        {entity.entity_type.replace('_', ' ')}
-                      </div>
-                      <div className="text-xs text-gray-500 font-mono">
-                        PAN: {entity.pan || 'N/A'}
-                      </div>
-                      <div className="text-xs text-gray-500 font-mono">
-                        CIN: {entity.cin || entity.llpin || 'N/A'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">
-                        {entity.city || 'N/A'}
-                      </div>
-                      <div className="text-sm text-gray-500">
-                        {entity.state || 'N/A'}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        <div className="w-16 bg-gray-200 rounded-full h-1.5">
-                          <div
-                            className={`h-1.5 rounded-full ${
-                              (entity.completeness_score || 0) > 80
-                                ? 'bg-green-500'
-                                : (entity.completeness_score || 0) > 50
-                                  ? 'bg-yellow-500'
-                                  : 'bg-red-500'
-                            }`}
-                            style={{
-                              width: `${entity.completeness_score || 0}%`,
-                            }}
-                          ></div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center space-x-2">
+                          <div className="w-16 bg-gray-200 rounded-full h-1.5">
+                            <div
+                              className={`h-1.5 rounded-full ${
+                                (entity.completeness_score || 0) > 80
+                                  ? 'bg-green-500'
+                                  : (entity.completeness_score || 0) > 50
+                                    ? 'bg-yellow-500'
+                                    : 'bg-red-500'
+                              }`}
+                              style={{
+                                width: `${entity.completeness_score || 0}%`,
+                              }}
+                            ></div>
+                          </div>
+                          <span className="text-xs font-medium text-gray-700">
+                            {entity.completeness_score || 0}%
+                          </span>
                         </div>
-                        <span className="text-xs font-medium text-gray-700">
-                          {entity.completeness_score || 0}%
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        {getStatusIcon(entity.status)}
-                        <span
-                          className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(entity.status)}`}
-                        >
-                          {entity.status}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      <div className="flex items-center space-x-2">
-                        <Link href={`/entities/${entity.id}`}>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          {getStatusIcon(entity.status)}
+                          <span
+                            className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(entity.status)}`}
+                          >
+                            {entity.status}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                        <div className="flex items-center space-x-2">
+                          <Link href={`/entities/${entity.id}`}>
+                            <GhostButton
+                              size="sm"
+                              aria-label="View entity details"
+                              title="View details"
+                            >
+                              <Eye className="w-4 h-4" />
+                            </GhostButton>
+                          </Link>
+                          <Link href={`/entities/${entity.id}/edit`}>
+                            <GhostButton
+                              size="sm"
+                              aria-label="Edit entity"
+                              title="Edit entity"
+                            >
+                              <Edit className="w-4 h-4" />
+                            </GhostButton>
+                          </Link>
                           <GhostButton
                             size="sm"
-                            aria-label="View entity details"
-                            title="View details"
+                            aria-label="More options"
+                            title="More options"
                           >
-                            <Eye className="w-4 h-4" />
+                            <MoreVertical className="w-4 h-4" />
                           </GhostButton>
-                        </Link>
-                        <GhostButton
-                          size="sm"
-                          aria-label="Edit entity"
-                          title="Edit entity"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </GhostButton>
-                        <GhostButton
-                          size="sm"
-                          aria-label="More options"
-                          title="More options"
-                        >
-                          <MoreVertical className="w-4 h-4" />
-                        </GhostButton>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </MainLayout>

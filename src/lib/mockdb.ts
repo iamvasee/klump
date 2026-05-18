@@ -9,6 +9,7 @@ import {
   BankAccount,
   EntityGstin,
   Filing,
+  EquityTransaction,
 } from './types';
 
 // --- Mock Initial Data ---
@@ -165,6 +166,23 @@ const ent1_filings: Filing[] = [
     ],
     created_at: new Date().toISOString(),
   },
+  {
+    id: 'fil_dir12_1',
+    entity_id: 'ent_1',
+    name: 'Form DIR-12 (Appointment of Alice Smith)',
+    filing_type: 'mca_annual_return',
+    financial_year: '2010-11',
+    filing_date: '2010-05-30',
+    status: 'completed',
+    description: 'Appointment of Director',
+    data: {
+      'Director Name': 'Alice Smith',
+      DIN: '01234567',
+      'Appointment Date': '2010-05-15',
+    },
+    files: [],
+    created_at: new Date().toISOString(),
+  },
 ];
 
 export const MOCK_ENTITIES: Entity[] = [
@@ -194,6 +212,52 @@ export const MOCK_ENTITIES: Entity[] = [
     gstins: ent1_gstins,
     documents: ent1_documents,
     filings: ent1_filings,
+    share_classes: [
+      {
+        id: 'sc_1',
+        entity_id: 'ent_1',
+        name: 'Equity Shares',
+        type: 'equity',
+        nominal_value: 10,
+        total_authorised: 100000,
+        total_issued: 10000,
+      },
+    ],
+    equity_ledger: [
+      {
+        id: 'tx_1',
+        entity_id: 'ent_1',
+        share_class_id: 'sc_1',
+        transaction_type: 'issuance',
+        to_stakeholder_id: 'per_1',
+        to_stakeholder_type: 'person',
+        share_count: 5500,
+        effective_date: '2010-05-15',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'tx_2',
+        entity_id: 'ent_1',
+        share_class_id: 'sc_1',
+        transaction_type: 'issuance',
+        to_stakeholder_id: 'per_3',
+        to_stakeholder_type: 'person',
+        share_count: 3500,
+        effective_date: '2012-01-10',
+        created_at: new Date().toISOString(),
+      },
+      {
+        id: 'tx_3',
+        entity_id: 'ent_1',
+        share_class_id: 'sc_1',
+        transaction_type: 'issuance',
+        to_stakeholder_id: 'ent_2', // Entity owning another entity
+        to_stakeholder_type: 'entity',
+        share_count: 1000,
+        effective_date: '2023-06-01',
+        created_at: new Date().toISOString(),
+      },
+    ],
   },
   {
     id: 'ent_2',
@@ -209,6 +273,66 @@ export const MOCK_ENTITIES: Entity[] = [
     pan: 'FGHIJ5678K',
     llpin: 'AAA-1234',
     completeness_score: 60,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    bank_accounts: [],
+    gstins: [],
+    documents: [],
+    filings: [],
+  },
+  {
+    id: 'ent_3',
+    organisation_id: 'org_1',
+    legal_name: 'Beta Associates',
+    short_name: 'Beta',
+    entity_type: 'partnership',
+    status: 'active',
+    date_of_incorporation: '2018-02-10',
+    state_of_incorporation: 'Delhi',
+    financial_year_end: 'march_31',
+    nature_of_business: 'Trading',
+    pan: 'KLMNO9012P',
+    completeness_score: 45,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    bank_accounts: [],
+    gstins: [],
+    documents: [],
+    filings: [],
+  },
+  {
+    id: 'ent_4',
+    organisation_id: 'org_1',
+    legal_name: 'Gamma Charitable Trust',
+    short_name: 'Gamma Trust',
+    entity_type: 'trust_public',
+    status: 'active',
+    date_of_incorporation: '2005-11-05',
+    state_of_incorporation: 'Tamil Nadu',
+    financial_year_end: 'march_31',
+    nature_of_business: 'Charity',
+    pan: 'QRSTU3456V',
+    completeness_score: 80,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+    bank_accounts: [],
+    gstins: [],
+    documents: [],
+    filings: [],
+  },
+  {
+    id: 'ent_5',
+    organisation_id: 'org_1',
+    legal_name: 'David Smith & Associates',
+    short_name: 'David Smith',
+    entity_type: 'partnership',
+    status: 'active',
+    date_of_incorporation: '2010-01-01',
+    state_of_incorporation: 'Delhi',
+    financial_year_end: 'march_31',
+    nature_of_business: 'Auditing',
+    pan: 'AUDIT9999S',
+    completeness_score: 100,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     bank_accounts: [],
@@ -299,17 +423,6 @@ export const MOCK_PEOPLE: Person[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'per_4',
-    organisation_id: 'org_1',
-    full_name: 'David Smith & Associates',
-    nationality: 'Indian',
-    email: 'audit@davidsmith.com',
-    pan: 'AUDIT9999S',
-    completeness_score: 100,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
     id: 'per_5',
     organisation_id: 'org_1',
     full_name: 'Meera Iyer',
@@ -329,6 +442,7 @@ export const MOCK_RELATIONSHIPS: EntityPersonRelationship[] = [
     person_id: 'per_1',
     role: 'director',
     effective_from: '2010-05-15',
+    appointment_filing_id: 'fil_dir12_1',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -346,7 +460,7 @@ export const MOCK_RELATIONSHIPS: EntityPersonRelationship[] = [
     entity_id: 'ent_1',
     person_id: 'per_3',
     role: 'shareholder',
-    shareholding_pct: 45,
+    share_count: 4500,
     effective_from: '2012-01-10',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -356,7 +470,7 @@ export const MOCK_RELATIONSHIPS: EntityPersonRelationship[] = [
     entity_id: 'ent_1',
     person_id: 'per_1',
     role: 'shareholder',
-    shareholding_pct: 55,
+    share_count: 5500,
     effective_from: '2010-05-15',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -364,7 +478,7 @@ export const MOCK_RELATIONSHIPS: EntityPersonRelationship[] = [
   {
     id: 'rel_5',
     entity_id: 'ent_1',
-    person_id: 'per_4',
+    related_entity_id: 'ent_5',
     role: 'auditor',
     effective_from: '2020-04-01',
     created_at: new Date().toISOString(),
@@ -418,6 +532,20 @@ class MockDatabase {
     return newEntity;
   }
 
+  updateEntity(id: string, updates: Partial<Entity>) {
+    const index = this.entities.findIndex((e) => e.id === id);
+    if (index !== -1) {
+      this.entities[index] = {
+        ...this.entities[index],
+        ...updates,
+        updated_at: new Date().toISOString(),
+      };
+      return this.entities[index];
+    }
+    return null;
+  }
+
+
   // People
   getPeople() {
     return this.people;
@@ -445,6 +573,70 @@ class MockDatabase {
   }
   getRelationshipsForPerson(personId: string) {
     return this.relationships.filter((r) => r.person_id === personId);
+  }
+  addRelationship(relationship: Omit<EntityPersonRelationship, 'id' | 'created_at' | 'updated_at'>) {
+    const newRelationship: EntityPersonRelationship = {
+      ...relationship,
+      id: `rel_${Math.random().toString(36).substr(2, 9)}`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    this.relationships.push(newRelationship);
+    return newRelationship;
+  }
+
+  // Equity
+  addEquityTransaction(transaction: Omit<EquityTransaction, 'id' | 'created_at'>) {
+    const newTransaction: EquityTransaction = {
+      ...transaction,
+      id: `tx_${Math.random().toString(36).substr(2, 9)}`,
+      created_at: new Date().toISOString(),
+    };
+    const entity = this.entities.find((e) => e.id === transaction.entity_id);
+    if (entity) {
+      if (!entity.equity_ledger) entity.equity_ledger = [];
+      entity.equity_ledger.push(newTransaction);
+      
+      // Update share class issued amount
+      const shareClass = entity.share_classes?.find(sc => sc.id === transaction.share_class_id);
+      if (shareClass && transaction.transaction_type === 'issuance') {
+        shareClass.total_issued += transaction.share_count;
+      }
+    }
+    return newTransaction;
+  }
+
+  // Banking
+  addBankAccount(bankAccount: Omit<BankAccount, 'id' | 'created_at'>) {
+    const newAccount: BankAccount = {
+      ...bankAccount,
+      id: `bank_${Math.random().toString(36).substr(2, 9)}`,
+      created_at: new Date().toISOString(),
+    };
+    const entity = this.entities.find((e) => e.id === bankAccount.entity_id);
+    if (entity) {
+      if (!entity.bank_accounts) entity.bank_accounts = [];
+      entity.bank_accounts.push(newAccount);
+    }
+    return newAccount;
+  }
+
+  // Documents
+  addDocument(document: Omit<Document, 'id' | 'created_at'>) {
+    const newDocument: Document = {
+      ...document,
+      id: `doc_${Math.random().toString(36).substr(2, 9)}`,
+      created_at: new Date().toISOString(),
+    };
+    this.documents.push(newDocument);
+    if (document.entity_id) {
+      const entity = this.entities.find((e) => e.id === document.entity_id);
+      if (entity) {
+        if (!entity.documents) entity.documents = [];
+        entity.documents.push(newDocument);
+      }
+    }
+    return newDocument;
   }
 }
 

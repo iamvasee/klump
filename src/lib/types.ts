@@ -34,6 +34,18 @@ export type RelationshipRole =
   | 'auditor'
   | 'company_secretary';
 
+// --- Equity Ledger Enums ---
+
+export type ShareClassType = 'equity' | 'preference' | 'ccps' | 'ocps';
+
+export type EquityTransactionType =
+  | 'issuance' // Company creates new shares
+  | 'transfer' // Shareholder A to Shareholder B
+  | 'buyback' // Company takes back shares
+  | 'bonus' // New shares given to existing holders
+  | 'split' // Sub-division of existing shares
+  | 'merger'; // Result of a corporate action
+
 export type DocumentType =
   | 'certificate_of_incorporation'
   | 'llp_agreement'
@@ -122,6 +134,9 @@ export interface Entity {
   relationships?: EntityPersonRelationship[];
   documents?: Document[];
   filings?: Filing[];
+  // Equity Ledger
+  share_classes?: ShareClass[];
+  equity_ledger?: EquityTransaction[];
 }
 
 export interface Filing {
@@ -193,17 +208,74 @@ export interface Person {
 export interface EntityPersonRelationship {
   id: string;
   entity_id: string;
-  person_id: string;
+  person_id?: string;
+  related_entity_id?: string;
   role: RelationshipRole;
-  shareholding_pct?: number;
   effective_from?: string;
   effective_to?: string;
+  appointment_filing_id?: string;
+  resignation_filing_id?: string;
   created_by?: string;
   created_at: string;
   updated_at: string;
   // Populated via joins
   entity?: Entity;
   person?: Person;
+  related_entity?: Entity;
+}
+
+// --- Equity Ledger Interfaces ---
+
+export interface Stakeholder {
+  id: string; // The ID of the Person or Entity
+  type: 'person' | 'entity';
+  name: string; // Cached for UI performance
+}
+
+export interface ShareClass {
+  id: string;
+  entity_id: string;
+  name: string; // e.g., "Series A Preferred"
+  type: ShareClassType;
+  nominal_value: number; // Face value per share
+  total_authorised: number;
+  total_issued: number;
+}
+
+export interface EquityTransaction {
+  id: string;
+  entity_id: string;
+  share_class_id: string;
+  transaction_type: EquityTransactionType;
+
+  // The Movement
+  from_stakeholder_id?: string; // Null if 'issuance'
+  from_stakeholder_type?: 'person' | 'entity';
+
+  to_stakeholder_id?: string; // Null if 'buyback'
+  to_stakeholder_type?: 'person' | 'entity';
+
+  share_count: number;
+  price_per_share?: number;
+  total_consideration?: number;
+
+  // Timeline
+  effective_date: string;
+  board_resolution_date?: string;
+  created_at: string;
+
+  // Metadata for the UI
+  notes?: string;
+  document_id?: string; // Reference to SH-4, Transfer Deed, etc.
+}
+
+export interface CapTableEntry {
+  stakeholder_id: string;
+  stakeholder_type: 'person' | 'entity';
+  stakeholder_name: string;
+  share_class_id: string;
+  shares_held: number;
+  percentage_holding: number;
 }
 
 export interface Document {

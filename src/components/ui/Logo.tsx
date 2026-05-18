@@ -40,8 +40,6 @@ export const FullLogo = ({
   textFill = '#0A0B14',
 }: LogoProps) => (
   <svg
-    width="199"
-    height="47"
     viewBox="0 0 199 47"
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
