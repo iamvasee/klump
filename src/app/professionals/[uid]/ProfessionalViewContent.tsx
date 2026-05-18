@@ -122,10 +122,7 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
                 </div>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <OutlineButton leftIcon={<Edit className="w-4 h-4" />}>Edit Profile</OutlineButton>
-              <PrimaryButton leftIcon={<Plus className="w-4 h-4" />}>New Appointment</PrimaryButton>
-            </div>
+
           </div>
         </div>
 

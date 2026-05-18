@@ -1,4 +1,4 @@
-import { Entity, Person, EntityPersonRelationship, Document, AuditLogEntry, UserProfile, Organisation, BankAccount, EntityGstin } from "./types";
+import { Entity, Person, EntityPersonRelationship, Document, AuditLogEntry, UserProfile, Organisation, BankAccount, EntityGstin, Filing } from "./types";
 
 // --- Mock Initial Data ---
 
@@ -67,7 +67,7 @@ const ent1_documents: Document[] = [
     organisation_id: "org_1",
     entity_id: "ent_1",
     file_name: "Certificate_of_Incorporation.pdf",
-    file_path: "/docs/coi.pdf",
+    file_path: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     document_type: "certificate_of_incorporation",
     document_date: "2010-05-15",
     created_at: new Date().toISOString(),
@@ -77,29 +77,77 @@ const ent1_documents: Document[] = [
     organisation_id: "org_1",
     entity_id: "ent_1",
     file_name: "PAN_Card_Acme.pdf",
-    file_path: "/docs/pan.pdf",
+    file_path: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     document_type: "pan_card",
     created_at: new Date().toISOString(),
+  }
+];
+
+const ent1_filings: Filing[] = [
+  {
+    id: "fil_1",
+    entity_id: "ent_1",
+    name: "GSTR-3B Aug 2024",
+    filing_type: "gst_return",
+    financial_year: "2024-25",
+    filing_date: "2024-09-20",
+    status: "completed",
+    description: "Monthly GST Return for August",
+    data: {
+      "Total Turnover": "₹1,25,00,000",
+      "Taxable Value": "₹1,00,00,000",
+      "IGST": "₹18,00,000",
+      "CGST": "₹0",
+      "SGST": "₹0",
+      "ITC Claimed": "₹12,50,000",
+      "Net Tax Paid": "₹5,50,000"
+    },
+    files: [
+      {
+        id: "doc_gst_3b_1",
+        organisation_id: "org_1",
+        file_name: "GSTR-3B_Receipt.pdf",
+        file_path: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        document_type: "gst_return",
+        created_at: new Date().toISOString()
+      },
+      {
+        id: "doc_gst_3b_2",
+        organisation_id: "org_1",
+        file_name: "Working_Sheet.xlsx",
+        file_path: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        document_type: "gst_return",
+        created_at: new Date().toISOString()
+      }
+    ],
+    created_at: new Date().toISOString()
   },
   {
-    id: "doc_3",
-    organisation_id: "org_1",
+    id: "fil_2",
     entity_id: "ent_1",
-    file_name: "ITR_V_FY_2023_24.pdf",
-    file_path: "/docs/itr_2024.pdf",
-    document_type: "itr_acknowledgement",
+    name: "Income Tax Return FY 23-24",
+    filing_type: "itr_acknowledgement",
     financial_year: "2023-24",
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "doc_4",
-    organisation_id: "org_1",
-    entity_id: "ent_1",
-    file_name: "FSSAI_License_2024.pdf",
-    file_path: "/docs/fssai.pdf",
-    document_type: "other",
-    description: "FSSAI Food Safety License",
-    created_at: new Date().toISOString(),
+    filing_date: "2024-07-15",
+    status: "completed",
+    description: "Annual ITR Filing",
+    data: {
+      "Total Income": "₹12,45,00,000",
+      "Total Tax Paid": "₹3,10,00,000",
+      "Section": "115BAA",
+      "Audit Date": "2024-06-30"
+    },
+    files: [
+      {
+        id: "doc_itr_ack",
+        organisation_id: "org_1",
+        file_name: "ITR_V_Acknowledgement.pdf",
+        file_path: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
+        document_type: "itr_acknowledgement",
+        created_at: new Date().toISOString()
+      }
+    ],
+    created_at: new Date().toISOString()
   }
 ];
 
@@ -129,6 +177,7 @@ export const MOCK_ENTITIES: Entity[] = [
     bank_accounts: ent1_bank_accounts,
     gstins: ent1_gstins,
     documents: ent1_documents,
+    filings: ent1_filings,
   },
   {
     id: "ent_2",
@@ -149,6 +198,7 @@ export const MOCK_ENTITIES: Entity[] = [
     bank_accounts: [],
     gstins: [],
     documents: [],
+    filings: [],
   }
 ];
 
@@ -173,7 +223,7 @@ const per1_documents: Document[] = [
     organisation_id: "org_1",
     person_id: "per_1",
     file_name: "PAN_Alice_Smith.pdf",
-    file_path: "/docs/alice_pan.pdf",
+    file_path: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     document_type: "pan_card",
     created_at: new Date().toISOString(),
   },
@@ -182,18 +232,8 @@ const per1_documents: Document[] = [
     organisation_id: "org_1",
     person_id: "per_1",
     file_name: "Aadhaar_Alice_Smith.pdf",
-    file_path: "/docs/alice_aadhaar.pdf",
+    file_path: "https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf",
     document_type: "aadhaar_card",
-    created_at: new Date().toISOString(),
-  },
-  {
-    id: "doc_p1_3",
-    organisation_id: "org_1",
-    person_id: "per_1",
-    file_name: "ITR_V_Alice_2023_24.pdf",
-    file_path: "/docs/alice_itr_2024.pdf",
-    document_type: "itr_acknowledgement",
-    financial_year: "2023-24",
     created_at: new Date().toISOString(),
   }
 ];
@@ -334,6 +374,16 @@ class MockDatabase {
   // Entities
   getEntities() { return this.entities; }
   getEntity(id: string) { return this.entities.find(e => e.id === id); }
+  
+  // Filings
+  getFiling(id: string) {
+    for (const entity of this.entities) {
+      const filing = entity.filings?.find(f => f.id === id);
+      if (filing) return { filing, entity };
+    }
+    return null;
+  }
+
   addEntity(entity: Omit<Entity, "id" | "created_at" | "updated_at">) {
     const newEntity: Entity = {
       ...entity,

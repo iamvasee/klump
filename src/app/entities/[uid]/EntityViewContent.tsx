@@ -32,7 +32,13 @@ import {
   Briefcase,
   ExternalLink,
   Copy,
-  Check
+  Check,
+  Filter,
+  Search,
+  Book,
+  Activity,
+  File,
+  Eye
 } from "lucide-react";
 import MainLayout from '@/components/layout/MainLayout';
 import {
@@ -42,7 +48,8 @@ import {
   OutlineButton
 } from '@/components/ui/Button/index';
 import { db } from '@/lib/mockdb';
-import { Entity, Person, EntityPersonRelationship, Document, BankAccount } from '@/lib/types';
+import { Entity, Person, EntityPersonRelationship, Document, BankAccount, Filing } from '@/lib/types';
+import { DOCUMENT_TYPE_LABELS } from '@/lib/constants';
 import Link from 'next/link';
 
 export default function EntityViewContent({ uid }: { uid: string }) {
@@ -51,6 +58,8 @@ export default function EntityViewContent({ uid }: { uid: string }) {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [filingFilter, setFilingFilter] = useState('all');
+  const [filingSearch, setFilingSearch] = useState('');
 
   const breadcrumbs = [
     { label: 'Entities', href: '/entities' },
@@ -100,17 +109,28 @@ Branch: ${acc.branch || 'N/A'}`;
       case 'inactive': return 'bg-gray-100 text-gray-800 border-gray-200';
       case 'suspended': return 'bg-red-100 text-red-800 border-red-200';
       case 'pending': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'completed': return 'bg-emerald-100 text-emerald-800 border-emerald-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getDocumentIcon = (type: string) => {
-    switch (type) {
-      case 'certificate_of_incorporation': return <BadgeCheck className="w-5 h-5 text-blue-600" />;
-      case 'pan_card': return <FileText className="w-5 h-5 text-orange-600" />;
-      case 'itr_acknowledgement': return <FileCheck className="w-5 h-5 text-green-600" />;
-      default: return <FileText className="w-5 h-5 text-gray-600" />;
-    }
+    if (!type) return <FileText className="w-5 h-5 text-gray-600" />;
+    if (type.includes('gst')) return <BadgeCheck className="w-5 h-5 text-blue-600" />;
+    if (type.includes('mca') || type === 'certificate_of_incorporation') return <Building2 className="w-5 h-5 text-indigo-600" />;
+    if (type.includes('itr') || type.includes('tds') || type === 'pan_card') return <FileText className="w-5 h-5 text-orange-600" />;
+    if (type.includes('pf') || type.includes('esi')) return <Users className="w-5 h-5 text-green-600" />;
+    return <FileCheck className="w-5 h-5 text-gray-600" />;
+  };
+
+  const getFilingCategory = (type: string) => {
+    if (!type) return 'others';
+    if (type.includes('gst')) return 'gst';
+    if (type.includes('itr') || type.includes('tds') || type === 'pan_card' || type === 'tan_allotment') return 'tax';
+    if (type.includes('mca') || type === 'certificate_of_incorporation' || type === 'moa_aoa' || type === 'balance_sheet') return 'mca';
+    if (type.includes('pf') || type.includes('esi') || type === 'professional_tax_return') return 'labor';
+    if (type.includes('fssai') || type.includes('udyam') || type.includes('iec')) return 'licenses';
+    return 'others';
   };
 
   if (loading) {
@@ -141,6 +161,32 @@ Branch: ${acc.branch || 'N/A'}`;
   const shareholders = relationships.filter(r => r.role === 'shareholder');
   const professionalAppointments = relationships.filter(r => ['auditor', 'company_secretary'].includes(r.role));
 
+  // Static/One-time documents
+  const staticDocTypes = [
+    'certificate_of_incorporation', 'llp_agreement', 'pan_card', 'aadhaar_card', 
+    'tan_allotment', 'gst_certificate', 'moa_aoa', 'fssai_license', 
+    'udyam_certificate', 'iec_certificate'
+  ];
+  
+  const staticDocuments = entity.documents?.filter(doc => staticDocTypes.includes(doc.document_type)) || [];
+
+  // Filings filtering using the new Filing interface
+  const filteredFilings = entity.filings?.filter(f => {
+    const matchesSearch = f.name.toLowerCase().includes(filingSearch.toLowerCase()) || 
+                         (f.description || '').toLowerCase().includes(filingSearch.toLowerCase());
+    const matchesFilter = filingFilter === 'all' || getFilingCategory(f.filing_type) === filingFilter;
+    return matchesSearch && matchesFilter;
+  }) || [];
+
+  const filingCategories = [
+    { id: 'all', label: 'All' },
+    { id: 'tax', label: 'Income Tax' },
+    { id: 'gst', label: 'GST' },
+    { id: 'labor', label: 'Labor/PF/ESI' },
+    { id: 'mca', label: 'MCA/Annual' },
+    { id: 'others', label: 'Others' }
+  ];
+
   return (
     <MainLayout breadcrumbs={breadcrumbs}>
       <div className="max-w-7xl mx-auto space-y-6">
@@ -153,8 +199,8 @@ Branch: ${acc.branch || 'N/A'}`;
                 { id: 'overview', label: 'Overview', icon: Info },
                 { id: 'management', label: 'Management', icon: Users },
                 { id: 'banking', label: 'Banking', icon: CreditCard },
-                { id: 'compliance', label: 'Compliance', icon: Shield },
-                { id: 'documents', label: 'Documents', icon: FileText }
+                { id: 'statutory', label: 'Statutory Docs', icon: Book },
+                { id: 'filings', label: 'Filings', icon: Shield }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -169,11 +215,6 @@ Branch: ${acc.branch || 'N/A'}`;
                   {tab.label}
                 </button>
               ))}
-            </div>
-            
-            <div className="hidden md:flex items-center gap-3">
-               <OutlineButton size="sm" leftIcon={<Edit className="w-3.5 h-3.5" />}>Edit</OutlineButton>
-               <PrimaryButton size="sm" leftIcon={<Plus className="w-3.5 h-3.5" />}>Stakeholder</PrimaryButton>
             </div>
           </div>
 
@@ -326,10 +367,10 @@ Branch: ${acc.branch || 'N/A'}`;
                           <tr key={rel.id} className="hover:bg-indigo-50/30 transition-colors">
                             <td className="px-6 py-5 whitespace-nowrap">
                               <div className="flex items-center">
-                                <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-3">
+                                <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center mr-3">
                                   <span className="text-indigo-700 font-bold text-sm">{rel.person?.full_name[0]}</span>
                                 </div>
-                                <div className="text-sm font-semibold text-gray-900">{rel.person?.full_name}</div>
+                                <div className="text-sm font-bold text-gray-900">{rel.person?.full_name}</div>
                               </div>
                             </td>
                             <td className="px-6 py-5 whitespace-nowrap">
@@ -375,11 +416,11 @@ Branch: ${acc.branch || 'N/A'}`;
                                 <div className="w-24 bg-gray-100 rounded-full h-1.5 hidden md:block">
                                   <div className="bg-green-500 h-1.5 rounded-full" style={{ width: `${rel.shareholding_pct}%` }}></div>
                                 </div>
-                                <span className="text-sm font-semibold text-gray-900">{rel.shareholding_pct}%</span>
+                                <span className="text-sm font-bold text-gray-900">{rel.shareholding_pct}%</span>
                               </div>
                             </td>
                             <td className="px-6 py-5 whitespace-nowrap">
-                              <span className="flex items-center text-green-600 text-[10px] font-semibold uppercase tracking-widest">
+                              <span className="flex items-center text-green-600 text-[10px] font-bold uppercase tracking-widest">
                                 <CheckCircle className="w-3.5 h-3.5 mr-1" /> Active
                               </span>
                             </td>
@@ -463,89 +504,143 @@ Branch: ${acc.branch || 'N/A'}`;
               </div>
             )}
 
-            {/* Compliance Tab */}
-            {activeTab === 'compliance' && (
-              <div className="space-y-8">
-                {/* GST Details */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                    <h2 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                      <BadgeCheck className="w-4 h-4 text-blue-600" />
-                      GST Registrations
-                    </h2>
-                  </div>
-                  <div className="p-6">
-                    {entity.gstins?.map((gst) => (
-                      <div key={gst.id} className="flex items-center justify-between p-5 bg-gray-50/50 rounded-2xl border border-gray-100 hover:bg-white hover:shadow-lg hover:shadow-gray-200/50 transition-all">
-                        <div className="flex items-center gap-5">
-                          <div className="p-3 bg-white rounded-xl shadow-sm border border-gray-100 text-blue-600">
-                            <Building2 className="w-6 h-6" />
-                          </div>
-                          <div>
-                            <p className="text-base font-semibold text-gray-900 font-mono tracking-tighter">{gst.gstin}</p>
-                            <p className="text-[10px] text-gray-400 font-semibold uppercase tracking-widest mt-0.5">{gst.state} • <span className="text-green-600 font-bold">VERIFIED</span></p>
-                          </div>
-                        </div>
-                        <GhostButton size="sm" className="font-semibold text-[10px] uppercase tracking-widest text-blue-600" leftIcon={<Download className="w-4 h-4" />}>Certificate</GhostButton>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Tax Filings */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                    <h2 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                      <History className="w-4 h-4 text-blue-600" />
-                      Income Tax Filing History
-                    </h2>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Financial Year</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Filing Date</th>
-                          <th className="px-6 py-4 text-right text-[10px] font-semibold text-gray-400 uppercase tracking-widest">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {entity.documents?.filter(d => d.document_type === 'itr_acknowledgement').map((doc) => (
-                          <tr key={doc.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-5 whitespace-nowrap text-sm font-semibold text-gray-900">{doc.financial_year}</td>
-                            <td className="px-6 py-5 whitespace-nowrap text-xs font-medium text-gray-500">{doc.document_date || 'Jul 2024'}</td>
-                            <td className="px-6 py-5 whitespace-nowrap text-right">
-                              <GhostButton size="sm" className="text-blue-600 font-semibold text-[10px] uppercase tracking-widest" leftIcon={<Download className="w-3.5 h-3.5" />}>Acknowledgement</GhostButton>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Documents Tab */}
-            {activeTab === 'documents' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {entity.documents?.map((doc) => (
-                  <div key={doc.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-start hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group">
+            {/* Statutory Documents Tab */}
+            {activeTab === 'statutory' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {staticDocuments.map((doc) => (
+                  <div key={doc.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-start hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-300 group">
                     <div className="p-4 bg-gray-50 rounded-2xl text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-6">
                       {getDocumentIcon(doc.document_type)}
                     </div>
-                    <div className="flex-1 space-y-1 mb-6">
-                      <h3 className="text-sm font-semibold text-gray-900 group-hover:text-blue-700 leading-tight transition-colors">{doc.file_name}</h3>
-                      <p className="text-[9px] font-semibold text-gray-400 uppercase tracking-widest">
-                        {doc.document_type.replace(/_/g, ' ')}
-                      </p>
+                    <div className="flex-1 space-y-1.5 mb-6">
+                      <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 leading-tight transition-colors line-clamp-2">{doc.file_name}</h3>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type.replace(/_/g, ' ')}
+                        </p>
+                      </div>
+                      {doc.document_date && <p className="text-[10px] text-gray-500 font-medium italic">Issued: {doc.document_date}</p>}
                     </div>
-                    <button className="w-full py-3 bg-gray-50 group-hover:bg-blue-50 text-gray-400 group-hover:text-blue-600 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-semibold text-[10px] uppercase tracking-widest">
-                      <Download className="w-3.5 h-3.5" />
-                      Download File
-                    </button>
+                    <div className="w-full pt-4 border-t border-gray-50 flex items-center gap-2">
+                      <button className="flex-1 py-3 bg-gray-50 group-hover:bg-blue-600 text-gray-400 group-hover:text-white rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-bold text-[10px] uppercase tracking-widest">
+                        <Download className="w-3.5 h-3.5" />
+                        Download
+                      </button>
+                      <button className="p-3 bg-gray-50 group-hover:bg-blue-50 text-gray-400 group-hover:text-blue-600 rounded-xl transition-all duration-300">
+                        <ExternalLink className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
+                
+                <button className="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center text-gray-300 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-all duration-300 group min-h-[260px]">
+                  <Plus className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold uppercase tracking-widest">Add Statutory Doc</span>
+                </button>
+              </div>
+            )}
+
+            {/* Filings Tab */}
+            {activeTab === 'filings' && (
+              <div className="space-y-8">
+                {/* Filing Filters & Search */}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/50 p-6 rounded-3xl border border-gray-100 shadow-sm">
+                    <div className="flex overflow-x-auto no-scrollbar gap-2">
+                      {filingCategories.map((cat) => (
+                        <button
+                          key={cat.id}
+                          onClick={() => setFilingFilter(cat.id)}
+                          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border ${
+                            filingFilter === cat.id
+                              ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20'
+                              : 'bg-white text-gray-500 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                          }`}
+                        >
+                          {cat.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="relative w-full md:w-64 group">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                        <input 
+                          type="text" 
+                          placeholder="Search filings..."
+                          value={filingSearch}
+                          onChange={(e) => setFilingSearch(e.target.value)}
+                          className="w-full pl-10 pr-4 py-2.5 text-sm font-medium border border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 outline-none transition-all"
+                        />
+                      </div>
+                      <Link href={`/entities/${uid}/filings/add`}>
+                        <PrimaryButton size="sm" leftIcon={<Plus className="w-4 h-4" />}>Create Filing</PrimaryButton>
+                      </Link>
+                    </div>
+                  </div>
+
+                {/* Filings List - Dense Row Layout */}
+                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest w-12">#</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filing Name</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Type</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">FY / Period</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filing Date</th>
+                        <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {filteredFilings.map((filing, index) => (
+                        <tr key={filing.id} className="hover:bg-blue-50/30 transition-colors group">
+                          <td className="px-6 py-5 whitespace-nowrap text-xs font-bold text-gray-400">
+                            {String(index + 1).padStart(2, '0')}
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <Link href={`/entities/${uid}/filings/${filing.id}`} className="flex items-center group/name">
+                              <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center mr-3 group-hover/name:bg-blue-100 transition-colors">
+                                {getDocumentIcon(filing.filing_type)}
+                              </div>
+                              <div className="text-sm font-semibold text-gray-900 tracking-tight group-hover/name:text-blue-600 transition-colors">{filing.name}</div>
+                            </Link>
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <span className="text-[10px] font-bold text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md uppercase tracking-tighter">
+                              {DOCUMENT_TYPE_LABELS[filing.filing_type] || filing.filing_type}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-700">
+                            {filing.financial_year}
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
+                            {filing.filing_date}
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap text-right">
+                            <div className="flex justify-end gap-2">
+                               <Link href={`/entities/${uid}/filings/${filing.id}`}>
+                                <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View Details">
+                                  <Eye className="w-4 h-4" />
+                                </button>
+                              </Link>
+                              <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Download Proof">
+                                <Download className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  
+                  {filteredFilings.length === 0 && (
+                    <div className="py-20 text-center bg-white">
+                      <Shield className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                      <p className="text-gray-400 font-medium">No recurring filings match your current criteria.</p>
+                      <button onClick={() => {setFilingFilter('all'); setFilingSearch('');}} className="mt-2 text-blue-600 text-sm font-bold hover:underline">Reset Filters</button>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>

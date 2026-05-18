@@ -41,9 +41,18 @@ export type DocumentType =
   | "aadhaar_card"
   | "tan_allotment"
   | "gst_certificate"
+  | "gst_return"
   | "moa_aoa"
   | "balance_sheet"
   | "itr_acknowledgement"
+  | "tds_return"
+  | "pf_return"
+  | "esi_return"
+  | "professional_tax_return"
+  | "mca_annual_return"
+  | "fssai_license"
+  | "udyam_certificate"
+  | "iec_certificate"
   | "bank_statement"
   | "kyc_document"
   | "other";
@@ -112,6 +121,21 @@ export interface Entity {
   bank_accounts?: BankAccount[];
   relationships?: EntityPersonRelationship[];
   documents?: Document[];
+  filings?: Filing[];
+}
+
+export interface Filing {
+  id: string;
+  entity_id: string;
+  name: string;
+  filing_type: DocumentType;
+  financial_year: string;
+  filing_date: string;
+  status: string;
+  description?: string;
+  data?: Record<string, any>; // User entered data
+  files: Document[];
+  created_at: string;
 }
 
 export interface EntityGstin {

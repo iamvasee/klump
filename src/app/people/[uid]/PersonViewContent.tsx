@@ -37,12 +37,15 @@ import {
   ExternalLink,
   Copy,
   Check,
-  History
+  History,
+  Search,
+  Book
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { SecondaryButton, OutlineButton, PrimaryButton, GhostButton } from '@/components/ui/Button/index';
 import { db } from '@/lib/mockdb';
 import { Person, Entity, EntityPersonRelationship, Document, BankAccount } from '@/lib/types';
+import { DOCUMENT_TYPE_LABELS } from '@/lib/constants';
 import Link from 'next/link';
 
 export default function PersonViewContent({ uid }: { uid: string }) {
@@ -52,6 +55,8 @@ export default function PersonViewContent({ uid }: { uid: string }) {
   const [showSensitiveData, setShowSensitiveData] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [filingFilter, setFilingFilter] = useState('all');
+  const [filingSearch, setFilingSearch] = useState('');
 
   const breadcrumbs = [
     { label: 'People', href: '/people' },
@@ -102,12 +107,17 @@ Branch: ${acc.branch || 'N/A'}`;
   };
 
   const getDocumentIcon = (type: string) => {
-    switch (type) {
-      case 'aadhaar_card': return <IdCard className="w-5 h-5 text-blue-600" />;
-      case 'pan_card': return <FileText className="w-5 h-5 text-orange-600" />;
-      case 'itr_acknowledgement': return <FileCheck className="w-5 h-5 text-green-600" />;
-      default: return <FileText className="w-5 h-5 text-gray-600" />;
-    }
+    if (type === 'pan_card') return <FileText className="w-5 h-5 text-orange-600" />;
+    if (type === 'aadhaar_card') return <IdCard className="w-5 h-5 text-blue-600" />;
+    if (type.includes('itr') || type.includes('tds')) return <FileCheck className="w-5 h-5 text-green-600" />;
+    return <FileText className="w-5 h-5 text-gray-600" />;
+  };
+
+  const getFilingCategory = (type: string) => {
+    if (type.includes('itr')) return 'tax';
+    if (type.includes('tds')) return 'tds';
+    if (type === 'pan_card' || type === 'aadhaar_card' || type === 'kyc_document') return 'kyc';
+    return 'others';
   };
 
   if (loading) {
@@ -134,6 +144,27 @@ Branch: ${acc.branch || 'N/A'}`;
     );
   }
 
+  // Static/KYC documents
+  const staticDocTypes = ['aadhaar_card', 'pan_card', 'kyc_document'];
+  const staticDocuments = person.documents?.filter(doc => staticDocTypes.includes(doc.document_type)) || [];
+
+  // Recurring filings
+  const recurringFilings = person.documents?.filter(doc => !staticDocTypes.includes(doc.document_type)) || [];
+
+  const filteredFilings = recurringFilings.filter(doc => {
+    const matchesSearch = doc.file_name.toLowerCase().includes(filingSearch.toLowerCase()) || 
+                         (doc.description || '').toLowerCase().includes(filingSearch.toLowerCase());
+    const matchesFilter = filingFilter === 'all' || getFilingCategory(doc.document_type) === filingFilter;
+    return matchesSearch && matchesFilter;
+  });
+
+  const filingCategories = [
+    { id: 'all', label: 'All Filings' },
+    { id: 'tax', label: 'Income Tax (ITR)' },
+    { id: 'tds', label: 'TDS Filings' },
+    { id: 'others', label: 'Others' }
+  ];
+
   return (
     <MainLayout breadcrumbs={breadcrumbs}>
       <div className="max-w-7xl mx-auto space-y-6">
@@ -146,8 +177,8 @@ Branch: ${acc.branch || 'N/A'}`;
                 { id: 'overview', label: 'Overview', icon: Info },
                 { id: 'entities', label: 'Associated Entities', icon: Building2 },
                 { id: 'banking', label: 'Banking', icon: CreditCard },
-                { id: 'filings', label: 'Filings', icon: Shield },
-                { id: 'documents', label: 'Documents', icon: FileText }
+                { id: 'statutory', label: 'KYC Docs', icon: Book },
+                { id: 'filings', label: 'Filings', icon: Shield }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -164,10 +195,7 @@ Branch: ${acc.branch || 'N/A'}`;
               ))}
             </div>
             
-            <div className="hidden md:flex items-center gap-3">
-               <OutlineButton size="sm" leftIcon={<Edit className="w-3.5 h-3.5" />}>Edit</OutlineButton>
-               <PrimaryButton size="sm" leftIcon={<Plus className="w-3.5 h-3.5" />}>Appointment</PrimaryButton>
-            </div>
+
           </div>
 
           <div className="p-8">
@@ -365,75 +393,127 @@ Branch: ${acc.branch || 'N/A'}`;
               </div>
             )}
 
-            {/* Filings Tab */}
-            {activeTab === 'filings' && (
-              <div className="space-y-8">
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                  <div className="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
-                    <h2 className="text-xs font-bold text-gray-900 uppercase tracking-widest flex items-center gap-2">
-                      <History className="w-4 h-4 text-blue-600" />
-                      Personal Tax Filings
-                    </h2>
-                  </div>
-                  <div className="overflow-x-auto">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Financial Year</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filing Type</th>
-                          <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Date</th>
-                          <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {person.documents?.filter(d => d.document_type === 'itr_acknowledgement').map((doc) => (
-                          <tr key={doc.id} className="hover:bg-gray-50 transition-colors">
-                            <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-900">{doc.financial_year}</td>
-                            <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-600 font-medium">Income Tax Return (ITR)</td>
-                            <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">{doc.document_date || 'Jul 2024'}</td>
-                            <td className="px-6 py-5 whitespace-nowrap text-right">
-                              <GhostButton size="sm" className="text-blue-600 font-bold text-[10px] uppercase tracking-widest" leftIcon={<Download className="w-3.5 h-3.5" />}>Download</GhostButton>
-                            </td>
-                          </tr>
-                        ))}
-                        {person.documents?.filter(d => d.document_type === 'itr_acknowledgement').length === 0 && (
-                          <tr>
-                            <td colSpan={4} className="px-6 py-8 text-center text-sm text-gray-500 font-medium">
-                              No tax filings records found.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Documents Tab */}
-            {activeTab === 'documents' && (
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {person.documents?.map((doc) => (
-                  <div key={doc.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-start hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/10 transition-all duration-300 group">
+            {/* Statutory Documents Tab */}
+            {activeTab === 'statutory' && (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {staticDocuments.map((doc) => (
+                  <div key={doc.id} className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-start hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-300 group">
                     <div className="p-4 bg-gray-50 rounded-2xl text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-6">
                       {getDocumentIcon(doc.document_type)}
                     </div>
-                    <div className="flex-1 space-y-1 mb-6">
-                      <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 leading-tight transition-colors">{doc.file_name}</h3>
-                      <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest">
-                        {doc.document_type.replace(/_/g, ' ')}
-                      </p>
+                    <div className="flex-1 space-y-1.5 mb-6">
+                      <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 leading-tight transition-colors line-clamp-2">{doc.file_name}</h3>
+                      <div className="flex items-center gap-2">
+                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                          {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type.replace(/_/g, ' ')}
+                        </p>
+                      </div>
                     </div>
-                    <button className="w-full py-3 bg-gray-50 group-hover:bg-blue-50 text-gray-400 group-hover:text-blue-600 rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-semibold text-[10px] uppercase tracking-widest">
-                      <Download className="w-3.5 h-3.5" />
-                      Download File
-                    </button>
+                    <div className="w-full pt-4 border-t border-gray-50 flex items-center gap-2">
+                      <button className="flex-1 py-3 bg-gray-50 group-hover:bg-blue-600 text-gray-400 group-hover:text-white rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-bold text-[10px] uppercase tracking-widest">
+                        <Download className="w-3.5 h-3.5" />
+                        Download
+                      </button>
+                    </div>
                   </div>
                 ))}
                 <button className="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center text-gray-300 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-all duration-300 group min-h-[220px]">
                   <Plus className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-bold uppercase tracking-widest">Upload Document</span>
+                  <span className="text-xs font-bold uppercase tracking-widest">Add KYC Doc</span>
                 </button>
+              </div>
+            )}
+
+            {/* Filings Tab */}
+            {activeTab === 'filings' && (
+              <div className="space-y-8">
+                {/* Filing Filters & Search */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-gray-50/50 p-6 rounded-3xl border border-gray-100 shadow-sm">
+                  <div className="flex overflow-x-auto no-scrollbar gap-2">
+                    {filingCategories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() => setFilingFilter(cat.id)}
+                        className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-xl transition-all border ${
+                          filingFilter === cat.id
+                            ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-600/20'
+                            : 'bg-white text-gray-500 border-gray-200 hover:border-blue-300 hover:text-blue-600'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+                  <div className="relative w-full md:w-64 group">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 group-focus-within:text-blue-600 transition-colors" />
+                    <input 
+                      type="text" 
+                      placeholder="Search filings..."
+                      value={filingSearch}
+                      onChange={(e) => setFilingSearch(e.target.value)}
+                      className="w-full pl-10 pr-4 py-2.5 text-sm font-medium border border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                {/* Filings List - Dense Row Layout */}
+                <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+                  <table className="min-w-full divide-y divide-gray-200">
+                    <thead className="bg-gray-50">
+                      <tr>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filing Name</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filing Type</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Period / FY</th>
+                        <th className="px-6 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Filing Date</th>
+                        <th className="px-6 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-200">
+                      {filteredFilings.map((doc) => (
+                        <tr key={doc.id} className="hover:bg-blue-50/30 transition-colors group">
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <div className="flex items-center">
+                              <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center mr-3 group-hover:bg-blue-100 transition-colors">
+                                {getDocumentIcon(doc.document_type)}
+                              </div>
+                              <div className="text-sm font-semibold text-gray-900">{doc.file_name}</div>
+                            </div>
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap">
+                            <span className="text-xs font-medium text-gray-500 bg-gray-100 px-2 py-0.5 rounded-md">
+                              {DOCUMENT_TYPE_LABELS[doc.document_type] || doc.document_type}
+                            </span>
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap text-sm font-bold text-gray-700">
+                            {doc.financial_year || 'N/A'}
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap text-sm text-gray-500 font-medium">
+                            {doc.document_date || 'N/A'}
+                          </td>
+                          <td className="px-6 py-5 whitespace-nowrap text-right">
+                            <div className="flex justify-end gap-2">
+                              <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="Download Proof">
+                                <Download className="w-4 h-4" />
+                              </button>
+                              <button className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all" title="View Details">
+                                <ExternalLink className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  
+                  {filteredFilings.length === 0 && (
+                    <div className="py-20 text-center bg-white">
+                      <Shield className="w-12 h-12 text-gray-200 mx-auto mb-4" />
+                      <p className="text-gray-400 font-medium">No recurring filings match your current criteria.</p>
+                      <button onClick={() => {setFilingFilter('all'); setFilingSearch('');}} className="mt-2 text-blue-600 text-sm font-bold hover:underline">Reset Filters</button>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
