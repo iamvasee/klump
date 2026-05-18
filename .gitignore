@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# agents
+CLAUDE.md
+AGENTS.md
+GEMINI.md
+.gemini/
+
+# linting
+lint-results.json
+lint-results-clean.json
