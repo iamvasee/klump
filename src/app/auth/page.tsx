@@ -8,36 +8,72 @@ import {
   Mail,
   ArrowRight,
   CheckCircle,
+  AlertCircle,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { PrimaryButton } from '@/components/ui/Button/index';
 import { FullLogo } from '@/components/ui/Logo';
+import { supabase } from '@/lib/supabase';
 
 export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [error, setError] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
 
-  // Check for existing session (Mock)
+  // Check for existing session
   useEffect(() => {
-    const session = localStorage.getItem('klump-session');
-    if (session) {
-      router.push('/');
-    }
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        router.push('/');
+      }
+    };
+    checkSession();
   }, [router]);
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError('');
+    setSuccessMessage('');
 
-    // Simulate API call
-    setTimeout(() => {
-      localStorage.setItem('klump-session', 'true');
-      router.push('/');
-    }, 1500);
+    if (isLogin) {
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setError(error.message);
+        setIsLoading(false);
+      } else {
+        router.push('/');
+      }
+    } else {
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: { data: { full_name: fullName } },
+      });
+      if (error) {
+        setError(error.message);
+        setIsLoading(false);
+      } else {
+        setSuccessMessage('Account created! Check your email to confirm your address.');
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const handleGoogleAuth = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo: `${window.location.origin}/` },
+    });
   };
 
   return (
@@ -133,6 +169,8 @@ export default function AuthPage() {
                     <input
                       type="text"
                       required
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
                       className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-200 outline-none"
                       placeholder="John Doe"
                     />
@@ -151,6 +189,8 @@ export default function AuthPage() {
                   <input
                     type="email"
                     required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-200 outline-none"
                     placeholder="name@company.com"
                   />
@@ -178,6 +218,8 @@ export default function AuthPage() {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-11 pr-12 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-200 outline-none"
                     placeholder="••••••••"
                   />
@@ -208,6 +250,22 @@ export default function AuthPage() {
                   >
                     Keep me signed in for 30 days
                   </label>
+                </div>
+              )}
+
+              {/* Error Banner */}
+              {error && (
+                <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  {error}
+                </div>
+              )}
+
+              {/* Success Banner */}
+              {successMessage && (
+                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
+                  <CheckCircle className="w-4 h-4 shrink-0" />
+                  {successMessage}
                 </div>
               )}
 
@@ -248,14 +306,18 @@ export default function AuthPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-4">
-              <button className="flex items-center justify-center space-x-2 py-3 px-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors font-medium text-gray-700">
+              <button
+                type="button"
+                onClick={handleGoogleAuth}
+                className="flex items-center justify-center space-x-2 py-3 px-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors font-medium text-gray-700"
+              >
                 <Image
                   src="https://www.svgrepo.com/show/355037/google.svg"
                   width={20}
                   height={20}
                   alt="Google"
                 />
-                <span>Google</span>
+                <span>Continue with Google</span>
               </button>
             </div>
 
