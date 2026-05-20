@@ -12,6 +12,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
+import { EntityType, EntityStatus } from '@/lib/types';
 import {
   PrimaryButton,
   SecondaryButton,
@@ -144,7 +145,7 @@ export default function EditEntityContent({ uid }: { uid: string }) {
       legal_name: formData.legal_name,
       short_name: formData.short_name,
       entity_type: formData.entity_type as EntityType,
-      status: formData.status as any,
+      status: formData.status as EntityStatus,
       date_of_incorporation: formData.date_of_incorporation,
       state_of_incorporation: formData.state_of_incorporation,
       pan: formData.pan,
@@ -156,7 +157,7 @@ export default function EditEntityContent({ uid }: { uid: string }) {
       state: formData.state,
       pin_code: formData.pin_code,
     });
-    
+
     // Simulate network delay
     setTimeout(() => {
       setIsSubmitting(false);

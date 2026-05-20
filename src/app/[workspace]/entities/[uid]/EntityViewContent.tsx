@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   Users,
   User,
@@ -46,7 +46,9 @@ import UploadDocumentModal from './UploadDocumentModal';
 export default function EntityViewContent({ uid }: { uid: string }) {
   const [entity, setEntity] = useState<Entity | null>(null);
   const [relationships, setRelationships] = useState<
-    Array<EntityPersonRelationship & { person?: Person; related_entity?: Entity }>
+    Array<
+      EntityPersonRelationship & { person?: Person; related_entity?: Entity }
+    >
   >([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('overview');
@@ -58,7 +60,7 @@ export default function EntityViewContent({ uid }: { uid: string }) {
   const [isAddBankModalOpen, setIsAddBankModalOpen] = useState(false);
   const [isUploadDocModalOpen, setIsUploadDocModalOpen] = useState(false);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     setLoading(true);
     const entityData = db.getEntity(uid);
     if (entityData) {
@@ -67,16 +69,19 @@ export default function EntityViewContent({ uid }: { uid: string }) {
       const relsWithPeople = rels.map((rel) => ({
         ...rel,
         person: rel.person_id ? db.getPerson(rel.person_id) : undefined,
-        related_entity: rel.related_entity_id ? db.getEntity(rel.related_entity_id) : undefined,
+        related_entity: rel.related_entity_id
+          ? db.getEntity(rel.related_entity_id)
+          : undefined,
       }));
       setRelationships(relsWithPeople);
     }
     setLoading(false);
-  };
+  }, [uid]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchData();
-  }, [uid]);
+  }, [fetchData]);
   const calculateCapTable = (entity: Entity): CapTableEntry[] => {
     if (!entity.equity_ledger || !entity.share_classes) return [];
 
@@ -313,7 +318,9 @@ Branch: ${acc.branch || 'N/A'}`;
   const tabs = [
     { id: 'overview', label: 'Overview', icon: Info },
     { id: 'management', label: 'Management', icon: Users },
-    ...(isLimitedCompany ? [{ id: 'ownership', label: 'Ownership', icon: TrendingUp }] : []),
+    ...(isLimitedCompany
+      ? [{ id: 'ownership', label: 'Ownership', icon: TrendingUp }]
+      : []),
     { id: 'banking', label: 'Banking', icon: CreditCard },
     { id: 'statutory', label: 'Statutory Docs', icon: Book },
     { id: 'filings', label: 'Filings', icon: Shield },
@@ -371,7 +378,10 @@ Branch: ${acc.branch || 'N/A'}`;
                           {entity.short_name || 'Legal Entity Identity'}
                         </p>
                         <Link href={`/entities/${uid}/edit`}>
-                          <SecondaryButton size="sm" leftIcon={<Edit className="w-4 h-4" />}>
+                          <SecondaryButton
+                            size="sm"
+                            leftIcon={<Edit className="w-4 h-4" />}
+                          >
                             Edit Entity
                           </SecondaryButton>
                         </Link>
@@ -481,7 +491,11 @@ Branch: ${acc.branch || 'N/A'}`;
                         ? 'Partners'
                         : 'Board of Directors'}
                     </h2>
-                    <PrimaryButton size="sm" onClick={() => setIsAddMemberModalOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+                    <PrimaryButton
+                      size="sm"
+                      onClick={() => setIsAddMemberModalOpen(true)}
+                      leftIcon={<Plus className="w-4 h-4" />}
+                    >
                       Add Member
                     </PrimaryButton>
                   </div>
@@ -561,7 +575,9 @@ Branch: ${acc.branch || 'N/A'}`;
                                     className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                                   >
                                     <FileCheck className="w-3.5 h-3.5" />
-                                    {appointmentFiling.name.split('(')[0].trim()}
+                                    {appointmentFiling.name
+                                      .split('(')[0]
+                                      .trim()}
                                   </Link>
                                 ) : (
                                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter italic">
@@ -624,11 +640,15 @@ Branch: ${acc.branch || 'N/A'}`;
                                 <div className="flex items-center">
                                   <div className="w-10 h-10 rounded-xl bg-indigo-100 flex items-center justify-center mr-3">
                                     <span className="text-indigo-700 font-bold text-sm">
-                                      {(rel.person?.full_name || rel.related_entity?.legal_name)?.[0]}
+                                      {
+                                        (rel.person?.full_name ||
+                                          rel.related_entity?.legal_name)?.[0]
+                                      }
                                     </span>
                                   </div>
                                   <div className="text-sm font-bold text-gray-900">
-                                    {rel.person?.full_name || rel.related_entity?.legal_name}
+                                    {rel.person?.full_name ||
+                                      rel.related_entity?.legal_name}
                                   </div>
                                 </div>
                               </td>
@@ -650,7 +670,9 @@ Branch: ${acc.branch || 'N/A'}`;
                                     className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                                   >
                                     <FileCheck className="w-3.5 h-3.5" />
-                                    {appointmentFiling.name.split('(')[0].trim()}
+                                    {appointmentFiling.name
+                                      .split('(')[0]
+                                      .trim()}
                                   </Link>
                                 ) : (
                                   <span className="text-[10px] text-gray-400 font-bold uppercase tracking-tighter italic">
@@ -678,7 +700,11 @@ Branch: ${acc.branch || 'N/A'}`;
                       <TrendingUp className="w-4 h-4 text-green-600" />
                       Shareholding Pattern
                     </h2>
-                    <PrimaryButton size="sm" onClick={() => setIsIssueSharesModalOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+                    <PrimaryButton
+                      size="sm"
+                      onClick={() => setIsIssueSharesModalOpen(true)}
+                      leftIcon={<Plus className="w-4 h-4" />}
+                    >
                       Issue Shares
                     </PrimaryButton>
                   </div>
@@ -747,7 +773,8 @@ Branch: ${acc.branch || 'N/A'}`;
                             </td>
                             <td className="px-6 py-5 whitespace-nowrap">
                               <span className="flex items-center text-green-600 text-[10px] font-bold uppercase tracking-widest">
-                                <CheckCircle className="w-3.5 h-3.5 mr-1" /> Active
+                                <CheckCircle className="w-3.5 h-3.5 mr-1" />{' '}
+                                Active
                               </span>
                             </td>
                           </tr>
@@ -763,8 +790,14 @@ Branch: ${acc.branch || 'N/A'}`;
             {activeTab === 'banking' && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-gray-900">Bank Accounts</h2>
-                  <PrimaryButton size="sm" onClick={() => setIsAddBankModalOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Bank Accounts
+                  </h2>
+                  <PrimaryButton
+                    size="sm"
+                    onClick={() => setIsAddBankModalOpen(true)}
+                    leftIcon={<Plus className="w-4 h-4" />}
+                  >
                     Add Bank Account
                   </PrimaryButton>
                 </div>
@@ -879,55 +912,61 @@ Branch: ${acc.branch || 'N/A'}`;
             {activeTab === 'statutory' && (
               <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                  <h2 className="text-xl font-bold text-gray-900">Statutory Documents</h2>
-                  <PrimaryButton size="sm" onClick={() => setIsUploadDocModalOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+                  <h2 className="text-xl font-bold text-gray-900">
+                    Statutory Documents
+                  </h2>
+                  <PrimaryButton
+                    size="sm"
+                    onClick={() => setIsUploadDocModalOpen(true)}
+                    leftIcon={<Plus className="w-4 h-4" />}
+                  >
                     Upload Document
                   </PrimaryButton>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {staticDocuments.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-start hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-300 group"
-                  >
-                    <div className="p-4 bg-gray-50 rounded-2xl text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-6">
-                      {getDocumentIcon(doc.document_type)}
-                    </div>
-                    <div className="flex-1 space-y-1.5 mb-6">
-                      <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 leading-tight transition-colors line-clamp-2">
-                        {doc.file_name}
-                      </h3>
-                      <div className="flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                        <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
-                          {DOCUMENT_TYPE_LABELS[doc.document_type] ||
-                            doc.document_type.replace(/_/g, ' ')}
-                        </p>
+                  {staticDocuments.map((doc) => (
+                    <div
+                      key={doc.id}
+                      className="bg-white rounded-3xl shadow-sm border border-gray-100 p-6 flex flex-col items-start hover:border-blue-400 hover:shadow-2xl hover:shadow-blue-500/5 transition-all duration-300 group"
+                    >
+                      <div className="p-4 bg-gray-50 rounded-2xl text-gray-400 group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 mb-6">
+                        {getDocumentIcon(doc.document_type)}
                       </div>
-                      {doc.document_date && (
-                        <p className="text-[10px] text-gray-500 font-medium italic">
-                          Issued: {doc.document_date}
-                        </p>
-                      )}
+                      <div className="flex-1 space-y-1.5 mb-6">
+                        <h3 className="text-sm font-bold text-gray-900 group-hover:text-blue-700 leading-tight transition-colors line-clamp-2">
+                          {doc.file_name}
+                        </h3>
+                        <div className="flex items-center gap-2">
+                          <span className="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                          <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">
+                            {DOCUMENT_TYPE_LABELS[doc.document_type] ||
+                              doc.document_type.replace(/_/g, ' ')}
+                          </p>
+                        </div>
+                        {doc.document_date && (
+                          <p className="text-[10px] text-gray-500 font-medium italic">
+                            Issued: {doc.document_date}
+                          </p>
+                        )}
+                      </div>
+                      <div className="w-full pt-4 border-t border-gray-50 flex items-center gap-2">
+                        <button className="flex-1 py-3 bg-gray-50 group-hover:bg-blue-600 text-gray-400 group-hover:text-white rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-bold text-[10px] uppercase tracking-widest">
+                          <Download className="w-3.5 h-3.5" />
+                          Download
+                        </button>
+                        <button className="p-3 bg-gray-50 group-hover:bg-blue-50 text-gray-400 group-hover:text-blue-600 rounded-xl transition-all duration-300">
+                          <ExternalLink className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                    <div className="w-full pt-4 border-t border-gray-50 flex items-center gap-2">
-                      <button className="flex-1 py-3 bg-gray-50 group-hover:bg-blue-600 text-gray-400 group-hover:text-white rounded-xl flex items-center justify-center gap-2 transition-all duration-300 font-bold text-[10px] uppercase tracking-widest">
-                        <Download className="w-3.5 h-3.5" />
-                        Download
-                      </button>
-                      <button className="p-3 bg-gray-50 group-hover:bg-blue-50 text-gray-400 group-hover:text-blue-600 rounded-xl transition-all duration-300">
-                        <ExternalLink className="w-4 h-4" />
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
 
-                <button className="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center text-gray-300 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-all duration-300 group min-h-[260px]">
-                  <Plus className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform" />
-                  <span className="text-xs font-bold uppercase tracking-widest">
-                    Add Statutory Doc
-                  </span>
-                </button>
+                  <button className="border-2 border-dashed border-gray-200 rounded-3xl p-8 flex flex-col items-center justify-center text-gray-300 hover:border-blue-400 hover:text-blue-500 hover:bg-blue-50/30 transition-all duration-300 group min-h-[260px]">
+                    <Plus className="w-10 h-10 mb-3 group-hover:scale-110 transition-transform" />
+                    <span className="text-xs font-bold uppercase tracking-widest">
+                      Add Statutory Doc
+                    </span>
+                  </button>
                 </div>
               </div>
             )}
@@ -1081,31 +1120,31 @@ Branch: ${acc.branch || 'N/A'}`;
           </div>
         </div>
       </div>
-      
+
       {/* Modals */}
-      <AddMemberModal 
-        entityId={uid} 
-        isOpen={isAddMemberModalOpen} 
-        onClose={() => setIsAddMemberModalOpen(false)} 
-        onSuccess={fetchData} 
+      <AddMemberModal
+        entityId={uid}
+        isOpen={isAddMemberModalOpen}
+        onClose={() => setIsAddMemberModalOpen(false)}
+        onSuccess={fetchData}
       />
-      <IssueSharesModal 
-        entity={entity} 
-        isOpen={isIssueSharesModalOpen} 
-        onClose={() => setIsIssueSharesModalOpen(false)} 
-        onSuccess={fetchData} 
+      <IssueSharesModal
+        entity={entity}
+        isOpen={isIssueSharesModalOpen}
+        onClose={() => setIsIssueSharesModalOpen(false)}
+        onSuccess={fetchData}
       />
-      <AddBankAccountModal 
-        entityId={uid} 
-        isOpen={isAddBankModalOpen} 
-        onClose={() => setIsAddBankModalOpen(false)} 
-        onSuccess={fetchData} 
+      <AddBankAccountModal
+        entityId={uid}
+        isOpen={isAddBankModalOpen}
+        onClose={() => setIsAddBankModalOpen(false)}
+        onSuccess={fetchData}
       />
-      <UploadDocumentModal 
-        entityId={uid} 
-        isOpen={isUploadDocModalOpen} 
-        onClose={() => setIsUploadDocModalOpen(false)} 
-        onSuccess={fetchData} 
+      <UploadDocumentModal
+        entityId={uid}
+        isOpen={isUploadDocModalOpen}
+        onClose={() => setIsUploadDocModalOpen(false)}
+        onSuccess={fetchData}
       />
     </MainLayout>
   );

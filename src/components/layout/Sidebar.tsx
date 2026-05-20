@@ -15,21 +15,29 @@ import {
 } from 'lucide-react';
 import { FullLogo, BrandMark } from '@/components/ui/Logo';
 
-const navigation: Array<{
-  name: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: number;
-}> = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Entities', href: '/entities', icon: Building2 },
-  { name: 'People', href: '/people', icon: User },
-  { name: 'Professionals', href: '/professionals', icon: Briefcase },
-  { name: 'Compliance', href: '/compliance', icon: ShieldCheck, badge: 2 },
-];
+import { useParams } from 'next/navigation';
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const params = useParams();
+  const workspace = params.workspace as string;
+
+  const navigation = [
+    { name: 'Dashboard', href: `/${workspace}`, icon: LayoutDashboard },
+    { name: 'Entities', href: `/${workspace}/entities`, icon: Building2 },
+    { name: 'People', href: `/${workspace}/people`, icon: User },
+    {
+      name: 'Professionals',
+      href: `/${workspace}/professionals`,
+      icon: Briefcase,
+    },
+    {
+      name: 'Compliance',
+      href: `/${workspace}/compliance`,
+      icon: ShieldCheck,
+      badge: 2,
+    },
+  ];
   const [isCollapsed, setIsCollapsed] = useState(true); // Start collapsed to prevent flash
   const [isMobile, setIsMobile] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false); // Track hydration state
@@ -180,8 +188,8 @@ export default function Sidebar() {
         <nav className="flex-1 px-3 py-2 space-y-1">
           {navigation.map((item) => {
             const isActive =
-              item.href === '/'
-                ? pathname === '/'
+              item.href === `/${workspace}`
+                ? pathname === `/${workspace}`
                 : pathname.startsWith(item.href);
             return (
               <Link

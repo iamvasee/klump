@@ -36,31 +36,91 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
-  const isOnboardingRoute = ONBOARDING_ROUTES.some((r) => pathname.startsWith(r));
+  const isOnboardingRoute = ONBOARDING_ROUTES.some((r) =>
+    pathname.startsWith(r)
+  );
+
+  // Helper to create a redirect response that preserves cookies set by Supabase
+  const redirect = (url: string) => {
+    const res = NextResponse.redirect(new URL(url, request.url));
+    response.cookies.getAll().forEach((cookie) => {
+      res.cookies.set(cookie.name, cookie.value, cookie.options);
+    });
+    return res;
+  };
 
   // 1. No session → send to login
   if (!user && !isPublicRoute) {
-    return NextResponse.redirect(new URL('/auth', request.url));
+    return redirect('/auth');
   }
 
   // 2. Has session but on login page → send home
   if (user && isPublicRoute) {
-    return NextResponse.redirect(new URL('/', request.url));
+    return redirect('/');
   }
 
   // 3. Has session → check workspace membership
-  if (user && !isPublicRoute && !isOnboardingRoute) {
-    const { data: memberships } = await supabase
+  if (user && !isPublicRoute) {
+    // A. First, get all workspace IDs this user belongs to
+    const { data: membershipData, error: membershipError } = await supabase
       .from('workspace_members')
-      .select('id')
-      .eq('user_id', user.id)
-      .limit(1);
+      .select('workspace_id')
+      .eq('user_id', user.id);
 
-    if (!memberships || memberships.length === 0) {
-      return NextResponse.redirect(new URL('/onboarding', request.url));
+    if (membershipError)
+      console.error('[PROXY ERROR] Membership check:', membershipError);
+
+    const workspaceIds = (membershipData || []).map((m) => m.workspace_id);
+    console.log('[PROXY DEBUG] User:', user.id, 'Workspace IDs:', workspaceIds);
+
+    let firstSlug = null;
+
+    if (workspaceIds.length > 0) {
+      // B. Fetch the slugs for these workspaces directly to avoid join/RLS complexities
+      const { data: workspaces, error: workspaceError } = await supabase
+        .from('workspaces')
+        .select('slug')
+        .in('id', workspaceIds)
+        .limit(1);
+
+      if (workspaceError)
+        console.error('[PROXY ERROR] Workspace lookup:', workspaceError);
+
+      if (workspaces && workspaces.length > 0) {
+        firstSlug = workspaces[0].slug;
+      }
+    }
+
+    const hasWorkspaces = workspaceIds.length > 0;
+    console.log(
+      '[PROXY DEBUG] Decision - hasWorkspaces:',
+      hasWorkspaces,
+      'firstSlug:',
+      firstSlug
+    );
+
+    // If they have a workspace but try to access onboarding, send them to their dashboard
+    if (hasWorkspaces && isOnboardingRoute && firstSlug) {
+      return redirect(`/${firstSlug}`);
+    }
+
+    // If hitting the exact root '/', redirect accordingly
+    if (pathname === '/') {
+      if (!hasWorkspaces) {
+        return redirect('/onboarding');
+      } else if (firstSlug) {
+        return redirect(`/${firstSlug}`);
+      }
+    }
+
+    // If trying to access any internal route but they have no workspace
+    if (!hasWorkspaces && !isOnboardingRoute) {
+      return redirect('/onboarding');
     }
   }
 

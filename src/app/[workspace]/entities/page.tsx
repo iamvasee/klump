@@ -37,7 +37,7 @@ export default function EntitiesPage() {
         .from('entities')
         .select('*')
         .order('created_at', { ascending: false });
-      
+
       if (error) {
         console.error('Error fetching entities:', error);
       } else {

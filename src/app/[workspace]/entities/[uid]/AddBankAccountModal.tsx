@@ -15,7 +15,12 @@ interface AddBankAccountModalProps {
   onSuccess: () => void;
 }
 
-export default function AddBankAccountModal({ entityId, isOpen, onClose, onSuccess }: AddBankAccountModalProps) {
+export default function AddBankAccountModal({
+  entityId,
+  isOpen,
+  onClose,
+  onSuccess,
+}: AddBankAccountModalProps) {
   const [bankName, setBankName] = useState('');
   const [accountHolder, setAccountHolder] = useState('');
   const [accountNumber, setAccountNumber] = useState('');
@@ -27,7 +32,7 @@ export default function AddBankAccountModal({ entityId, isOpen, onClose, onSucce
 
   const handleSubmit = () => {
     if (!bankName || !accountHolder || !accountNumber || !ifscCode) return;
-    
+
     setIsSubmitting(true);
     db.addBankAccount({
       entity_id: entityId,
@@ -51,11 +56,14 @@ export default function AddBankAccountModal({ entityId, isOpen, onClose, onSucce
       <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
         <div className="flex items-center justify-between p-6 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-900">Add Bank Account</h2>
-          <button onClick={onClose} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors">
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
+          >
             <X className="w-5 h-5" />
           </button>
         </div>
-        
+
         <div className="p-6 space-y-4">
           <TextField
             id="bank_name"
@@ -104,9 +112,15 @@ export default function AddBankAccountModal({ entityId, isOpen, onClose, onSucce
 
         <div className="flex items-center justify-end gap-3 p-6 border-t border-gray-100 bg-gray-50/50">
           <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
-          <PrimaryButton 
-            onClick={handleSubmit} 
-            disabled={isSubmitting || !bankName || !accountHolder || !accountNumber || !ifscCode}
+          <PrimaryButton
+            onClick={handleSubmit}
+            disabled={
+              isSubmitting ||
+              !bankName ||
+              !accountHolder ||
+              !accountNumber ||
+              !ifscCode
+            }
           >
             {isSubmitting ? 'Adding...' : 'Add Account'}
           </PrimaryButton>
