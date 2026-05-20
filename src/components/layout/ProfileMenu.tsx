@@ -143,6 +143,7 @@ export default function ProfileMenu() {
       >
         <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
           {profile?.avatar_url ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img src={profile.avatar_url} alt="" className="w-full h-full rounded-xl object-cover" />
           ) : (
             <User className="h-5 w-5 text-white" />

@@ -39,7 +39,7 @@ export default function AccountSettingsPage() {
         const { data: { user } } = await supabase.auth.getUser();
         if (!user) return;
 
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('users')
           .select('full_name, email, avatar_url')
           .eq('auth_user_id', user.id)
@@ -81,8 +81,8 @@ export default function AccountSettingsPage() {
       
       setMessage({ type: 'success', text: 'Profile updated successfully!' });
       setTimeout(() => setMessage({ type: '', text: '' }), 5000);
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message || 'Failed to update profile' });
+    } catch (err: unknown) {
+      setMessage({ type: 'error', text: err instanceof Error ? err.message : 'Failed to update profile' });
     } finally {
       setIsSubmitting(false);
     }
@@ -183,6 +183,7 @@ export default function AccountSettingsPage() {
                       <div className="relative group">
                         <div className="w-24 h-24 bg-gradient-to-br from-indigo-50 to-blue-50 rounded-[2rem] flex items-center justify-center overflow-hidden border-4 border-white shadow-xl">
                           {formData.avatar_url ? (
+                            // eslint-disable-next-line @next/next/no-img-element
                             <img src={formData.avatar_url} alt="Profile" className="w-full h-full object-cover" />
                           ) : (
                             <User className="w-10 h-10 text-indigo-400" />
