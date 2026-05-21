@@ -1,178 +1,342 @@
 'use client';
 
+import Image from 'next/image';
 import {
-  MessageSquare,
-  FolderOpen,
-  Mail,
-  Sheet,
+  AlertCircle,
+  CheckCircle2,
+  FileSignature,
+  FileText,
+  History,
+  ShieldAlert,
+  Building2,
+  Users,
   ShieldCheck,
-  Zap,
-  ArrowRight,
+  Lock,
 } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
-
-const chaosItems = [
-  {
-    icon: MessageSquare,
-    label: 'WhatsApp',
-    color: 'text-green-600',
-    bg: 'bg-green-50',
-  },
-  {
-    icon: FolderOpen,
-    label: 'Shared drives',
-    color: 'text-yellow-600',
-    bg: 'bg-yellow-50',
-  },
-  { icon: Mail, label: 'Email', color: 'text-blue-500', bg: 'bg-blue-50' },
-  {
-    icon: Sheet,
-    label: 'Excel',
-    color: 'text-emerald-600',
-    bg: 'bg-emerald-50',
-  },
-];
 
 export default function RealitySection() {
   return (
     <section
       id="reality"
-      className="relative py-32 px-6 sm:px-10 bg-white overflow-hidden"
+      className="relative py-32 px-6 sm:px-10 bg-[#f8fafc] overflow-hidden"
     >
-      {/* Background grid and ambient glow */}
+      {/* Premium Background Ambient Effects */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-[-10%] right-[-5%] w-[40%] h-[40%] bg-red-50/50 rounded-full blur-[120px]" />
-        <div className="absolute bottom-[-10%] left-[-5%] w-[40%] h-[40%] bg-indigo-50/50 rounded-full blur-[120px]" />
+        <div className="absolute top-[10%] right-[-10%] w-[50%] h-[50%] bg-red-100/40 rounded-full blur-[140px]" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[50%] h-[50%] bg-indigo-100/50 rounded-full blur-[140px]" />
         <div className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-[size:32px_32px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]" />
       </div>
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-7xl mx-auto relative z-10">
         <ScrollReveal>
           <div className="text-center mb-24">
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-[900] text-gray-900 tracking-tight mb-6">
-              Memory shouldn&apos;t be
+            <h2 className="text-4xl sm:text-5xl lg:text-[4rem] font-[900] text-gray-900 tracking-tight leading-[1.1] mb-6">
+              Complexity shouldn&apos;t be
               <br />
-              <span className="text-gray-400">an operational risk.</span>
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-blue-500">
+                an operational nightmare.
+              </span>
             </h2>
-            <p className="text-lg text-gray-500 max-w-2xl mx-auto">
-              Most institutional knowledge is scattered across fragmented
-              channels, creating a fragile foundation for growth.
+            <p className="text-lg sm:text-xl text-gray-500 max-w-3xl mx-auto font-medium">
+              Managing 10 Private Limiteds, 5 LLPs, and 50+ Directors means
+              critical records are scattered across WhatsApp, Telegram, PDFs,
+              and fragile spreadsheets.
             </p>
           </div>
         </ScrollReveal>
 
-        <div className="relative">
-          {/* Connecting Line (Desktop) */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-px bg-gradient-to-r from-transparent via-gray-100 to-transparent hidden lg:block" />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-stretch">
+          {/* LEFT: THE CHAOS (Scattered Mess) */}
+          <div className="relative flex flex-col h-full">
+            <ScrollReveal delay={100} x={-30} className="flex flex-col h-full">
+              <div className="mb-12">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-black uppercase tracking-widest mb-4">
+                  <ShieldAlert className="w-3 h-3" />
+                  The Current Mess
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                  A multi-entity disaster waiting to happen.
+                </h3>
+                <p className="text-gray-500 leading-relaxed">
+                  GST filings in email threads. MCA portal passwords in WhatsApp
+                  groups. Form 26AS PDFs in Telegram. When managing massive
+                  portfolios, this fragmentation causes fatal confusion during
+                  audits or team transitions.
+                </p>
+              </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 items-center">
-            {/* The Chaos side */}
-            <div className="space-y-8 relative">
-              <ScrollReveal delay={100} x={-20}>
-                <div className="relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-red-100 to-orange-100 rounded-3xl blur opacity-30" />
-                  <div className="relative bg-white border border-gray-100 p-8 rounded-[2.5rem] shadow-sm">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-red-500 mb-6">
-                      The Current Mess
+              {/* Visualizing the Chaos (More dense & chaotic) */}
+              <div className="relative flex-1 w-full perspective-1000 min-h-[480px] mt-auto">
+                <div className="absolute inset-0 bg-gradient-to-br from-red-50 to-orange-50/50 rounded-[3rem] border border-red-100/50 shadow-inner" />
+
+                {/* WhatsApp Password Card */}
+                <div className="absolute top-6 left-2 sm:left-6 w-64 bg-white p-4 rounded-2xl shadow-xl shadow-red-900/5 border border-red-100 transform -rotate-6 animate-float z-30">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Image
+                      src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg"
+                      alt="WhatsApp"
+                      width={20}
+                      height={20}
+                      className="w-5 h-5"
+                    />
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      Group: Admin &amp; Passwords
+                    </span>
+                  </div>
+                  <div className="bg-green-50/50 p-2 rounded-xl rounded-tl-none border border-green-100/50">
+                    <p className="text-xs text-gray-700 font-medium">
+                      &quot;Guys, what&apos;s the MCA portal login for Singhania
+                      Ventures Pvt Ltd again? The one pinned is failing.&quot;
                     </p>
-                    <div className="grid grid-cols-2 gap-4">
-                      {chaosItems.map((item, i) => (
-                        <div
-                          key={item.label}
-                          className={`group p-4 bg-gray-50 rounded-2xl border border-transparent hover:border-red-100 transition-all duration-300 hover:scale-[1.05] animate-float`}
-                          style={{
-                            animationDelay: `${i * 0.5}s`,
-                            animationDuration: '4s',
-                          }}
-                        >
-                          <div
-                            className={`w-10 h-10 ${item.bg} rounded-xl flex items-center justify-center mb-3`}
-                          >
-                            <item.icon className={`w-5 h-5 ${item.color}`} />
+                  </div>
+                </div>
+
+                {/* Telegram Documents Card */}
+                <div className="absolute top-32 right-2 sm:right-6 w-72 bg-white p-4 rounded-2xl shadow-xl shadow-red-900/5 border border-red-100 transform rotate-3 animate-float-delayed z-40">
+                  <div className="flex items-center gap-3 mb-2">
+                    <Image
+                      src="https://upload.wikimedia.org/wikipedia/commons/8/82/Telegram_logo.svg"
+                      alt="Telegram"
+                      width={20}
+                      height={20}
+                      className="w-5 h-5"
+                    />
+                    <span className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">
+                      Vajra Corp Compliance
+                    </span>
+                  </div>
+                  <div className="bg-blue-50/50 p-3 rounded-xl rounded-tr-none border border-blue-100/50 flex items-center gap-3">
+                    <FileText className="w-6 h-6 text-blue-500" />
+                    <div>
+                      <p className="text-xs text-gray-700 font-bold">
+                        FY23_GST_Returns_Final.pdf
+                      </p>
+                      <p className="text-[9px] text-gray-500">
+                        Can someone verify if this is the filed version?
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Excel Tracker Mess */}
+                <div className="absolute bottom-32 left-8 sm:left-12 w-64 bg-white p-4 rounded-2xl shadow-xl shadow-red-900/5 border border-red-100 transform -rotate-3 animate-float z-20">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Image
+                      src="https://upload.wikimedia.org/wikipedia/commons/e/e3/Microsoft_Office_Excel_%282019%E2%80%932025%29.svg"
+                      alt="Excel"
+                      width={20}
+                      height={20}
+                      className="w-5 h-5"
+                    />
+                    <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
+                      EPFO_Payments_2023.xlsx
+                    </span>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex gap-2 text-[8px] font-mono text-red-500 bg-red-50 p-1 rounded">
+                      <span>#REF!</span>
+                      <span>Row 42</span>
+                      <span>Data Missing</span>
+                    </div>
+                    <div className="flex gap-2 text-[8px] font-mono text-gray-400 bg-gray-50 p-1 rounded">
+                      <span>Director_KYC</span>
+                      <span>Pending</span>
+                      <span>Overdue</span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Drive File Card */}
+                <div className="absolute bottom-6 right-8 sm:right-16 w-72 bg-white p-4 rounded-2xl shadow-xl shadow-red-900/5 border border-red-100 transform rotate-2 animate-float-delayed z-10">
+                  <div className="flex items-center gap-3 mb-3">
+                    <Image
+                      src="https://upload.wikimedia.org/wikipedia/commons/1/12/Google_Drive_icon_%282020%29.svg"
+                      alt="Drive"
+                      width={20}
+                      height={20}
+                      className="w-5 h-5"
+                    />
+                    <span className="text-[10px] font-bold text-red-500 flex items-center gap-1 uppercase tracking-wider">
+                      <AlertCircle className="w-3 h-3" /> Conflicting Copies
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                      <span className="text-[10px] text-gray-500 font-medium">
+                        TDS_Form26AS_FINAL.pdf
+                      </span>
+                      <span className="text-[9px] text-gray-400">Oct 2023</span>
+                    </div>
+                    <div className="flex items-center justify-between p-2 bg-red-50 rounded-lg border border-red-100">
+                      <span className="text-[10px] text-red-700 font-bold">
+                        TDS_Form26AS_ActualFinal.pdf
+                      </span>
+                      <span className="text-[9px] text-red-500">Nov 2023</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
+          </div>
+
+          {/* RIGHT: THE KLUMP WAY (Multi-Entity, Role-Based, Chronological) */}
+          <div className="relative flex flex-col h-full">
+            <ScrollReveal delay={300} x={30} className="flex flex-col h-full">
+              <div className="mb-12">
+                <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-black uppercase tracking-widest mb-4">
+                  <ShieldCheck className="w-3 h-3" />
+                  The Klump Way
+                </div>
+                <h3 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-4">
+                  Unified. Compartmentalized. Perfect Memory.
+                </h3>
+                <p className="text-gray-500 leading-relaxed">
+                  Manage infinite entities—Pvt Ltds, LLPs, Partnerships—from one
+                  unified dashboard. Everything is strictly compartmentalized
+                  with role-based access, creating an unbreakable chronological
+                  history of every tax return, resolution, and KYC document.
+                </p>
+              </div>
+
+              {/* Visualizing the Unified Dashboard & Timeline */}
+              <div className="relative flex-1 bg-white border border-indigo-100 rounded-[2.5rem] p-6 shadow-2xl shadow-indigo-900/5 mt-auto">
+                {/* Mock Multi-Entity Header */}
+                <div className="border-b border-gray-100 pb-4 mb-6">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100 cursor-pointer hover:bg-gray-100 transition-colors">
+                      <Building2 className="w-4 h-4 text-indigo-600" />
+                      <span className="text-sm font-bold text-gray-900">
+                        Singhania Ventures Pvt Ltd
+                      </span>
+                      <span className="text-[9px] text-gray-400 ml-2">
+                        ▼ Switch Entity
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg border border-emerald-100">
+                      <Lock className="w-3 h-3" />
+                      <span className="text-[9px] font-bold uppercase tracking-wider">
+                        Access: Full Admin
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Portfolio Stats */}
+                  <div className="flex gap-4 px-2">
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      <Building2 className="w-3 h-3" /> 10 Pvt Ltd
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      <Building2 className="w-3 h-3" /> 5 LLPs
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      <Users className="w-3 h-3" /> 60 Directors
+                    </div>
+                  </div>
+                </div>
+
+                {/* Timeline Line */}
+                <div className="absolute top-[140px] bottom-10 left-[41px] sm:left-[41px] w-px bg-gradient-to-b from-indigo-100 via-indigo-200 to-indigo-50" />
+
+                <div className="space-y-6 relative ml-1">
+                  {/* Timeline Event 1: GST */}
+                  <div className="flex gap-4 sm:gap-6 relative group">
+                    <div className="w-8 h-8 rounded-full bg-white border-4 border-indigo-100 flex items-center justify-center shrink-0 z-10 group-hover:border-indigo-500 transition-colors">
+                      <CheckCircle2 className="w-4 h-4 text-indigo-500" />
+                    </div>
+                    <div className="flex-1 bg-gray-50 hover:bg-white p-4 rounded-2xl border border-transparent hover:border-indigo-100 hover:shadow-lg transition-all">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600">
+                          Statutory Filing
+                        </span>
+                        <span className="text-[10px] font-bold text-gray-400">
+                          Oct 14, 2023
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-bold text-gray-900 mb-2">
+                        GST Return FY23-24
+                      </h4>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full bg-indigo-100 flex items-center justify-center text-[8px] font-bold text-indigo-700">
+                            CA
                           </div>
-                          <span className="text-xs font-bold text-gray-900">
-                            {item.label}
+                          <span className="text-[10px] font-medium text-gray-500">
+                            Filed by CA Team
                           </span>
                         </div>
-                      ))}
+                        <span className="text-[8px] font-bold bg-white border border-gray-200 px-2 py-1 rounded text-gray-500 uppercase">
+                          Vajra Pvt Ltd
+                        </span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </ScrollReveal>
 
-              <ScrollReveal delay={300}>
-                <div className="flex items-start gap-4 p-6 bg-red-50/50 rounded-2xl border border-red-100">
-                  <div className="p-2 bg-white rounded-lg text-red-600 shadow-sm">
-                    <Zap className="w-4 h-4 fill-current" />
-                  </div>
-                  <p className="text-sm font-medium text-red-900/80 leading-relaxed italic">
-                    &quot;We found the resolution, but it was the unsigned
-                    version. The signed copy was in a partner&apos;s WhatsApp
-                    from 2021.&quot;
-                  </p>
-                </div>
-              </ScrollReveal>
-            </div>
-
-            {/* The Order side */}
-            <div className="space-y-8 relative">
-              <ScrollReveal delay={200} x={20}>
-                <div className="relative">
-                  <div className="absolute -inset-1 bg-gradient-to-r from-indigo-100 to-blue-100 rounded-3xl blur opacity-50" />
-                  <div className="relative bg-white border border-indigo-100 p-8 rounded-[2.5rem] shadow-xl">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 mb-6">
-                      The Klump Way
-                    </p>
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-4 p-5 bg-indigo-600 rounded-2xl text-white shadow-lg shadow-indigo-200 group overflow-hidden relative">
-                        <div className="absolute inset-0 bg-white/10 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                        <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center shrink-0">
-                          <ShieldCheck className="w-6 h-6" />
-                        </div>
-                        <div>
-                          <h4 className="font-bold text-sm">Unified Memory</h4>
-                          <p className="text-[11px] opacity-80">
-                            Everything linked, searchable, and generational.
-                          </p>
-                        </div>
-                        <ArrowRight className="w-4 h-4 ml-auto opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                  {/* Timeline Event 2: ITR */}
+                  <div className="flex gap-4 sm:gap-6 relative group">
+                    <div className="w-8 h-8 rounded-full bg-white border-4 border-emerald-100 flex items-center justify-center shrink-0 z-10 group-hover:border-emerald-500 transition-colors">
+                      <FileSignature className="w-4 h-4 text-emerald-500" />
+                    </div>
+                    <div className="flex-1 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:border-emerald-200 hover:shadow-lg transition-all">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-emerald-600">
+                          Personal Tax
+                        </span>
+                        <span className="text-[10px] font-bold text-gray-400">
+                          Nov 02, 2023
+                        </span>
                       </div>
-
-                      <div className="grid grid-cols-1 gap-3">
-                        {[
-                          'Institutional Continuity',
-                          'Compliance Certainty',
-                          'Clean Governance',
-                        ].map((item) => (
-                          <div
-                            key={item}
-                            className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl border border-gray-100"
-                          >
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                            <span className="text-xs font-bold text-gray-700">
-                              {item}
-                            </span>
+                      <h4 className="text-sm font-bold text-gray-900 mb-2">
+                        Income Tax Return (ITR-V)
+                      </h4>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full bg-emerald-100 border border-white flex items-center justify-center text-[8px] font-bold text-emerald-700">
+                            RK
                           </div>
-                        ))}
+                          <span className="text-[10px] font-medium text-gray-500">
+                            Rajesh Kumar (Director)
+                          </span>
+                        </div>
+                        <span className="text-[8px] font-bold bg-red-50 text-red-600 border border-red-100 px-2 py-1 rounded flex items-center gap-1 uppercase">
+                          <Lock className="w-2 h-2" /> Highly Confidential
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Timeline Event 3: TDS / EPFO */}
+                  <div className="flex gap-4 sm:gap-6 relative group">
+                    <div className="w-8 h-8 rounded-full bg-white border-4 border-blue-100 flex items-center justify-center shrink-0 z-10 group-hover:border-blue-500 transition-colors">
+                      <History className="w-4 h-4 text-blue-500" />
+                    </div>
+                    <div className="flex-1 bg-gray-50 hover:bg-white p-4 rounded-2xl border border-transparent hover:border-blue-100 hover:shadow-lg transition-all">
+                      <div className="flex justify-between items-start mb-2">
+                        <span className="text-[9px] font-black uppercase tracking-widest text-blue-600">
+                          Compliance Sync
+                        </span>
+                        <span className="text-[10px] font-bold text-gray-400">
+                          Today
+                        </span>
+                      </div>
+                      <h4 className="text-sm font-bold text-gray-900 mb-2">
+                        Form 26AS (TDS) Reconciled
+                      </h4>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-medium text-gray-500">
+                            System Auto-Retrieved
+                          </span>
+                        </div>
+                        <span className="text-[8px] font-bold bg-blue-50 text-blue-600 border border-blue-100 px-2 py-1 rounded flex items-center gap-1 uppercase">
+                          <Users className="w-2 h-2" /> Auditor Access Only
+                        </span>
                       </div>
                     </div>
                   </div>
                 </div>
-              </ScrollReveal>
-
-              <ScrollReveal delay={400}>
-                <div className="p-8 bg-indigo-50/30 rounded-3xl border border-indigo-100/50">
-                  <p className="text-sm font-bold text-gray-900 mb-2">
-                    Build Infrastructure, not just folders.
-                  </p>
-                  <p className="text-xs text-gray-500 leading-relaxed">
-                    Klump transforms scattered documents into institutional
-                    intelligence. We help you move from surviving the next audit
-                    to owning your entire corporate history.
-                  </p>
-                </div>
-              </ScrollReveal>
-            </div>
+              </div>
+            </ScrollReveal>
           </div>
         </div>
       </div>

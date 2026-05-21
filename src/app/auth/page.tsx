@@ -12,26 +12,25 @@ import {
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
+import Link from 'next/link';
 import { PrimaryButton } from '@/components/ui/Button/index';
 import { FullLogo } from '@/components/ui/Logo';
 import { supabase } from '@/lib/supabase';
 
 export default function AuthPage() {
   const [showPassword, setShowPassword] = useState(false);
-  const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [fullName, setFullName] = useState('');
   const [error, setError] = useState('');
-  const [successMessage, setSuccessMessage] = useState('');
   const router = useRouter();
 
   // Check for existing session
   useEffect(() => {
     const checkSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       if (session) {
         router.push('/');
       }
@@ -43,37 +42,17 @@ export default function AuthPage() {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    setSuccessMessage('');
 
-    if (isLogin) {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        setError(error.message);
-        setIsLoading(false);
-      } else {
-        router.push('/');
-      }
-    } else {
-      const { error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: { data: { full_name: fullName } },
-      });
-      if (error) {
-        setError(error.message);
-        setIsLoading(false);
-      } else {
-        setSuccessMessage('Account created! Check your email to confirm your address.');
-        setIsLoading(false);
-      }
-    }
-  };
-
-  const handleGoogleAuth = async () => {
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: { redirectTo: `${window.location.origin}/` },
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
+    if (error) {
+      setError(error.message);
+      setIsLoading(false);
+    } else {
+      router.push('/');
+    }
   };
 
   return (
@@ -139,7 +118,7 @@ export default function AuthPage() {
         </div>
       </div>
 
-      {/* Right Column - Auth Form */}
+      {/* Right Column - Login Form */}
       <div className="w-full lg:w-1/2 flex flex-col justify-center px-8 sm:px-12 lg:px-20 relative bg-white">
         <div className="max-w-md mx-auto w-full">
           {/* Mobile logo */}
@@ -147,37 +126,32 @@ export default function AuthPage() {
             <FullLogo className="h-8" />
           </div>
 
-          <div className="mb-10">
+          <div className="mb-8">
             <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
-              {isLogin ? 'Welcome back' : 'Create an account'}
+              Welcome back
             </h2>
             <p className="mt-2 text-gray-500">
-              {isLogin
-                ? 'Access your entity compliance dashboard'
-                : 'Start managing your portfolio with Klump'}
+              Access your entity compliance dashboard
             </p>
+          </div>
+
+          {/* Beta Warning Banner */}
+          <div className="mb-8 p-4 bg-amber-50 border border-amber-200 rounded-xl flex items-start gap-3 shadow-sm shadow-amber-900/5">
+            <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+            <div>
+              <h3 className="text-sm font-bold text-amber-900">
+                Developer Beta
+              </h3>
+              <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                Access is currently strictly limited to invited users. As we are
+                in active development, expect rapid updates, experimental
+                features, and occasional bugs.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-6">
             <form onSubmit={handleAuth} className="space-y-5">
-              {!isLogin && (
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    Full Name
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="text"
-                      required
-                      value={fullName}
-                      onChange={(e) => setFullName(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-200 rounded-xl bg-gray-50/50 focus:bg-white focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 transition-all duration-200 outline-none"
-                      placeholder="John Doe"
-                    />
-                  </div>
-                </div>
-              )}
-
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                   Email address
@@ -202,14 +176,12 @@ export default function AuthPage() {
                   <label className="block text-sm font-semibold text-gray-700">
                     Password
                   </label>
-                  {isLogin && (
-                    <a
-                      href="#"
-                      className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
-                    >
-                      Forgot password?
-                    </a>
-                  )}
+                  <a
+                    href="#"
+                    className="text-xs font-semibold text-indigo-600 hover:text-indigo-700 transition-colors"
+                  >
+                    Forgot password?
+                  </a>
                 </div>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -237,35 +209,25 @@ export default function AuthPage() {
                 </div>
               </div>
 
-              {isLogin && (
-                <div className="flex items-center">
-                  <input
-                    id="remember"
-                    type="checkbox"
-                    className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
-                  />
-                  <label
-                    htmlFor="remember"
-                    className="ml-2 block text-sm text-gray-600 cursor-pointer select-none"
-                  >
-                    Keep me signed in for 30 days
-                  </label>
-                </div>
-              )}
+              <div className="flex items-center">
+                <input
+                  id="remember"
+                  type="checkbox"
+                  className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+                />
+                <label
+                  htmlFor="remember"
+                  className="ml-2 block text-sm text-gray-600 cursor-pointer select-none"
+                >
+                  Keep me signed in for 30 days
+                </label>
+              </div>
 
               {/* Error Banner */}
               {error && (
                 <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-sm text-red-700">
                   <AlertCircle className="w-4 h-4 shrink-0" />
                   {error}
-                </div>
-              )}
-
-              {/* Success Banner */}
-              {successMessage && (
-                <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-xl text-sm text-green-700">
-                  <CheckCircle className="w-4 h-4 shrink-0" />
-                  {successMessage}
                 </div>
               )}
 
@@ -282,11 +244,7 @@ export default function AuthPage() {
                     </div>
                   ) : (
                     <div className="flex items-center justify-center space-x-2">
-                      <span>
-                        {isLogin
-                          ? 'Sign In to Dashboard'
-                          : 'Create Klump Account'}
-                      </span>
+                      <span>Sign In to Dashboard</span>
                       <ArrowRight className="w-5 h-5" />
                     </div>
                   )}
@@ -294,44 +252,15 @@ export default function AuthPage() {
               </div>
             </form>
 
-            <div className="relative my-8">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-100"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-400">
-                  or continue with
-                </span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-4">
-              <button
-                type="button"
-                onClick={handleGoogleAuth}
-                className="flex items-center justify-center space-x-2 py-3 px-4 border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors font-medium text-gray-700"
-              >
-                <Image
-                  src="https://www.svgrepo.com/show/355037/google.svg"
-                  width={20}
-                  height={20}
-                  alt="Google"
-                />
-                <span>Continue with Google</span>
-              </button>
-            </div>
-
             <div className="pt-8 text-center">
-              <p className="text-sm text-gray-600">
-                {isLogin
-                  ? "Don't have an account?"
-                  : 'Already have an account?'}{' '}
-                <button
-                  onClick={() => setIsLogin(!isLogin)}
+              <p className="text-sm text-gray-500">
+                Don&apos;t have an account?{' '}
+                <Link
+                  href="/#waitlist"
                   className="font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
                 >
-                  {isLogin ? 'Sign up for free' : 'Sign in here'}
-                </button>
+                  Join the waitlist
+                </Link>
               </p>
             </div>
           </div>

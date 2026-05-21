@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRight, CheckCircle } from 'lucide-react';
+import { ArrowRight, CheckCircle, AlertCircle, Users } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
 import { PrimaryButton } from '@/components/ui/Button/index';
 import { WAITLIST_ROLE_OPTIONS } from '@/lib/constants';
+import { submitWaitlist } from '@/app/actions/waitlist';
 
 export default function WaitlistSection() {
   const [formData, setFormData] = useState({
@@ -16,13 +17,25 @@ export default function WaitlistSection() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isFull, setIsFull] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setError('');
+
+    const result = await submitWaitlist(formData);
+
+    if (result.success) {
+      setIsSubmitted(true);
+    } else if (result.isFull) {
+      setIsFull(true);
+    } else {
+      setError(result.error || 'Something went wrong. Please try again.');
+    }
+
     setIsSubmitting(false);
-    setIsSubmitted(true);
   };
 
   return (
@@ -61,6 +74,19 @@ export default function WaitlistSection() {
               <p className="text-gray-500 font-medium">
                 Thank you for believing in institutional continuity. We&apos;ll
                 be in touch soon to begin our partnership.
+              </p>
+            </div>
+          ) : isFull ? (
+            <div className="bg-white border border-amber-200 rounded-[3rem] p-12 text-center shadow-2xl shadow-amber-100/50 animate-in zoom-in-95 duration-700">
+              <div className="w-20 h-20 bg-amber-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8">
+                <Users className="w-10 h-10 text-amber-500" />
+              </div>
+              <h3 className="text-3xl font-[900] text-gray-900 mb-4">
+                Waitlist is full.
+              </h3>
+              <p className="text-gray-500 font-medium">
+                We&apos;re currently onboarding our first 25 founding partners.
+                More spots will open soon. Follow us for updates.
               </p>
             </div>
           ) : (
@@ -164,6 +190,13 @@ export default function WaitlistSection() {
                     />
                   </div>
                 </div>
+
+                {error && (
+                  <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-2xl text-sm text-red-700 font-medium">
+                    <AlertCircle className="w-4 h-4 shrink-0" />
+                    {error}
+                  </div>
+                )}
 
                 <PrimaryButton
                   type="submit"
