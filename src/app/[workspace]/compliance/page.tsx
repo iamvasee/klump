@@ -10,8 +10,12 @@ import {
   AlertTriangle,
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
+import { useParams } from 'next/navigation';
+import Link from 'next/link';
 
 export default function CompliancePage() {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const breadcrumbs = [{ label: 'Compliance', current: true }];
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -99,6 +103,13 @@ export default function CompliancePage() {
             <p className="mt-1 text-sm text-gray-600">
               Monitor and manage statutory compliance across all entities
             </p>
+          </div>
+          <div className="flex items-center space-x-3">
+            <Link href={`/${workspaceSlug}/compliance/history`}>
+              <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-all">
+                View History
+              </button>
+            </Link>
           </div>
         </div>
 

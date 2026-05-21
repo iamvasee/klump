@@ -15,10 +15,13 @@ import {
 import MainLayout from '@/components/layout/MainLayout';
 import { PrimaryButton, GhostButton } from '@/components/ui/Button/index';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { db } from '@/lib/mockdb';
 
 export default function PeoplePage() {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const breadcrumbs = [{ label: 'People', current: true }];
 
   const [sortField, setSortField] = useState<string | null>(null);
@@ -90,7 +93,7 @@ export default function PeoplePage() {
               Manage stakeholders, directors, and partners
             </p>
           </div>
-          <Link href="/people/add">
+          <Link href={`/${workspaceSlug}/people/add`}>
             <PrimaryButton leftIcon={<Plus className="w-4 h-4" />}>
               Add Person
             </PrimaryButton>
@@ -262,7 +265,7 @@ export default function PeoplePage() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <Link href={`/people/${person.id}`}>
+                      <Link href={`/${workspaceSlug}/people/${person.id}`}>
                         <GhostButton
                           size="sm"
                           leftIcon={<Eye className="w-4 h-4" />}

@@ -14,6 +14,7 @@ import {
   EyeOff,
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
+import { useParams } from 'next/navigation';
 import {
   GhostButton,
   SecondaryButton,
@@ -32,6 +33,8 @@ export default function FilingDetailView({
   uid,
   filingId,
 }: FilingDetailViewProps) {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const [data, setData] = useState<{ filing: Filing; entity: Entity } | null>(
     null
   );
@@ -87,12 +90,15 @@ export default function FilingDetailView({
   return (
     <MainLayout
       breadcrumbs={[
-        { label: 'Entities', href: '/entities' },
+        { label: 'Entities', href: `/${workspaceSlug}/entities` },
         {
           label: entity.short_name || entity.legal_name,
-          href: `/entities/${uid}`,
+          href: `/${workspaceSlug}/entities/${uid}`,
         },
-        { label: 'Filings', href: `/entities/${uid}?tab=filings` },
+        {
+          label: 'Filings',
+          href: `/${workspaceSlug}/entities/${uid}?tab=filings`,
+        },
         { label: filing.name, current: true },
       ]}
     >

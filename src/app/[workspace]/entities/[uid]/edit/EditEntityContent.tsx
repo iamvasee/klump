@@ -12,6 +12,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
+import { useParams } from 'next/navigation';
 import { EntityType, EntityStatus } from '@/lib/types';
 import {
   PrimaryButton,
@@ -43,6 +44,8 @@ interface FormData {
 
 export default function EditEntityContent({ uid }: { uid: string }) {
   const router = useRouter();
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const [loading, setLoading] = useState(true);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<FormData>({
@@ -91,8 +94,11 @@ export default function EditEntityContent({ uid }: { uid: string }) {
   }, [uid]);
 
   const breadcrumbs = [
-    { label: 'Entities', href: '/entities' },
-    { label: formData.legal_name || 'Loading...', href: `/entities/${uid}` },
+    { label: 'Entities', href: `/${workspaceSlug}/entities` },
+    {
+      label: formData.legal_name || 'Loading...',
+      href: `/${workspaceSlug}/entities/${uid}`,
+    },
     { label: 'Edit', current: true },
   ];
 

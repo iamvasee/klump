@@ -20,8 +20,11 @@ import { SecondaryButton, GhostButton } from '@/components/ui/Button/index';
 import { db } from '@/lib/mockdb';
 import { Person, Entity, EntityPersonRelationship } from '@/lib/types';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function ProfessionalViewContent({ uid }: { uid: string }) {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const [person, setPerson] = useState<Person | null>(null);
   const [relationships, setRelationships] = useState<
     Array<EntityPersonRelationship & { entity?: Entity }>
@@ -287,7 +290,7 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
                         >
                           <td className="px-6 py-5 whitespace-nowrap">
                             <Link
-                              href={`/entities/${rel.entity_id}`}
+                              href={`/${workspaceSlug}/entities/${rel.entity_id}`}
                               className="flex items-center group"
                             >
                               <div className="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center mr-3 group-hover:bg-indigo-600 transition-all duration-300">
@@ -313,7 +316,9 @@ export default function ProfessionalViewContent({ uid }: { uid: string }) {
                             </span>
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap text-right">
-                            <Link href={`/entities/${rel.entity_id}`}>
+                            <Link
+                              href={`/${workspaceSlug}/entities/${rel.entity_id}`}
+                            >
                               <GhostButton
                                 size="sm"
                                 className="text-blue-600 font-bold text-[10px] uppercase tracking-widest"

@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 interface WalletEntry {
   id: string;
@@ -48,8 +49,10 @@ interface Disbursement {
 }
 
 export default function ApprovalLogsPage() {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const breadcrumbs = [
-    { label: 'Approvals', href: '/approvals' },
+    { label: 'Compliance', href: `/${workspaceSlug}/compliance` },
     { label: 'Approval Logs', current: true },
   ];
 
@@ -285,9 +288,9 @@ export default function ApprovalLogsPage() {
               View all approved and rejected wallet entries and disbursements
             </p>
           </div>
-          <Link href="/approvals">
+          <Link href={`/${workspaceSlug}/compliance`}>
             <button className="px-4 py-2 text-sm font-medium text-blue-600 bg-blue-50 rounded-lg hover:bg-blue-100">
-              Back to Approvals
+              Back to Compliance
             </button>
           </Link>
         </div>

@@ -11,6 +11,7 @@ import {
   MapPin,
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
+import { useParams } from 'next/navigation';
 import {
   PrimaryButton,
   SecondaryButton,
@@ -38,8 +39,10 @@ interface FormData {
 }
 
 export default function AddEntityPage() {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const breadcrumbs = [
-    { label: 'Entities', href: '/entities' },
+    { label: 'Entities', href: `/${workspaceSlug}/entities` },
     { label: 'Add Entity', current: true },
   ];
 

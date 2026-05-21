@@ -34,8 +34,11 @@ import {
 } from '@/lib/types';
 import { DOCUMENT_TYPE_LABELS } from '@/lib/constants';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 
 export default function PersonViewContent({ uid }: { uid: string }) {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const [person, setPerson] = useState<Person | null>(null);
   const [relationships, setRelationships] = useState<
     Array<EntityPersonRelationship & { entity?: Entity }>
@@ -379,7 +382,7 @@ Branch: ${acc.branch || 'N/A'}`;
                         >
                           <td className="px-6 py-5 whitespace-nowrap">
                             <Link
-                              href={`/entities/${rel.entity_id}`}
+                              href={`/${workspaceSlug}/entities/${rel.entity_id}`}
                               className="flex items-center group"
                             >
                               <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center mr-3 group-hover:bg-blue-600 transition-all duration-300">
@@ -399,7 +402,9 @@ Branch: ${acc.branch || 'N/A'}`;
                             {rel.effective_from}
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap text-right">
-                            <Link href={`/entities/${rel.entity_id}`}>
+                            <Link
+                              href={`/${workspaceSlug}/entities/${rel.entity_id}`}
+                            >
                               <GhostButton
                                 size="sm"
                                 className="text-blue-600 font-bold text-[10px] uppercase tracking-widest"

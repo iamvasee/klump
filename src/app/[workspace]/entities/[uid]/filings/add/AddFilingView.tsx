@@ -14,6 +14,7 @@ import {
   Save,
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
+import { useParams } from 'next/navigation';
 import {
   PrimaryButton,
   SecondaryButton,
@@ -32,6 +33,8 @@ interface AddFilingViewProps {
 }
 
 export default function AddFilingView({ uid }: AddFilingViewProps) {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const [entity, setEntity] = useState<Entity | null>(null);
   const [currentStep, setCurrentStep] = useState(1);
   const [loading, setLoading] = useState(true);
@@ -142,10 +145,10 @@ export default function AddFilingView({ uid }: AddFilingViewProps) {
   return (
     <MainLayout
       breadcrumbs={[
-        { label: 'Entities', href: '/entities' },
+        { label: 'Entities', href: `/${workspaceSlug}/entities` },
         {
           label: entity.short_name || entity.legal_name,
-          href: `/entities/${uid}`,
+          href: `/${workspaceSlug}/entities/${uid}`,
         },
         { label: 'Add Filing', current: true },
       ]}

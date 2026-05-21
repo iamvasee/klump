@@ -10,6 +10,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
+import { useParams } from 'next/navigation';
 import {
   PrimaryButton,
   SecondaryButton,
@@ -28,8 +29,10 @@ interface FormData {
 }
 
 export default function AddPersonPage() {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const breadcrumbs = [
-    { label: 'People', href: '/people' },
+    { label: 'People', href: `/${workspaceSlug}/people` },
     { label: 'Add Person', current: true },
   ];
 

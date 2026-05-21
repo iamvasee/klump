@@ -2,8 +2,12 @@ import { createServerClient } from '@supabase/ssr';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-// Routes that never require auth
+// Routes that never require auth (fully public)
 const PUBLIC_ROUTES = ['/auth'];
+
+// The landing page is public for unauthenticated users,
+// but logged-in users get redirected to their workspace/onboarding.
+const LANDING_ROUTE = '/';
 
 // Routes that require auth but NOT an org (onboarding state)
 const ONBOARDING_ROUTES = ['/onboarding'];
@@ -41,6 +45,7 @@ export async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   const isPublicRoute = PUBLIC_ROUTES.some((r) => pathname.startsWith(r));
+  const isLandingRoute = pathname === LANDING_ROUTE;
   const isOnboardingRoute = ONBOARDING_ROUTES.some((r) =>
     pathname.startsWith(r)
   );
@@ -54,18 +59,23 @@ export async function proxy(request: NextRequest) {
     return res;
   };
 
-  // 1. No session → send to login
-  if (!user && !isPublicRoute) {
+  // 1. No session + public route or landing page → let through
+  if (!user && (isPublicRoute || isLandingRoute)) {
+    return response;
+  }
+
+  // 2. No session + protected route → send to login
+  if (!user && !isPublicRoute && !isLandingRoute) {
     return redirect('/auth');
   }
 
-  // 2. Has session but on login page → send home
+  // 3. Has session but on login page → send to root for workspace resolution
   if (user && isPublicRoute) {
     return redirect('/');
   }
 
-  // 3. Has session → check workspace membership
-  if (user && !isPublicRoute) {
+  // 4. Has session → check workspace membership to decide destination
+  if (user) {
     // A. First, get all workspace IDs this user belongs to
     const { data: membershipData, error: membershipError } = await supabase
       .from('workspace_members')
@@ -109,8 +119,8 @@ export async function proxy(request: NextRequest) {
       return redirect(`/${firstSlug}`);
     }
 
-    // If hitting the exact root '/', redirect accordingly
-    if (pathname === '/') {
+    // If hitting the landing page while logged in, redirect to workspace or onboarding
+    if (isLandingRoute) {
       if (!hasWorkspaces) {
         return redirect('/onboarding');
       } else if (firstSlug) {

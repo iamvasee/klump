@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import {
   Plus,
   Search,
@@ -25,6 +26,8 @@ import { supabase } from '@/lib/supabase';
 import { Entity } from '@/lib/types';
 
 export default function EntitiesPage() {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const breadcrumbs = [{ label: 'Entities', current: true }];
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('all');
@@ -109,7 +112,7 @@ export default function EntitiesPage() {
               Manage companies, LLPs, and portfolios
             </p>
           </div>
-          <Link href="/entities/add">
+          <Link href={`/${workspaceSlug}/entities/add`}>
             <PrimaryButton leftIcon={<Plus className="w-4 h-4" />}>
               Add Entity
             </PrimaryButton>
@@ -231,7 +234,7 @@ export default function EntitiesPage() {
               <p className="text-gray-500 mb-6">
                 Get started by creating your first entity.
               </p>
-              <Link href="/entities/add">
+              <Link href={`/${workspaceSlug}/entities/add`}>
                 <PrimaryButton leftIcon={<Plus className="w-4 h-4" />}>
                   Add Entity
                 </PrimaryButton>
@@ -327,7 +330,9 @@ export default function EntitiesPage() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <div className="flex items-center space-x-2">
-                          <Link href={`/entities/${entity.id}`}>
+                          <Link
+                            href={`/${workspaceSlug}/entities/${entity.id}`}
+                          >
                             <GhostButton
                               size="sm"
                               aria-label="View entity details"
@@ -336,7 +341,9 @@ export default function EntitiesPage() {
                               <Eye className="w-4 h-4" />
                             </GhostButton>
                           </Link>
-                          <Link href={`/entities/${entity.id}/edit`}>
+                          <Link
+                            href={`/${workspaceSlug}/entities/${entity.id}/edit`}
+                          >
                             <GhostButton
                               size="sm"
                               aria-label="Edit entity"

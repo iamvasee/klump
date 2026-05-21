@@ -38,12 +38,15 @@ import {
 } from '@/lib/types';
 import { DOCUMENT_TYPE_LABELS } from '@/lib/constants';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import AddMemberModal from './AddMemberModal';
 import IssueSharesModal from './IssueSharesModal';
 import AddBankAccountModal from './AddBankAccountModal';
 import UploadDocumentModal from './UploadDocumentModal';
 
 export default function EntityViewContent({ uid }: { uid: string }) {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const [entity, setEntity] = useState<Entity | null>(null);
   const [relationships, setRelationships] = useState<
     Array<
@@ -377,7 +380,7 @@ Branch: ${acc.branch || 'N/A'}`;
                         <p className="text-base text-gray-500 font-medium">
                           {entity.short_name || 'Legal Entity Identity'}
                         </p>
-                        <Link href={`/entities/${uid}/edit`}>
+                        <Link href={`/${workspaceSlug}/entities/${uid}/edit`}>
                           <SecondaryButton
                             size="sm"
                             leftIcon={<Edit className="w-4 h-4" />}
@@ -541,7 +544,7 @@ Branch: ${acc.branch || 'N/A'}`;
                               </td>
                               <td className="px-6 py-5 whitespace-nowrap">
                                 <Link
-                                  href={`/people/${rel.person_id}`}
+                                  href={`/${workspaceSlug}/people/${rel.person_id}`}
                                   className="flex items-center group"
                                 >
                                   <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center mr-3 group-hover:bg-blue-600 transition-all duration-300">
@@ -571,7 +574,7 @@ Branch: ${acc.branch || 'N/A'}`;
                               <td className="px-6 py-5 whitespace-nowrap">
                                 {appointmentFiling ? (
                                   <Link
-                                    href={`/entities/${entity.id}/filings/${appointmentFiling.id}`}
+                                    href={`/${workspaceSlug}/entities/${entity.id}/filings/${appointmentFiling.id}`}
                                     className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                                   >
                                     <FileCheck className="w-3.5 h-3.5" />
@@ -666,7 +669,7 @@ Branch: ${acc.branch || 'N/A'}`;
                               <td className="px-6 py-5 whitespace-nowrap">
                                 {appointmentFiling ? (
                                   <Link
-                                    href={`/entities/${entity.id}/filings/${appointmentFiling.id}`}
+                                    href={`/${workspaceSlug}/entities/${entity.id}/filings/${appointmentFiling.id}`}
                                     className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-800 transition-colors"
                                   >
                                     <FileCheck className="w-3.5 h-3.5" />
@@ -1002,7 +1005,9 @@ Branch: ${acc.branch || 'N/A'}`;
                         className="w-full pl-10 pr-4 py-2.5 text-sm font-medium border border-gray-200 rounded-2xl focus:ring-4 focus:ring-blue-600/10 focus:border-blue-600 outline-none transition-all"
                       />
                     </div>
-                    <Link href={`/entities/${uid}/filings/add`}>
+                    <Link
+                      href={`/${workspaceSlug}/entities/${uid}/filings/add`}
+                    >
                       <PrimaryButton
                         size="sm"
                         leftIcon={<Plus className="w-4 h-4" />}
@@ -1049,7 +1054,7 @@ Branch: ${acc.branch || 'N/A'}`;
                           </td>
                           <td className="px-6 py-5 whitespace-nowrap">
                             <Link
-                              href={`/entities/${uid}/filings/${filing.id}`}
+                              href={`/${workspaceSlug}/entities/${uid}/filings/${filing.id}`}
                               className="flex items-center group/name"
                             >
                               <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center mr-3 group-hover/name:bg-blue-100 transition-colors">
@@ -1075,7 +1080,7 @@ Branch: ${acc.branch || 'N/A'}`;
                           <td className="px-6 py-5 whitespace-nowrap text-right">
                             <div className="flex justify-end gap-2">
                               <Link
-                                href={`/entities/${uid}/filings/${filing.id}`}
+                                href={`/${workspaceSlug}/entities/${uid}/filings/${filing.id}`}
                               >
                                 <button
                                   className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"

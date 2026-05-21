@@ -2,12 +2,15 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useParams } from 'next/navigation';
 import { Briefcase, Search, Mail, Building2, ArrowUpRight } from 'lucide-react';
 import MainLayout from '@/components/layout/MainLayout';
 import { OutlineButton } from '@/components/ui/Button/index';
 import { db } from '@/lib/mockdb';
 
 export default function ProfessionalsPage() {
+  const params = useParams();
+  const workspaceSlug = params.workspace as string;
   const breadcrumbs = [{ label: 'Professionals', current: true }];
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -95,7 +98,7 @@ export default function ProfessionalsPage() {
                 <div className="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
                   <Briefcase className="w-6 h-6" />
                 </div>
-                <Link href={`/professionals/${pro.id}`}>
+                <Link href={`/${workspaceSlug}/professionals/${pro.id}`}>
                   <button className="p-2 text-gray-400 hover:text-blue-600 transition-colors">
                     <ArrowUpRight className="w-5 h-5" />
                   </button>
@@ -129,7 +132,10 @@ export default function ProfessionalsPage() {
                 </div>
               </div>
 
-              <Link href={`/professionals/${pro.id}`} className="block">
+              <Link
+                href={`/${workspaceSlug}/professionals/${pro.id}`}
+                className="block"
+              >
                 <OutlineButton className="w-full justify-center text-xs font-bold uppercase tracking-widest py-2.5">
                   View Full Profile
                 </OutlineButton>
