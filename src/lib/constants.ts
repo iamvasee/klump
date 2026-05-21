@@ -132,3 +132,24 @@ export const NAV_ITEMS = [
   { label: 'Professionals', href: '/professionals', icon: 'Briefcase' },
   { label: 'Settings', href: '/settings', icon: 'Settings' },
 ] as const;
+
+export const WAITLIST_ROLE_OPTIONS = [
+  'Company Secretary',
+  'CA / Audit Firm',
+  'Family Office',
+  'CFO / Finance',
+  'Legal / Governance',
+  'Founder / CEO',
+  'Other',
+] as const;
+
+export const LANDING_MEMORY_ITEMS = [
+  'Filing',
+  'Approval',
+  'Resolution',
+  'Certificate',
+  'Ownership change',
+  'Notice',
+  'Financial report',
+  'Governance event',
+] as const;

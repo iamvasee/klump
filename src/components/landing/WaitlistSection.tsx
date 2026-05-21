@@ -1,19 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { ArrowRight, CheckCircle, Loader2 } from 'lucide-react';
+import { ArrowRight, CheckCircle } from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
 import { PrimaryButton } from '@/components/ui/Button/index';
-
-const roleOptions = [
-  'Company Secretary',
-  'CA / Audit Firm',
-  'Family Office',
-  'CFO / Finance',
-  'Legal / Governance',
-  'Founder / CEO',
-  'Other',
-];
+import { WAITLIST_ROLE_OPTIONS } from '@/lib/constants';
 
 export default function WaitlistSection() {
   const [formData, setFormData] = useState({
@@ -35,7 +26,10 @@ export default function WaitlistSection() {
   };
 
   return (
-    <section id="waitlist" className="relative py-40 px-6 sm:px-10 bg-white overflow-hidden">
+    <section
+      id="waitlist"
+      className="relative py-40 px-6 sm:px-10 bg-white overflow-hidden"
+    >
       {/* Background ambient glows and grid */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-indigo-50/50 rounded-full blur-[120px]" />
@@ -49,7 +43,8 @@ export default function WaitlistSection() {
               Join the founding partners.
             </h2>
             <p className="text-lg text-gray-500 font-medium leading-relaxed">
-              We&apos;re building the next generation of institutional memory with the leaders who live this complexity every day.
+              We&apos;re building the next generation of institutional memory
+              with the leaders who live this complexity every day.
             </p>
           </div>
         </ScrollReveal>
@@ -60,9 +55,12 @@ export default function WaitlistSection() {
               <div className="w-20 h-20 bg-green-50 rounded-[2rem] flex items-center justify-center mx-auto mb-8">
                 <CheckCircle className="w-10 h-10 text-green-500" />
               </div>
-              <h3 className="text-3xl font-[900] text-gray-900 mb-4">You&apos;re on the list.</h3>
+              <h3 className="text-3xl font-[900] text-gray-900 mb-4">
+                You&apos;re on the list.
+              </h3>
               <p className="text-gray-500 font-medium">
-                Thank you for believing in institutional continuity. We&apos;ll be in touch soon to begin our partnership.
+                Thank you for believing in institutional continuity. We&apos;ll
+                be in touch soon to begin our partnership.
               </p>
             </div>
           ) : (
@@ -73,41 +71,76 @@ export default function WaitlistSection() {
               <form onSubmit={handleSubmit} className="space-y-8">
                 <div className="grid grid-cols-1 gap-8">
                   <div className="space-y-2.5">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Full Name</label>
+                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                      Full Name
+                    </label>
                     <input
                       type="text"
                       required
                       value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, name: e.target.value })
+                      }
                       className="w-full h-14 px-6 border border-gray-100 bg-gray-50/50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-600 outline-none transition-all font-medium text-gray-900"
                       placeholder="e.g. Alexander Wilder"
                     />
                   </div>
 
                   <div className="space-y-2.5">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Work Email</label>
+                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                      Work Email
+                    </label>
                     <input
                       type="email"
                       required
                       value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, email: e.target.value })
+                      }
                       className="w-full h-14 px-6 border border-gray-100 bg-gray-50/50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-600 outline-none transition-all font-medium text-gray-900"
                       placeholder="name@company.com"
                     />
                   </div>
 
                   <div className="space-y-2.5">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Current Role</label>
+                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                      Organization
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.organization}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          organization: e.target.value,
+                        })
+                      }
+                      className="w-full h-14 px-6 border border-gray-100 bg-gray-50/50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-600 outline-none transition-all font-medium text-gray-900"
+                      placeholder="e.g. Acme Corp"
+                    />
+                  </div>
+
+                  <div className="space-y-2.5">
+                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                      Current Role
+                    </label>
                     <div className="relative">
                       <select
                         required
                         value={formData.role}
-                        onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                        onChange={(e) =>
+                          setFormData({ ...formData, role: e.target.value })
+                        }
                         className="w-full h-14 px-6 border border-gray-100 bg-gray-50/50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-600 outline-none transition-all font-medium text-gray-900 appearance-none cursor-pointer"
                       >
-                        <option value="" disabled>What is your position?</option>
-                        {roleOptions.map((role) => (
-                          <option key={role} value={role}>{role}</option>
+                        <option value="" disabled>
+                          What is your position?
+                        </option>
+                        {WAITLIST_ROLE_OPTIONS.map((role) => (
+                          <option key={role} value={role}>
+                            {role}
+                          </option>
                         ))}
                       </select>
                       <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-gray-400">
@@ -117,11 +150,15 @@ export default function WaitlistSection() {
                   </div>
 
                   <div className="space-y-2.5">
-                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">Primary Challenge</label>
+                    <label className="text-[11px] font-black text-gray-400 uppercase tracking-widest ml-1">
+                      Primary Challenge
+                    </label>
                     <textarea
                       rows={3}
                       value={formData.challenge}
-                      onChange={(e) => setFormData({ ...formData, challenge: e.target.value })}
+                      onChange={(e) =>
+                        setFormData({ ...formData, challenge: e.target.value })
+                      }
                       className="w-full p-6 border border-gray-100 bg-gray-50/50 rounded-2xl focus:bg-white focus:ring-4 focus:ring-indigo-500/5 focus:border-indigo-600 outline-none transition-all font-medium text-gray-900 resize-none"
                       placeholder="What's the hardest part about your records today?"
                     />
@@ -133,9 +170,11 @@ export default function WaitlistSection() {
                   disabled={isSubmitting}
                   loading={isSubmitting}
                   className="w-full h-16 bg-indigo-600 hover:bg-indigo-700 text-white font-black uppercase tracking-widest rounded-2xl shadow-2xl shadow-indigo-200 transition-all duration-300 flex items-center justify-center gap-4 hover:scale-[1.02]"
-                  rightIcon={!isSubmitting && <ArrowRight className="w-5 h-5" />}
+                  rightIcon={
+                    !isSubmitting && <ArrowRight className="w-5 h-5" />
+                  }
                 >
-                  {isSubmitting ? 'SECuring your spot...' : 'Reserve Access'}
+                  {isSubmitting ? 'Securing Access...' : 'Reserve Access'}
                 </PrimaryButton>
               </form>
             </div>

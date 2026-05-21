@@ -1,7 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, Briefcase, Landmark, ShieldCheck, CheckCircle2 } from 'lucide-react';
+import {
+  Building2,
+  Briefcase,
+  Landmark,
+  ShieldCheck,
+  CheckCircle2,
+} from 'lucide-react';
 import ScrollReveal from './ScrollReveal';
 
 const personas = [
@@ -30,7 +36,7 @@ const personas = [
       'Recurring filing chaos every cycle',
       'Difficult onboarding for new staff',
     ],
-    emotional: 'Institutional memory shouldn\'t disappear when partners retire.',
+    emotional: "Institutional memory shouldn't disappear when partners retire.",
     color: 'blue',
   },
   {
@@ -104,13 +110,17 @@ export default function PersonaPainSection() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           {/* Left: Tab Selectors */}
-          <div className="lg:col-span-5 space-y-3">
+          <div className="lg:col-span-5 space-y-3" role="tablist">
             {personas.map((persona) => {
               const isActive = activeTab.id === persona.id;
               return (
                 <button
                   key={persona.id}
                   onClick={() => setActiveTab(persona)}
+                  role="tab"
+                  aria-selected={isActive}
+                  aria-controls={`panel-${persona.id}`}
+                  id={`tab-${persona.id}`}
                   className={`w-full text-left p-6 rounded-[2rem] border transition-all duration-300 group ${
                     isActive
                       ? 'bg-white border-gray-200 shadow-xl shadow-gray-200/50 scale-[1.02]'
@@ -118,16 +128,24 @@ export default function PersonaPainSection() {
                   }`}
                 >
                   <div className="flex items-center gap-5">
-                    <div className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center transition-colors ${
-                      isActive ? colorMap[persona.color] : 'bg-gray-100 text-gray-400'
-                    }`}>
+                    <div
+                      className={`w-14 h-14 shrink-0 rounded-2xl flex items-center justify-center transition-colors ${
+                        isActive
+                          ? colorMap[persona.color]
+                          : 'bg-gray-100 text-gray-400'
+                      }`}
+                    >
                       <persona.icon className="w-7 h-7" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className={`font-bold text-lg truncate ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>
+                      <h3
+                        className={`font-bold text-lg truncate ${isActive ? 'text-gray-900' : 'text-gray-500'}`}
+                      >
                         {persona.title}
                       </h3>
-                      <div className={`overflow-hidden transition-all duration-300 ${isActive ? 'max-h-12 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}>
+                      <div
+                        className={`overflow-hidden transition-all duration-300 ${isActive ? 'max-h-12 opacity-100 mt-1' : 'max-h-0 opacity-0'}`}
+                      >
                         <p className="text-xs text-gray-500 font-medium truncate">
                           {persona.headline}
                         </p>
@@ -142,12 +160,24 @@ export default function PersonaPainSection() {
           {/* Right: Active Content */}
           <div className="lg:col-span-7">
             {/* Fixed height container to prevent jumping */}
-            <div className="bg-white rounded-[3rem] border border-gray-100 shadow-2xl shadow-gray-200/40 p-10 sm:p-14 relative overflow-hidden h-[540px] flex flex-col">
+            <div
+              className="bg-white rounded-[3rem] border border-gray-100 shadow-2xl shadow-gray-200/40 p-10 sm:p-14 relative overflow-hidden h-[540px] flex flex-col"
+              role="tabpanel"
+              id={`panel-${activeTab.id}`}
+              aria-labelledby={`tab-${activeTab.id}`}
+            >
               {/* Background Accent */}
-              <div className={`absolute top-0 right-0 w-64 h-64 blur-[100px] opacity-20 -mr-32 -mt-32 transition-colors duration-700 ${lightColorMap[activeTab.color]}`} />
-              
-              <div key={activeTab.id} className="relative z-10 animate-in fade-in slide-in-from-right-8 duration-500 flex-1 flex flex-col">
-                <div className={`inline-flex self-start items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 ${lightColorMap[activeTab.color]}`}>
+              <div
+                className={`absolute top-0 right-0 w-64 h-64 blur-[100px] opacity-20 -mr-32 -mt-32 transition-colors duration-700 ${lightColorMap[activeTab.color]}`}
+              />
+
+              <div
+                key={activeTab.id}
+                className="relative z-10 animate-in fade-in slide-in-from-right-8 duration-500 flex-1 flex flex-col"
+              >
+                <div
+                  className={`inline-flex self-start items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest mb-8 ${lightColorMap[activeTab.color]}`}
+                >
                   <activeTab.icon className="w-3 h-3" />
                   The {activeTab.title} Challenge
                 </div>
@@ -159,10 +189,14 @@ export default function PersonaPainSection() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 mb-8 flex-1 content-start">
                   {activeTab.pains.map((pain) => (
                     <div key={pain} className="flex items-start gap-3">
-                      <div className={`mt-1 shrink-0 rounded-full p-0.5 ${lightColorMap[activeTab.color]}`}>
+                      <div
+                        className={`mt-1 shrink-0 rounded-full p-0.5 ${lightColorMap[activeTab.color]}`}
+                      >
                         <CheckCircle2 className="w-3.5 h-3.5" />
                       </div>
-                      <span className="text-sm font-bold text-gray-600 leading-snug">{pain}</span>
+                      <span className="text-sm font-bold text-gray-600 leading-snug">
+                        {pain}
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -184,4 +218,3 @@ export default function PersonaPainSection() {
     </section>
   );
 }
-
