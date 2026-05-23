@@ -76,47 +76,38 @@ export async function proxy(request: NextRequest) {
 
   // 4. Has session → check workspace membership to decide destination
   if (user) {
-    // A. First, get all workspace IDs this user belongs to
-    const { data: membershipData, error: membershipError } = await supabase
-      .from('workspace_members')
-      .select('workspace_id')
-      .eq('user_id', user.id);
+    const isPrefetch = request.headers.get('x-middleware-prefetch') === '1';
 
-    if (membershipError)
-      console.error('[PROXY ERROR] Membership check:', membershipError);
-
-    const workspaceIds = (membershipData || []).map((m) => m.workspace_id);
-    const hasWorkspaces = workspaceIds.length > 0;
-    const workspaceCount = workspaceIds.length;
-
-    console.log('[PROXY DEBUG] User:', user.id, 'Workspace IDs:', workspaceIds);
-
-    let firstSlug = null;
-
-    if (hasWorkspaces) {
-      // B. Fetch the slugs for these workspaces directly
-      const { data: workspaces, error: workspaceError } = await supabase
-        .from('workspaces')
-        .select('slug')
-        .in('id', workspaceIds)
-        .limit(2); // We only need to know if there's more than 1
-
-      if (workspaceError)
-        console.error('[PROXY ERROR] Workspace lookup:', workspaceError);
-
-      if (workspaces && workspaces.length > 0) {
-        firstSlug = workspaces[0].slug;
-      }
+    if (!isPrefetch) {
+      console.log(`[PROXY DEBUG] [${request.method}] ${pathname}`, {
+        user: user.id,
+        purpose: request.headers.get('purpose'),
+        accept: request.headers.get('accept')?.split(',')[0],
+      });
     }
 
-    console.log(
-      '[PROXY DEBUG] Decision - hasWorkspaces:',
-      hasWorkspaces,
-      'workspaceCount:',
-      workspaceCount,
-      'firstSlug:',
-      firstSlug
-    );
+    // FETCH WORKSPACES AND SLUGS IN ONE QUERY
+    const { data: workspaces, error: workspaceError } = await supabase
+      .from('workspaces')
+      .select('id, slug, workspace_members!inner(user_id)')
+      .eq('workspace_members.user_id', user.id);
+
+    if (workspaceError) {
+      console.error('[PROXY ERROR] Workspace lookup:', workspaceError);
+    }
+
+    const userWorkspaces = workspaces || [];
+    const hasWorkspaces = userWorkspaces.length > 0;
+    const workspaceCount = userWorkspaces.length;
+    const firstSlug = hasWorkspaces ? userWorkspaces[0].slug : null;
+
+    if (!isPrefetch) {
+      console.log(`[PROXY DEBUG] Result for ${pathname}:`, {
+        hasWorkspaces,
+        workspaceCount,
+        firstSlug,
+      });
+    }
 
     // 1. NO WORKSPACES -> Must go to onboarding
     if (!hasWorkspaces && !isOnboardingRoute) {
