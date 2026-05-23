@@ -22,22 +22,24 @@ export default function Sidebar() {
   const params = useParams();
   const workspace = params.workspace as string;
 
-  const navigation = [
-    { name: 'Dashboard', href: `/${workspace}`, icon: LayoutDashboard },
-    { name: 'Entities', href: `/${workspace}/entities`, icon: Building2 },
-    { name: 'People', href: `/${workspace}/people`, icon: User },
-    {
-      name: 'Professionals',
-      href: `/${workspace}/professionals`,
-      icon: Briefcase,
-    },
-    {
-      name: 'Compliance',
-      href: `/${workspace}/compliance`,
-      icon: ShieldCheck,
-      badge: 2,
-    },
-  ];
+  const navigation = workspace
+    ? [
+        { name: 'Dashboard', href: `/${workspace}`, icon: LayoutDashboard },
+        { name: 'Entities', href: `/${workspace}/entities`, icon: Building2 },
+        { name: 'People', href: `/${workspace}/people`, icon: User },
+        {
+          name: 'Professionals',
+          href: `/${workspace}/professionals`,
+          icon: Briefcase,
+        },
+        {
+          name: 'Compliance',
+          href: `/${workspace}/compliance`,
+          icon: ShieldCheck,
+          badge: 2,
+        },
+      ]
+    : [{ name: 'Back to Workspaces', href: '/workspaces', icon: Building2 }];
   const [isCollapsed, setIsCollapsed] = useState(true); // Start collapsed to prevent flash
   const [isMobile, setIsMobile] = useState(false);
   const [isHydrated, setIsHydrated] = useState(false); // Track hydration state

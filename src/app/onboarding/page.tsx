@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   Building2,
@@ -9,166 +9,16 @@ import {
   Check,
   Sparkles,
   Lock,
-  AlertCircle,
-  Loader2,
-  X,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { FullLogo } from '@/components/ui/Logo';
+import CreateWorkspaceForm from '@/components/workspaces/CreateWorkspaceForm';
 
 type Step = 'choose' | 'create';
-type SlugStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
-
-const SLUG_REGEX = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
-const MIN_SLUG_LENGTH = 3;
-const MAX_SLUG_LENGTH = 48;
 
 export default function OnboardingPage() {
   const router = useRouter();
   const [step, setStep] = useState<Step>('choose');
-  const [orgName, setOrgName] = useState('');
-  const [orgSlug, setOrgSlug] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [slugStatus, setSlugStatus] = useState<SlugStatus>('idle');
-  const [slugMessage, setSlugMessage] = useState('');
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
-
-  const validateSlugFormat = (
-    slug: string
-  ): { valid: boolean; message: string } => {
-    if (slug.length === 0) return { valid: false, message: '' };
-    if (slug.length < MIN_SLUG_LENGTH)
-      return {
-        valid: false,
-        message: `Must be at least ${MIN_SLUG_LENGTH} characters.`,
-      };
-    if (slug.length > MAX_SLUG_LENGTH)
-      return {
-        valid: false,
-        message: `Must be ${MAX_SLUG_LENGTH} characters or fewer.`,
-      };
-    if (slug.startsWith('-') || slug.endsWith('-'))
-      return { valid: false, message: 'Cannot start or end with a hyphen.' };
-    if (slug.includes('--'))
-      return { valid: false, message: 'Cannot contain consecutive hyphens.' };
-    if (!SLUG_REGEX.test(slug))
-      return {
-        valid: false,
-        message: 'Only lowercase letters, numbers and hyphens allowed.',
-      };
-    return { valid: true, message: '' };
-  };
-
-  const checkSlugAvailability = useCallback(async (slug: string) => {
-    const { valid, message } = validateSlugFormat(slug);
-    if (!valid) {
-      setSlugStatus(message ? 'invalid' : 'idle');
-      setSlugMessage(message);
-      return;
-    }
-
-    setSlugStatus('checking');
-    setSlugMessage('');
-
-    const { data: isAvailable } = await supabase.rpc('check_slug_available', {
-      slug_to_check: slug,
-    });
-
-    if (isAvailable) {
-      setSlugStatus('available');
-      setSlugMessage('This URL is available!');
-    } else {
-      setSlugStatus('taken');
-      setSlugMessage('This URL is already taken.');
-    }
-  }, []);
-
-  const handleSlugChange = (value: string) => {
-    const cleaned = value.toLowerCase().replace(/[^a-z0-9-]/g, '');
-    setOrgSlug(cleaned);
-    setSlugStatus('idle');
-    setSlugMessage('');
-
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (cleaned.length > 0) {
-      debounceRef.current = setTimeout(
-        () => checkSlugAvailability(cleaned),
-        500
-      );
-    }
-  };
-
-  useEffect(() => {
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, []);
-
-  const handleOrgNameChange = (name: string) => {
-    setOrgName(name);
-    const slug = name
-      .toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
-    setOrgSlug(slug);
-    setSlugStatus('idle');
-    setSlugMessage('');
-
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-    if (slug.length > 0) {
-      debounceRef.current = setTimeout(() => checkSlugAvailability(slug), 500);
-    }
-  };
-
-  const handleCreateOrg = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    console.log('[DEBUG] Auth user:', user?.id, user?.email);
-
-    if (!user) {
-      router.push('/auth');
-      return;
-    }
-
-    // Also check the session to confirm JWT is being sent
-    const {
-      data: { session },
-    } = await supabase.auth.getSession();
-    console.log('[DEBUG] Session exists:', !!session);
-    console.log(
-      '[DEBUG] Access token (first 20 chars):',
-      session?.access_token?.substring(0, 20)
-    );
-
-    // Atomically create workspace and add user as admin
-    const { data: workspaceId, error: createError } = await supabase.rpc(
-      'create_workspace_with_admin',
-      {
-        workspace_name: orgName,
-        workspace_slug: orgSlug,
-      }
-    );
-
-    if (createError) {
-      setError(createError.message);
-      setIsLoading(false);
-      return;
-    }
-
-    console.log('[DEBUG] Successfully created workspace with ID:', workspaceId);
-
-    // Hard redirect to the new workspace dashboard.
-    // This bypasses the root redirect and ensures the user lands exactly where they need to be.
-    window.location.href = `/${orgSlug}`;
-  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col relative overflow-hidden font-sans">
@@ -297,128 +147,7 @@ export default function OnboardingPage() {
                 Back to options
               </button>
 
-              <div className="bg-white rounded-[2rem] shadow-xl shadow-gray-200/50 border border-gray-200 p-10 relative overflow-hidden">
-                <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-indigo-500 via-blue-500 to-indigo-500"></div>
-
-                <div className="mb-10 text-center">
-                  <div className="w-20 h-20 bg-indigo-50 rounded-3xl flex items-center justify-center mx-auto mb-6 border border-indigo-100">
-                    <Building2 className="w-10 h-10 text-indigo-600" />
-                  </div>
-                  <h2 className="text-3xl font-extrabold text-gray-900 tracking-tight">
-                    Name your workspace
-                  </h2>
-                  <p className="mt-3 text-gray-500">
-                    This is where your team will collaborate.
-                  </p>
-                </div>
-
-                <form onSubmit={handleCreateOrg} className="space-y-6">
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Organisation Name
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={orgName}
-                      onChange={(e) => handleOrgNameChange(e.target.value)}
-                      className="w-full px-5 py-4 border border-gray-200 rounded-2xl bg-gray-50/50 text-gray-900 placeholder-gray-400 focus:bg-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
-                      placeholder="e.g. Acme & Associates"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
-                      Workspace URL
-                    </label>
-                    <div
-                      className={`flex items-center border rounded-2xl overflow-hidden bg-gray-50/50 focus-within:bg-white focus-within:ring-2 transition-all ${
-                        slugStatus === 'available'
-                          ? 'border-green-300 focus-within:ring-green-500 focus-within:border-green-500'
-                          : slugStatus === 'taken' || slugStatus === 'invalid'
-                            ? 'border-red-300 focus-within:ring-red-500 focus-within:border-red-500'
-                            : 'border-gray-200 focus-within:ring-indigo-500 focus-within:border-indigo-500'
-                      }`}
-                    >
-                      <span className="px-5 py-4 text-gray-400 text-sm border-r border-gray-200 bg-gray-100 select-none font-medium">
-                        klump.app/
-                      </span>
-                      <input
-                        type="text"
-                        required
-                        value={orgSlug}
-                        onChange={(e) => handleSlugChange(e.target.value)}
-                        className="flex-1 px-5 py-4 bg-transparent outline-none text-gray-900 text-sm"
-                        placeholder="acme-associates"
-                        maxLength={MAX_SLUG_LENGTH}
-                      />
-                      {slugStatus !== 'idle' && (
-                        <div className="pr-4 flex items-center">
-                          {slugStatus === 'checking' && (
-                            <Loader2 className="w-5 h-5 text-gray-400 animate-spin" />
-                          )}
-                          {slugStatus === 'available' && (
-                            <Check className="w-5 h-5 text-green-500" />
-                          )}
-                          {slugStatus === 'taken' && (
-                            <X className="w-5 h-5 text-red-500" />
-                          )}
-                          {slugStatus === 'invalid' && (
-                            <AlertCircle className="w-5 h-5 text-red-500" />
-                          )}
-                        </div>
-                      )}
-                    </div>
-                    {slugMessage ? (
-                      <p
-                        className={`mt-2 text-xs font-medium ${
-                          slugStatus === 'available'
-                            ? 'text-green-600'
-                            : slugStatus === 'taken' || slugStatus === 'invalid'
-                              ? 'text-red-500'
-                              : 'text-gray-400'
-                        }`}
-                      >
-                        {slugMessage}
-                      </p>
-                    ) : (
-                      <p className="mt-2 text-xs font-medium text-gray-400">
-                        Lowercase letters, numbers and hyphens only.
-                      </p>
-                    )}
-                  </div>
-
-                  {error && (
-                    <div className="p-4 bg-red-50 border border-red-200 rounded-2xl text-sm font-medium text-red-600 flex items-center gap-2">
-                      <AlertCircle className="w-5 h-5 shrink-0" />
-                      {error}
-                    </div>
-                  )}
-
-                  <button
-                    type="submit"
-                    disabled={
-                      isLoading ||
-                      !orgName ||
-                      !orgSlug ||
-                      slugStatus !== 'available'
-                    }
-                    className="w-full py-4 px-6 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white font-extrabold rounded-2xl shadow-lg shadow-indigo-500/25 transition-all flex items-center justify-center gap-3 mt-4"
-                  >
-                    {isLoading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Provisioning...
-                      </>
-                    ) : (
-                      <>
-                        Create Workspace
-                        <ArrowRight className="w-5 h-5" />
-                      </>
-                    )}
-                  </button>
-                </form>
-              </div>
+              <CreateWorkspaceForm onCancel={() => setStep('choose')} />
             </div>
           )}
         </div>

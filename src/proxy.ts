@@ -86,17 +86,20 @@ export async function proxy(request: NextRequest) {
       console.error('[PROXY ERROR] Membership check:', membershipError);
 
     const workspaceIds = (membershipData || []).map((m) => m.workspace_id);
+    const hasWorkspaces = workspaceIds.length > 0;
+    const workspaceCount = workspaceIds.length;
+
     console.log('[PROXY DEBUG] User:', user.id, 'Workspace IDs:', workspaceIds);
 
     let firstSlug = null;
 
-    if (workspaceIds.length > 0) {
-      // B. Fetch the slugs for these workspaces directly to avoid join/RLS complexities
+    if (hasWorkspaces) {
+      // B. Fetch the slugs for these workspaces directly
       const { data: workspaces, error: workspaceError } = await supabase
         .from('workspaces')
         .select('slug')
         .in('id', workspaceIds)
-        .limit(1);
+        .limit(2); // We only need to know if there's more than 1
 
       if (workspaceError)
         console.error('[PROXY ERROR] Workspace lookup:', workspaceError);
@@ -106,31 +109,34 @@ export async function proxy(request: NextRequest) {
       }
     }
 
-    const hasWorkspaces = workspaceIds.length > 0;
     console.log(
       '[PROXY DEBUG] Decision - hasWorkspaces:',
       hasWorkspaces,
+      'workspaceCount:',
+      workspaceCount,
       'firstSlug:',
       firstSlug
     );
 
-    // If they have a workspace but try to access onboarding, send them to their dashboard
-    if (hasWorkspaces && isOnboardingRoute && firstSlug) {
-      return redirect(`/${firstSlug}`);
-    }
-
-    // If hitting the landing page while logged in, redirect to workspace or onboarding
-    if (isLandingRoute) {
-      if (!hasWorkspaces) {
-        return redirect('/onboarding');
-      } else if (firstSlug) {
-        return redirect(`/${firstSlug}`);
-      }
-    }
-
-    // If trying to access any internal route but they have no workspace
+    // 1. NO WORKSPACES -> Must go to onboarding
     if (!hasWorkspaces && !isOnboardingRoute) {
       return redirect('/onboarding');
+    }
+
+    // 2. HAS WORKSPACES -> Routing based on count and current path
+    if (hasWorkspaces) {
+      // If hitting the landing page while logged in, redirect to workspace or lobby
+      if (isLandingRoute) {
+        if (workspaceCount === 1 && firstSlug) {
+          return redirect(`/${firstSlug}`);
+        } else {
+          return redirect('/workspaces');
+        }
+      }
+
+      // If they try to access onboarding but they have workspaces,
+      // we let them through if they are at /onboarding (e.g. from the Lobby "Create New" button)
+      // but we redirect them from the dashboard back to selection if they are lost.
     }
   }
 

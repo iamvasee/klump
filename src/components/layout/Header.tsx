@@ -2,6 +2,7 @@
 
 import { Search } from 'lucide-react';
 import ProfileMenu from './ProfileMenu';
+import WorkspaceMenu from './WorkspaceMenu';
 
 export default function Header() {
   return (
@@ -23,6 +24,8 @@ export default function Header() {
 
         {/* Right Side - User Profile */}
         <div className="flex items-center space-x-3">
+          <WorkspaceMenu />
+          <div className="h-6 w-[1px] bg-gray-200 hidden sm:block" />
           <ProfileMenu />
         </div>
       </div>

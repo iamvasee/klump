@@ -3,16 +3,14 @@
 import {
   User,
   ChevronDown,
-  Settings,
   LogOut,
   UserCircle,
   Shield,
-  Building2,
   Loader2,
 } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter, useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 
 interface ProfileData {
@@ -21,26 +19,19 @@ interface ProfileData {
   avatar_url?: string;
 }
 
-interface WorkspaceData {
-  name: string;
-  role: string;
-}
-
 export default function ProfileMenu() {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [profile, setProfile] = useState<ProfileData | null>(null);
-  const [workspace, setWorkspace] = useState<WorkspaceData | null>(null);
   const [loading, setLoading] = useState(true);
-  
   const userMenuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const params = useParams();
-  const workspaceSlug = params.workspace as string;
 
   useEffect(() => {
     async function fetchProfileData() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
         if (!user) {
           router.push('/auth');
           return;
@@ -59,37 +50,6 @@ export default function ProfileMenu() {
           console.log('[PROFILE DEBUG] Profile data:', profileData);
           setProfile(profileData);
         }
-
-        // 2. Fetch workspace name and user's role in it
-        // We use a separate query to be absolutely sure about the workspace details
-        const { data: membershipData, error: membershipError } = await supabase
-          .from('workspace_members')
-          .select('role, workspace_id')
-          .eq('user_id', user.id)
-          .single();
-
-        if (membershipError) {
-          console.error('[PROFILE DEBUG] Membership fetch error:', membershipError);
-        } else if (membershipData) {
-          console.log('[PROFILE DEBUG] Membership data:', membershipData);
-          
-          // Now get the workspace name for this specific workspace
-          const { data: wsData, error: wsError } = await supabase
-            .from('workspaces')
-            .select('name')
-            .eq('id', membershipData.workspace_id)
-            .single();
-
-          if (wsError) {
-            console.error('[PROFILE DEBUG] Workspace fetch error:', wsError);
-          } else if (wsData) {
-            console.log('[PROFILE DEBUG] Workspace data:', wsData);
-            setWorkspace({
-              name: wsData.name,
-              role: membershipData.role,
-            });
-          }
-        }
       } catch (error) {
         console.error('[PROFILE DEBUG] Unexpected error:', error);
       } finally {
@@ -97,10 +57,8 @@ export default function ProfileMenu() {
       }
     }
 
-    if (workspaceSlug) {
-      fetchProfileData();
-    }
-  }, [workspaceSlug, router]);
+    fetchProfileData();
+  }, [router]);
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -144,7 +102,11 @@ export default function ProfileMenu() {
         <div className="w-9 h-9 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl flex items-center justify-center shadow-lg">
           {profile?.avatar_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={profile.avatar_url} alt="" className="w-full h-full rounded-xl object-cover" />
+            <img
+              src={profile.avatar_url}
+              alt=""
+              className="w-full h-full rounded-xl object-cover"
+            />
           ) : (
             <User className="h-5 w-5 text-white" />
           )}
@@ -152,9 +114,6 @@ export default function ProfileMenu() {
         <div className="hidden md:block text-left">
           <p className="text-sm font-semibold text-gray-900 truncate max-w-[120px]">
             {profile?.full_name || 'User'}
-          </p>
-          <p className="text-[10px] font-bold text-blue-600 uppercase tracking-widest leading-none mt-1">
-            {workspace?.name || 'Workspace'}
           </p>
         </div>
         <ChevronDown
@@ -175,42 +134,32 @@ export default function ProfileMenu() {
                 <p className="text-sm font-semibold text-gray-900">
                   {profile?.full_name}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{profile?.email}</p>
+                <p className="text-xs text-gray-500 truncate">
+                  {profile?.email}
+                </p>
               </div>
             </div>
           </div>
 
-          {/* Org Info */}
-          <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <Building2 className="w-4 h-4 text-gray-400" />
-              <span className="text-xs font-bold text-gray-700 uppercase tracking-wider truncate max-w-[150px]">
-                {workspace?.name}
-              </span>
-            </div>
-            <span className="px-1.5 py-0.5 bg-blue-50 text-blue-600 text-[9px] font-bold rounded uppercase">
-              {workspace?.role}
-            </span>
-          </div>
-
           {/* Menu Items */}
           <div className="py-2">
-            <button className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
-              <UserCircle className="h-4 w-4 mr-3 text-gray-400" />
-              My Profile
-            </button>
-            <Link 
-              href={`/${workspaceSlug}/settings`} 
-              onClick={() => setIsUserMenuOpen(false)} 
+            <Link
+              href="/workspaces/settings"
+              onClick={() => setIsUserMenuOpen(false)}
               className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
             >
-              <Settings className="h-4 w-4 mr-3 text-gray-400" />
-              Account Settings
+              <UserCircle className="h-4 w-4 mr-3 text-gray-400" />
+              My Profile
             </Link>
-            <button className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150">
+
+            <Link
+              href="/workspaces/settings?tab=security"
+              onClick={() => setIsUserMenuOpen(false)}
+              className="w-full flex items-center px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors duration-150"
+            >
               <Shield className="h-4 w-4 mr-3 text-gray-400" />
               Security & Privacy
-            </button>
+            </Link>
           </div>
 
           {/* Logout Button */}
